@@ -18,7 +18,7 @@ package software.plusminus.check;
 import software.plusminus.check.util.CheckUtils;
 import software.plusminus.check.util.JsonUtils;
 import software.plusminus.check.util.ResourceUtils;
-import company.plusminus.util.ObjectUtils;
+import software.plusminus.check.util.ObjectUtils;
 
 import static org.junit.Assert.assertEquals;
 

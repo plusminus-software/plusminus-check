@@ -15,7 +15,6 @@
  */
 package software.plusminus.check.util;
 
-import company.plusminus.util.ObjectUtils;
 import lombok.experimental.UtilityClass;
 
 /**

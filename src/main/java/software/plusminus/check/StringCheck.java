@@ -15,8 +15,8 @@
  */
 package software.plusminus.check;
 
-import software.plusminus.check.util.ResourceUtils;
 import lombok.AllArgsConstructor;
+import software.plusminus.util.ResourceUtils;
 
 import static org.junit.Assert.assertEquals;
 

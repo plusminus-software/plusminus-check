@@ -16,7 +16,7 @@
 package software.plusminus.check;
 
 import software.plusminus.check.util.CheckUtils;
-import software.plusminus.check.util.ResourceUtils;
+import software.plusminus.util.ResourceUtils;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -108,7 +108,7 @@ public class MapCheck<K, V> extends AbstractCheck {
     
     private Map<Object, Object> toMap(Object... keyValues) {
         Map<Object, Object> map = new HashMap<>();
-        for (int i = 0; i < keyValues.length; i = i+2) {
+        for (int i = 0; i < keyValues.length; i = i + 2) {
             map.put(keyValues[i], keyValues[i + 1]);
         }
         return map;

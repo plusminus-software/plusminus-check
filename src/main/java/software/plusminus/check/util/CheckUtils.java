@@ -16,6 +16,7 @@
 package software.plusminus.check.util;
 
 import lombok.experimental.UtilityClass;
+import software.plusminus.util.ObjectUtils;
 
 /**
  * Utility class with helper methods for checking.

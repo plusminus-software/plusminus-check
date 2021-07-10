@@ -191,17 +191,17 @@ public class ChecksTest {
         fail();
     }
 
+    private Map<Object, Object> toMap(Object... keyValues) {
+        Map<Object, Object> map = new HashMap<>();
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            map.put(keyValues[i], keyValues[i + 1]);
+        }
+        return map;
+    }
+    
     @Data
     private static class TestClass {
         private String string;
         private Integer integer;
-    }
-
-    private Map<Object, Object> toMap(Object... keyValues) {
-        Map<Object, Object> map = new HashMap<>();
-        for (int i = 0; i < keyValues.length; i = i+2) {
-            map.put(keyValues[i], keyValues[i + 1]);
-        }
-        return map;
     }
 }

@@ -49,6 +49,9 @@ public class JsonUtils {
         prettyMapper = new GsonBuilder().setPrettyPrinting().create();
     }
     
+    /* Had to suppress PMD.UselessParentheses to incease a code readability
+       https://stackoverflow.com/questions/34911230/pmd-uselessparentheses-violation */
+    @SuppressWarnings("PMD.UselessParentheses")
     public boolean isJson(String json) {
         return (json.startsWith("[") && json.endsWith("]")) 
                 || (json.startsWith("{") && json.endsWith("}"));

@@ -16,7 +16,7 @@
 package software.plusminus.check;
 
 import software.plusminus.check.util.CheckUtils;
-import software.plusminus.check.util.ResourceUtils;
+import software.plusminus.util.ResourceUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -72,7 +72,7 @@ public class CollectionCheck<T> extends AbstractCheck {
     private boolean isEqualToFirstElement(Object expected) {
         T singleElement = actual.iterator().next();
         return singleElement != null 
-                && CheckUtils.toString(singleElement).equals(CheckUtils.toString(singleElement));
+                && CheckUtils.toString(singleElement).equals(CheckUtils.toString(expected));
     }
     
     private void checkCollection(Collection<T> expected) {

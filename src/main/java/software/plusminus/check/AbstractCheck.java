@@ -15,6 +15,7 @@
  */
 package software.plusminus.check;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.plusminus.check.util.JsonUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +27,8 @@ import static org.junit.Assert.assertEquals;
  */
 public abstract class AbstractCheck {
     
-    @SuppressWarnings("checkstyle:EqualsHashCode")
+    @SuppressFBWarnings({ "EQ_UNUSUAL", "HE_EQUALS_USE_HASHCODE"})
+    @SuppressWarnings({ "checkstyle:EqualsHashCode", "PMD.OverrideBothEqualsAndHashcode" })
     @Override
     @Deprecated
     public boolean equals(Object object) {

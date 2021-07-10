@@ -17,8 +17,8 @@ package software.plusminus.check;
 
 import software.plusminus.check.util.CheckUtils;
 import software.plusminus.check.util.JsonUtils;
-import software.plusminus.check.util.ResourceUtils;
-import software.plusminus.check.util.ObjectUtils;
+import software.plusminus.util.ObjectUtils;
+import software.plusminus.util.ResourceUtils;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,7 +45,7 @@ public class ObjectCheck<T> extends AbstractCheck {
     }
     
     public void is(String expected) {
-        if (actual == expected) {
+        if (actual.equals(expected)) {
             return;
         }
         if (ResourceUtils.isResource(expected)) {

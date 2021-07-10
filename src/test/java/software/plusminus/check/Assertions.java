@@ -15,26 +15,29 @@
  */
 package software.plusminus.check;
 
-import lombok.AllArgsConstructor;
+import org.junit.ComparisonFailure;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-/**
- * Boolean primitive checker.
- *
- * @author Taras Shpek
- */
-@SuppressWarnings("PMD.UseAssertTrueInsteadOfAssertEquals")
-@AllArgsConstructor
-public class BooleanCheck extends AbstractCheck {
-    
-    private boolean actual;
-    
-    public void isTrue() {
-        assertEquals(true, actual);
+public final class Assertions {
+
+    private Assertions() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    public static void assertFail(Runnable lambda, Object actual, Object expected) {
+        try {
+            lambda.run();
+        } catch (ComparisonFailure e) {
+            assertEquals(expected, e.getExpected());
+            assertEquals(actual, e.getActual());
+            return;
+        } catch (AssertionError e) {
+            assertEquals("expected:<" + expected + "> but was:<" + actual + ">", e.getMessage());
+            return;
+        }
+        fail();
     }
     
-    public void isFalse() {
-        assertEquals(false, actual);
-    }
 }

@@ -16,15 +16,13 @@
 package software.plusminus.check;
 
 import lombok.Data;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static software.plusminus.check.Assertions.assertFail;
 
 /**
  * Main entry point tests.
@@ -41,7 +39,7 @@ public class ChecksTest {
 
     @Test
     public void integerFail() {
-        testFail(() -> Checks.check(1).is(2), 1, 2);
+        assertFail(() -> Checks.check(1).is(2), 1, 2);
     }
 
     @Test
@@ -51,7 +49,7 @@ public class ChecksTest {
 
     @Test
     public void numberListFail() {
-        testFail(() -> Checks.check(Arrays.asList(1, 2, 3)).is(1, 2, 4),
+        assertFail(() -> Checks.check(Arrays.asList(1, 2, 3)).is(1, 2, 4),
                 "[1,2,3]",
                 "[1,2,4]");
     }
@@ -63,7 +61,7 @@ public class ChecksTest {
 
     @Test
     public void stringFail() {
-        testFail(() -> Checks.check("test").is("fail"), "test", "fail");
+        assertFail(() -> Checks.check("test").is("fail"), "test", "fail");
     }
 
     @Test
@@ -75,7 +73,7 @@ public class ChecksTest {
     public void stringListFail() {
         Runnable check = () -> Checks.check(Arrays.asList("one", "two", "three"))
                 .is("one", "two", "four"); 
-        testFail(check,
+        assertFail(check,
                 "[\"one\",\"two\",\"three\"]",
                 "[\"one\",\"two\",\"four\"]");
     }
@@ -88,7 +86,7 @@ public class ChecksTest {
     @Test
     public void objectFail() {
         Runnable check = () -> Checks.check(one()).is(two());
-        testFail(check, 
+        assertFail(check, 
                 "{\n" +
                         "  \"string\": \"one\",\n" +
                         "  \"integer\": 1\n" +
@@ -107,7 +105,7 @@ public class ChecksTest {
     @Test
     public void collectionFail() {
         Runnable check = () -> Checks.check(Arrays.asList(one(), two())).is(one(), one());
-        testFail(check,
+        assertFail(check,
                 "[\n" +
                         "  {\n" +
                         "    \"string\": \"one\",\n" +
@@ -140,7 +138,7 @@ public class ChecksTest {
     public void mapFail() {
         Runnable check = () -> Checks.check(toMap("one", one(), "two", two()))
                 .is(toMap("one", one(), "two", one()));
-        testFail(check,
+        assertFail(check,
                 "{\n" +
                         "  \"one\": {\n" +
                         "    \"string\": \"one\",\n" +
@@ -175,20 +173,6 @@ public class ChecksTest {
         two.string = "two";
         two.integer = 2;
         return two;
-    }
-
-    private void testFail(Runnable runnable, Object actual, Object expected) {
-        try {
-            runnable.run();
-        } catch (ComparisonFailure e) {
-            assertEquals(expected, e.getExpected());
-            assertEquals(actual, e.getActual());
-            return;
-        } catch (AssertionError e) {
-            assertEquals("expected:<" + expected + "> but was:<" + actual + ">", e.getMessage());
-            return;
-        }
-        fail();
     }
 
     private Map<Object, Object> toMap(Object... keyValues) {

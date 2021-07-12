@@ -33,9 +33,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/plusminus-software/plusminus-parent.git</connection>
-        <developerConnection>scm:git:ssh://github.com:plusminus-software/plusminus-parent.git</developerConnection>
-        <url>https://github.com/plusminus-software/plusminus-parent/tree/main</url>
+        <connection>scm:git:git://github.com/plusminus-software/plusminus-check.git</connection>
+        <developerConnection>scm:git:ssh://github.com:plusminus-software/plusminus-check.git</developerConnection>
+        <url>https://github.com/plusminus-software/plusminus-check/tree/main</url>
     </scm>
     
     <parent>

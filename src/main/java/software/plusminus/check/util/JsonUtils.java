@@ -16,8 +16,12 @@
 package software.plusminus.check.util;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -26,6 +30,8 @@ import com.voodoodyne.jackson.jsog.JSOGGenerator;
 import lombok.experimental.UtilityClass;
 import software.plusminus.check.exception.JsonException;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,8 +49,8 @@ public class JsonUtils {
     private Gson prettyMapper;
     
     static {
-        jsonMapper = new ObjectMapper();
-        jsogMapper = new ObjectMapper();
+        jsonMapper = createObjectMapper();
+        jsogMapper = createObjectMapper();
         jsogMapper.addMixIn(Object.class, JsogMixin.class);
         prettyMapper = new GsonBuilder().setPrettyPrinting().create();
     }
@@ -90,9 +96,27 @@ public class JsonUtils {
         JsonElement je = JsonParser.parseString(json);
         return prettyMapper.toJson(je);
     }
+    
+    public String prettyAlternative(String json) {
+        try {
+            Object jsonObject = jsonMapper.readValue(json, Object.class);
+            return jsonMapper.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(jsonObject);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
+    private static ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.setDateFormat(new ISO8601DateFormat());
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return mapper;
+    }
+    
     @JsonIdentityInfo(generator = JSOGGenerator.class)
     private static class JsogMixin {
     }
-    
 }

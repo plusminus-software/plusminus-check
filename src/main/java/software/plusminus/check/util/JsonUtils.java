@@ -79,6 +79,14 @@ public class JsonUtils {
         }
     }
     
+    public <T> T fromJson(String json, Class<T> type) {
+        try {
+            return jsonMapper.readValue(json, type);
+        } catch (JsonProcessingException e) {
+            throw new JsonException(e);
+        }
+    }
+    
     public <T> List<T> fromJsonList(String json, Class<T[]> type) {
         T[] array;
         try {

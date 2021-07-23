@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.CheckReturnValue;
 
 /**
@@ -58,6 +59,10 @@ public class Checks {
 
     public <T> ObjectCheck<T> check(T actual) {
         return new ObjectCheck<>(actual);
+    }
+
+    public <T> OptionalCheck<T> check(Optional<T> actual) {
+        return new OptionalCheck<>(actual);
     }
 
     public <T> CollectionCheck<T> check(Collection<T> actual) {

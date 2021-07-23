@@ -36,8 +36,13 @@ public abstract class AbstractCheck {
     }
     
     protected void checkJson(String expected, String actual) {
-        if (!expected.equals(actual)) {
-            fail(JsonUtils.pretty(expected), JsonUtils.pretty(actual));
+        if (expected.equals(actual)) {
+            return;
+        }
+        String expectedPretty = JsonUtils.pretty(expected); 
+        String actualPretty = JsonUtils.pretty(actual);
+        if (!expectedPretty.equals(actualPretty)) {
+            fail(expectedPretty, actualPretty);
         }
     }
     

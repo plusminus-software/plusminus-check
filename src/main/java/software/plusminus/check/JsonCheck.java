@@ -16,22 +16,37 @@
 package software.plusminus.check;
 
 import lombok.AllArgsConstructor;
+import org.junit.Assert;
 import software.plusminus.check.util.JsonUtils;
 import software.plusminus.util.ResourceUtils;
+
+import java.util.function.BiConsumer;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * String checker.
+ * Json checker.
  *
  * @author Taras Shpek
  */
 @AllArgsConstructor
-public class StringCheck extends AbstractCheck {
+public class JsonCheck extends AbstractCheck {
     
     private String actual;
     
     public void is(String expected) {
+        check(expected, (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.pretty(a)));
+    }
+    
+    public void isExact(String expected) {
+        check(expected, Assert::assertEquals);
+    }
+    
+    public void isIgnoringFieldsOrder(String expected) {
+        check(expected, (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.prettyOrdered(a, e)));
+    }
+    
+    private void check(String expected, BiConsumer<String, String> checker) {
         if (expected == null) {
             throw new AssertionError("expected should not be null");
         }
@@ -41,22 +56,10 @@ public class StringCheck extends AbstractCheck {
         if (ResourceUtils.isResource(expected)) {
             expected = ResourceUtils.toString(expected);
         }
-        
-        if (JsonUtils.isJson(expected)) {
-            checkJson(expected);
-        } else {
-            assertEquals(expected, actual);
-        }
-    }
-    
-    public JsonCheck isJson() {
-        if (!JsonUtils.isJson(actual)) {
+
+        if (!JsonUtils.isJson(expected)) {
             throw new AssertionError("expected should be json");
         }
-        return new JsonCheck(actual);
-    }
-    
-    private void checkJson(String json) {
-        assertEquals(JsonUtils.pretty(json), JsonUtils.pretty(actual));
+        checker.accept(expected, actual);
     }
 }

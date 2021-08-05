@@ -70,6 +70,18 @@ public class ObjectCheck<T> extends AbstractCheck {
         assertEquals(expected, actual);
     }
     
+    public void isNull() {
+        if (actual != null) {
+            fail("is null", CheckUtils.toString(actual));
+        }
+    }
+    
+    public void isNotNull() {
+        if (actual == null) {
+            fail("is not null", "is null");
+        }
+    }
+    
     private void checkClasses(Object expected) {
         if (actual.getClass() != expected.getClass()) {
             fail("class should be " + expected.getClass().getName(),

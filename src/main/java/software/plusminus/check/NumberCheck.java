@@ -29,6 +29,10 @@ public class NumberCheck<T extends Number> extends AbstractNumberCheck {
     
     private T actual;
 
+    public void is(T expected) {
+        assertEquals(expected, actual);
+    }
+    
     public void is(String expected) {
         assertEquals(expected, actual.toString());
     }

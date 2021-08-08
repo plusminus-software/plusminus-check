@@ -21,6 +21,7 @@ import software.plusminus.util.ObjectUtils;
 import software.plusminus.util.ResourceUtils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Non-jvm classes checker.
@@ -58,7 +59,7 @@ public class ObjectCheck<T> extends AbstractCheck {
         }
     }
 
-    public void usingEqualsIs(T expected) {
+    public void isEqual(T expected) {
         if (actual == expected) {
             return;
         }
@@ -68,6 +69,10 @@ public class ObjectCheck<T> extends AbstractCheck {
                     + "Call is() method instead of usingEqualsIs()");
         }
         assertEquals(expected, actual);
+    }
+    
+    public void isSame(T expected) {
+        assertSame(expected, actual);
     }
     
     public void isNull() {

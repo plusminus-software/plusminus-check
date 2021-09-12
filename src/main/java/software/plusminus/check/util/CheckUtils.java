@@ -16,6 +16,7 @@
 package software.plusminus.check.util;
 
 import lombok.experimental.UtilityClass;
+import software.plusminus.util.ClassUtils;
 import software.plusminus.util.ObjectUtils;
 
 /**
@@ -27,7 +28,7 @@ import software.plusminus.util.ObjectUtils;
 public class CheckUtils {
     
     public String toString(Object object) {
-        if (ObjectUtils.isJvmClass(object.getClass())) {
+        if (ClassUtils.isJvmClass(object.getClass())) {
             return object.toString();
         }
         return toJson(object);

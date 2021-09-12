@@ -17,6 +17,7 @@ package software.plusminus.check;
 
 import lombok.AllArgsConstructor;
 import org.junit.Assert;
+import software.plusminus.check.util.CheckUtils;
 import software.plusminus.check.util.JsonUtils;
 import software.plusminus.util.ResourceUtils;
 
@@ -36,6 +37,10 @@ public class JsonCheck extends AbstractCheck {
     
     public void is(String expected) {
         check(expected, (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.pretty(a)));
+    }
+    
+    public void is(Object expected) {
+        is(CheckUtils.toString(expected));
     }
     
     public void isExact(String expected) {

@@ -44,6 +44,12 @@ public class CollectionCheck<T> extends AbstractCheck {
             checkElements(expected);
         }
     }
+    
+    public void contains(T expected) {
+        if (!actual.contains(expected)) {
+            fail("should contain " + expected, "does not contain in " + actual);
+        }
+    }
 
     public void hasSize(int expected) {
         if (actual.size() != expected) {

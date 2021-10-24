@@ -40,7 +40,7 @@ public class JsonCheck extends AbstractCheck {
     }
     
     public void is(Object expected) {
-        is(CheckUtils.toString(expected));
+        is(CheckUtils.toJson(expected));
     }
     
     public void isExact(String expected) {

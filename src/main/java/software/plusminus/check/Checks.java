@@ -17,6 +17,7 @@ package software.plusminus.check;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -65,6 +66,10 @@ public class Checks {
         return new OptionalCheck<>(actual);
     }
 
+    public <T> CollectionCheck<T> check(T[] actual) {
+        return new CollectionCheck<>(Arrays.asList(actual));
+    }
+    
     public <T> CollectionCheck<T> check(Collection<T> actual) {
         return new CollectionCheck<>(actual);
     }

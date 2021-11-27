@@ -18,6 +18,7 @@ package software.plusminus.check;
 import lombok.AllArgsConstructor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Non-primitive numbers checker (like BigDecimal, BigInteger etc).
@@ -35,6 +36,10 @@ public class NumberCheck<T extends Number> extends AbstractNumberCheck {
     
     public void is(String expected) {
         assertEquals(expected, actual.toString());
+    }
+    
+    public void isNot(T unexpected) {
+        assertNotEquals(unexpected, actual);
     }
     
     @Override

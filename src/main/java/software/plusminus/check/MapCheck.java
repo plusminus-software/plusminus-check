@@ -19,7 +19,6 @@ import software.plusminus.check.util.CheckUtils;
 import software.plusminus.util.ResourceUtils;
 
 import java.util.AbstractMap;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,7 +62,7 @@ public class MapCheck<K, V> extends AbstractCheck {
     }
 
     public void is(Object key, Object value) {
-        checkMap(Collections.singletonMap(key, value));
+        checkMap(key, value);
     }
 
     public void is(Object key1, Object value1, Object key2, Object value2) {

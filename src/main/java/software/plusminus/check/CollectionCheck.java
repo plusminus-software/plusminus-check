@@ -39,7 +39,7 @@ public class CollectionCheck<T> extends AbstractCheck {
 
     public void is(Object... expected) {
         if (expected.length == 1) {
-            checkSingle(expected);
+            checkSingle(expected[0]);
         } else {
             checkElements(expected);
         }

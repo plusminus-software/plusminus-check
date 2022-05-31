@@ -28,7 +28,7 @@ import software.plusminus.util.ObjectUtils;
 public class CheckUtils {
     
     public String toString(Object object) {
-        if (ClassUtils.isJvmClass(object.getClass())) {
+        if (ClassUtils.isJavaClass(object.getClass())) {
             return object.toString();
         }
         return toJson(object);

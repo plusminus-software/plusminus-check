@@ -15,7 +15,7 @@
  */
 package software.plusminus.check;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.junit.Assert;
 import software.plusminus.check.util.CheckUtils;
 import software.plusminus.check.util.JsonUtils;
@@ -30,28 +30,32 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Taras Shpek
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JsonCheck extends AbstractCheck {
     
-    private String actual;
+    private final String actual;
+    private BiConsumer<String, String> checker =
+            (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.pretty(a));
     
     public void is(String expected) {
-        check(expected, (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.pretty(a)));
+        check(expected);
     }
     
     public void is(Object expected) {
         is(CheckUtils.toJson(expected));
     }
     
-    public void isExact(String expected) {
-        check(expected, Assert::assertEquals);
+    public JsonCheck exact() {
+        checker = Assert::assertEquals;
+        return this;
     }
     
-    public void isIgnoringFieldsOrder(String expected) {
-        check(expected, (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.prettyOrdered(a, e)));
+    public JsonCheck ignoringFieldsOrder() {
+        checker = (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.prettyOrdered(a, e));
+        return this;
     }
     
-    private void check(String expected, BiConsumer<String, String> checker) {
+    private void check(String expected) {
         if (expected == null) {
             throw new AssertionError("expected should not be null");
         }

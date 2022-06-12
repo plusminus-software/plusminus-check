@@ -17,6 +17,7 @@ package software.plusminus.check;
 
 import lombok.experimental.UtilityClass;
 
+import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -56,6 +57,10 @@ public class Checks {
     
     public StringCheck check(String actual) {
         return new StringCheck(actual);
+    }
+    
+    public TemporalCheck check(Temporal actual) {
+        return new TemporalCheck(actual);
     }
 
     public <T> ObjectCheck<T> check(T actual) {

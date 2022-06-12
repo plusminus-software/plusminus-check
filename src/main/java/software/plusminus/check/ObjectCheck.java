@@ -66,7 +66,7 @@ public class ObjectCheck<T> extends AbstractCheck {
         checkClasses(expected);
         if (!ObjectUtils.equalsMethodIsOverridden(expected)) {
             fail("equals() must be overridden", "equals() is not overridden. "
-                    + "Call is() method instead of usingEqualsIs()");
+                    + "Call is() method instead of isEqual()");
         }
         assertEquals(expected, actual);
     }

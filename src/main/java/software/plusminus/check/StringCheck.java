@@ -55,6 +55,18 @@ public class StringCheck extends AbstractCheck {
         }
         return new JsonCheck(actual);
     }
+
+    public void isNull() {
+        if (actual != null) {
+            fail("is null", actual);
+        }
+    }
+
+    public void isNotNull() {
+        if (actual == null) {
+            fail("is not null", "is null");
+        }
+    }
     
     private void checkJson(String json) {
         assertEquals(JsonUtils.pretty(json), JsonUtils.pretty(actual));

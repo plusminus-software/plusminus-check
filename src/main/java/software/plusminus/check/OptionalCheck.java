@@ -48,4 +48,10 @@ public class OptionalCheck<T> extends AbstractCheck {
             new ObjectCheck<>(actual.get()).is(expected);
         }
     }
+    
+    public void isEmpty() {
+        if (actual.isPresent()) {
+            fail("empty", "not empty");
+        }
+    }
 }

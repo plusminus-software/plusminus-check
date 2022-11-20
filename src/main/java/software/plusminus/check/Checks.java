@@ -62,6 +62,10 @@ public class Checks {
     public TemporalCheck check(Temporal actual) {
         return new TemporalCheck(actual);
     }
+    
+    public <T extends Enum<T>> EnumCheck<T> check(T actual) {
+        return new EnumCheck<>(actual);
+    }
 
     public <T> ObjectCheck<T> check(T actual) {
         return new ObjectCheck<>(actual);

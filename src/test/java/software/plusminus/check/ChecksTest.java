@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static software.plusminus.check.Assertions.assertFail;
 
 /**
@@ -76,6 +77,18 @@ public class ChecksTest {
         assertFail(check,
                 "[\"one\",\"two\",\"three\"]",
                 "[\"one\",\"two\",\"four\"]");
+    }
+    
+    @Test
+    public void enumSuccess() {
+        Checks.check(TestEnum.ONE).is(TestEnum.ONE);
+    }
+    
+    @Test
+    public void enumFail() {
+        Runnable check = () -> Checks.check(TestEnum.ONE)
+                .is(TestEnum.TWO);
+        assertFail(check, "ONE", "TWO");
     }
 
     @Test

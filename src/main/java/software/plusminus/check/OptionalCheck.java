@@ -54,4 +54,10 @@ public class OptionalCheck<T> extends AbstractCheck {
             fail("empty", "not empty");
         }
     }
+    
+    public void isPresent() {
+        if (!actual.isPresent()) {
+            fail("not empty", "empty");
+        }
+    }
 }

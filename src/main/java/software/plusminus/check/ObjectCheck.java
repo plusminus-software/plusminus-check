@@ -87,6 +87,14 @@ public class ObjectCheck<T> extends AbstractCheck {
         }
     }
     
+    public <X> ObjectCheck<X> as(Class<X> expectedType) {
+        if (!expectedType.isAssignableFrom(actual.getClass())) {
+            fail("actual object should be an instance of " + expectedType.getName() + " class",
+                    "class of the actual object is " + actual.getClass().getName());
+        }
+        return new ObjectCheck<>(expectedType.cast(actual));
+    }
+    
     private void checkClasses(Object expected) {
         if (actual.getClass() != expected.getClass()) {
             fail("class should be " + expected.getClass().getName(),

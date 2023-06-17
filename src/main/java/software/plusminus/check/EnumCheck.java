@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Optional checker.
+ * Enum checker.
  *
  * @author Taras Shpek
  */
@@ -31,5 +31,9 @@ public class EnumCheck<T extends Enum<T>> {
     
     public void is(T expected) {
         assertEquals(expected, actual);
+    }
+
+    public void is(String expected) {
+        assertEquals(actual.name(), expected);
     }
 }

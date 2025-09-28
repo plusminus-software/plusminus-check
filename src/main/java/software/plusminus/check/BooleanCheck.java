@@ -37,4 +37,8 @@ public class BooleanCheck extends AbstractCheck {
     public void isFalse() {
         assertEquals(false, actual);
     }
+
+    public void is(boolean expected) {
+        assertEquals(expected, actual);
+    }
 }

@@ -96,6 +96,9 @@ public class CollectionCheck<T> extends AbstractCheck {
     private List<?> expectedList(Object... expected) {
         return Stream.of(expected)
                 .map(e -> {
+                    if (e == null) {
+                        return null;
+                    }
                     if (e.getClass() == String.class) {
                         String expectedString = (String) e;
                         if (ResourceUtils.isResource(expectedString)) {

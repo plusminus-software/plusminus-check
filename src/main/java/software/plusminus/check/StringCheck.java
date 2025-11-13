@@ -15,6 +15,7 @@
  */
 package software.plusminus.check;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
 import software.plusminus.check.util.JsonUtils;
 import software.plusminus.util.ResourceUtils;
@@ -30,10 +31,12 @@ import static org.junit.Assert.assertEquals;
 public class StringCheck extends AbstractCheck {
     
     private String actual;
-    
+
+    @SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE")
     public void is(String expected) {
         if (expected == null) {
-            throw new AssertionError("expected should not be null");
+            assertEquals(expected, actual);
+            return;
         }
         if (actual.equals(expected)) {
             return;

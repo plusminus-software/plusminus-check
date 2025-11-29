@@ -63,6 +63,12 @@ public class CollectionCheck<T> extends AbstractCheck {
         }
     }
 
+    public void isNotEmpty() {
+        if (actual.isEmpty()) {
+            fail("to not be empty", "contains " + actual.size() + " elements");
+        }
+    }
+
     private void checkSingle(Object expected) {
         if (actual.size() == 1 && isEqualToFirstElement(expected)) {
             return;

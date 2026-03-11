@@ -4,13 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>software.plusminus</groupId>
+    <parent>
+        <groupId>software.plusminus</groupId>
+        <artifactId>plusminus-parent</artifactId>
+        <version>1.4-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
     <artifactId>plusminus-check</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>Plusminus Check</name>
     <description>Rich test assertions for Java</description>
     <url>https://github.com/plusminus-software/plusminus-check</url>
+
+    <scm>
+        <url>https://github.com/plusminus-software/plusminus-check</url>
+        <connection>scm:git:https://github.com/plusminus-software/plusminus-check.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/plusminus-software/plusminus-check.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/plusminus-software/plusminus-check/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/plusminus-software/plusminus-check/actions</url>
+    </ciManagement>
 
     <licenses>
         <license>
@@ -31,18 +54,6 @@
             <timezone>Europe/Kyiv</timezone>
         </developer>
     </developers>
-
-    <scm>
-        <connection>scm:git:git://github.com/plusminus-software/plusminus-check.git</connection>
-        <developerConnection>scm:git:ssh://github.com:plusminus-software/plusminus-check.git</developerConnection>
-        <url>https://github.com/plusminus-software/plusminus-check/tree/main</url>
-    </scm>
-    
-    <parent>
-        <groupId>software.plusminus</groupId>
-        <artifactId>plusminus-parent</artifactId>
-        <version>1.4-SNAPSHOT</version>
-    </parent>
 
     <dependencies>
         <dependency>
@@ -70,7 +81,6 @@
             <artifactId>gson</artifactId>
             <version>2.8.6</version>
         </dependency>
-        <!-- Tests dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -84,7 +94,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>

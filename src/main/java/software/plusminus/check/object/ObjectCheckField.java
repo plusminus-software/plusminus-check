@@ -57,6 +57,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import javax.annotation.CheckReturnValue;
 
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @CheckReturnValue
 public interface ObjectCheckField<T> {
 
@@ -81,7 +82,8 @@ public interface ObjectCheckField<T> {
         return fieldOf(getter, BooleanCheck::new);
     }
 
-    default LinkedCheck<Character, PrimitiveCharacterCheck, ObjectCheck<T>> fieldOf(PrimitiveCharacterGetter<T> getter) {
+    default LinkedCheck<Character, PrimitiveCharacterCheck, ObjectCheck<T>> fieldOf(
+            PrimitiveCharacterGetter<T> getter) {
         return fieldOf(getter, getter::apply, PrimitiveCharacterCheck::new);
     }
 
@@ -105,7 +107,8 @@ public interface ObjectCheckField<T> {
         return fieldOf(getter, NumberCheck::new);
     }
 
-    default LinkedCheck<Integer, PrimitiveNumberCheck<Integer>, ObjectCheck<T>> fieldOf(PrimitiveIntegerGetter<T> getter) {
+    default LinkedCheck<Integer, PrimitiveNumberCheck<Integer>, ObjectCheck<T>> fieldOf(
+            PrimitiveIntegerGetter<T> getter) {
         return fieldOf(getter, getter::apply, PrimitiveNumberCheck::new);
     }
 
@@ -133,7 +136,8 @@ public interface ObjectCheckField<T> {
         return fieldOf(getter, DecimalCheck::new);
     }
 
-    default LinkedCheck<Double, PrimitiveDecimalCheck<Double>, ObjectCheck<T>> fieldOf(PrimitiveDoubleGetter<T> getter) {
+    default LinkedCheck<Double, PrimitiveDecimalCheck<Double>, ObjectCheck<T>> fieldOf(
+            PrimitiveDoubleGetter<T> getter) {
         return fieldOf(getter, getter::apply, PrimitiveDecimalCheck::new);
     }
 
@@ -160,8 +164,8 @@ public interface ObjectCheckField<T> {
         return fieldOf(getter, (v, l) -> new OrderedCollectionCheck<>(v, l, elementCheckBuilder));
     }
 
-    default <E> LinkedCheck<SortedSet<E>, OrderedCollectionCheck<E, SortedSet<E>, ObjectCheck<E>>, ObjectCheck<T>> fieldOf(
-            SortedSetGetter<T, E> getter) {
+    default <E> LinkedCheck<SortedSet<E>, OrderedCollectionCheck<E, SortedSet<E>, ObjectCheck<E>>, ObjectCheck<T>>
+            fieldOf(SortedSetGetter<T, E> getter) {
         return fieldOf(getter, OrderedCollectionCheck::create);
     }
 

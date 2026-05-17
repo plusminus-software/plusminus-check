@@ -44,21 +44,6 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
         this.elementCheck = elementCheck;
     }
 
-    @Override
-    public void isEqual(C expected) {
-        super.isEqual(expected);
-    }
-
-    @Override
-    public void isType(C expected) {
-        super.isType(expected);
-    }
-
-    @Override
-    public void isType(Class<?> expectedType) {
-        super.isType(expectedType);
-    }
-
     public void isEmpty() {
         isNotNull();
         if (!actual().isEmpty()) {
@@ -149,7 +134,7 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
             Iterator<Object> expectedElementsIterator = expectedElements.iterator();
             while (expectedElementsIterator.hasNext()) {
                 Object expectedElement = expectedElementsIterator.next();
-                if (contains(actualElement, expectedElement)) {
+                if (matches(actualElement, expectedElement)) {
                     actualElementsIterator.remove();
                     expectedElementsIterator.remove();
                 }
@@ -157,7 +142,7 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
         }
     }
 
-    private boolean contains(T element, Object value) {
+    private boolean matches(T element, Object value) {
         if (value instanceof String) {
             return predicate(element, levels(), ObjectCheck::new, check -> check.isString(value.toString()));
         }

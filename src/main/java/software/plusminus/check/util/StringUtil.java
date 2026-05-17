@@ -18,6 +18,18 @@ public class StringUtil {
         if (object == null) {
             return "null";
         }
+        String string = tryStringify(object, checkResource);
+        if (string != null) {
+            return string;
+        }
+        if (TypeUtil.isSimpleType(object)) {
+            return object.toString();
+        }
+        return JsonUtil.pretty(JsonUtil.toJson(object));
+    }
+
+    @Nullable
+    private String tryStringify(Object object, boolean checkResource) {
         if (object instanceof CharSequence) {
             String string = object.toString();
             if (checkResource && ResourceUtils.isResource(string)) {
@@ -44,9 +56,6 @@ public class StringUtil {
                 return "empty";
             }
         }
-        if (TypeUtil.isSimpleType(object)) {
-            return object.toString();
-        }
-        return JsonUtil.pretty(JsonUtil.toJson(object));
+        return null;
     }
 }

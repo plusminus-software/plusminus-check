@@ -42,6 +42,7 @@ public abstract class AbstractCheck<T> implements Check<T> {
     }
 
     /**
+     * Not supported on checks.
      * @deprecated equals() and hashCode() must not be called on checks
      */
     @Override
@@ -51,6 +52,7 @@ public abstract class AbstractCheck<T> implements Check<T> {
     }
 
     /**
+     * Not supported on checks.
      * @deprecated equals() and hashCode() must not be called on checks
      */
     @Override
@@ -167,6 +169,7 @@ public abstract class AbstractCheck<T> implements Check<T> {
         fail(actual, expected);
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     protected void fail(@Nullable Object actual, @Nullable Object expected) {
         String message = String.format(MESSAGE_PATTERN,
                 String.join(" -> ", levels) + (levels.isEmpty() ? "" : " "),

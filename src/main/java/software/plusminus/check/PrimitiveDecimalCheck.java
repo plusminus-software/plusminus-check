@@ -24,6 +24,7 @@ public class PrimitiveDecimalCheck<T extends Number> extends PrimitiveNumberChec
         return this;
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public PrimitiveDecimalCheck<T> limitScale(int scale) {
         this.scale.limit(scale);
         return this;

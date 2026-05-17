@@ -30,25 +30,15 @@ public class OrderedCollectionCheck<T, C extends Collection<T>, E extends Abstra
         return this;
     }
 
-    @Override
-    public void is(C expected) {
-        super.is(expected);
-    }
-
-    @Override
-    public void is(String expected) {
-        super.is(expected);
+    @SafeVarargs
+    public final void is(T... expected) {
+        isLike(Arrays.asList(expected));
     }
 
     @Override
     public OrderedCollectionCheck<T, C, E> contains(Object... expectedElements) {
         super.contains(expectedElements);
         return this;
-    }
-
-    @SafeVarargs
-    public final void is(T... expected) {
-        isLike(Arrays.asList(expected));
     }
 
     public static <T, C extends Collection<T>> OrderedCollectionCheck<T, C, ObjectCheck<T>> create(C actual) {

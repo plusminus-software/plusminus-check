@@ -15,6 +15,7 @@ public class LinkedCheck<T, C extends AbstractCheck<T>, P extends AbstractCheck<
         return previous;
     }
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public P is(Consumer<C> check) {
         check.accept(this.check);
         return previous;

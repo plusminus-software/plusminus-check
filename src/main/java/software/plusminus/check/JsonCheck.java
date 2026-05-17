@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("java:S2160")
 @CheckReturnValue
-public class JsonCheck extends AbstractObjectCheck<String> {
+public class JsonCheck extends AbstractCheck<String> {
 
     private Set<String> separatelyCheckedFields = new HashSet<>();
     private boolean ignoreFieldsOrder;
@@ -74,11 +74,6 @@ public class JsonCheck extends AbstractObjectCheck<String> {
         ObjectCheck<?> objectCheck = new ObjectCheck<>(value);
         fieldValueChecker.accept(objectCheck);
         return this;
-    }
-
-    @Override
-    public void isEqual(String expected) {
-        super.isEqual(expected);
     }
 
     public JsonCheck ignoringFieldsOrder() {

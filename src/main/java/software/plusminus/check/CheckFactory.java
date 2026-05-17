@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.SortedSet;
 import javax.annotation.CheckReturnValue;
 
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:ClassFanOutComplexity"})
 @CheckReturnValue
 public class CheckFactory {
 

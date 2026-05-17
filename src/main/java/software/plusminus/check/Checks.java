@@ -19,15 +19,15 @@ import javax.annotation.CheckReturnValue;
  *
  * @author Taras Shpek
  */
-@SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:ClassFanOutComplexity"})
 @CheckReturnValue
 @UtilityClass
 public class Checks {
 
     private CheckFactory factory = new CheckFactory();
 
-    public void factory(CheckFactory factory) {
-        Checks.factory = factory;
+    public void factory(CheckFactory checkFactory) {
+        Checks.factory = checkFactory;
     }
 
     public PrimitiveBooleanCheck check(boolean actual) {

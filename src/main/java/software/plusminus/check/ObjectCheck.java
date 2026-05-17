@@ -34,18 +34,10 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
     }
 
     @Override
-    public void isEqual(T expected) {
-        super.isEqual(expected);
-    }
-
-    @Override
-    public void isType(T expected) {
-        super.isType(expected);
-    }
-
-    @Override
-    public void isType(Class<?> expectedType) {
-        super.isType(expectedType);
+    public <X, C extends AbstractCheck<X>> C isType(Class<X> type,
+                                                    BiFunction<X, List<String>, C> checkBuilder) {
+        checkInstanceOf(type);
+        return checkBuilder.apply(type.cast(actual()), levels());
     }
 
     public <X> ObjectCheck<X> isInstanceOf(Class<X> expectedType) {
@@ -76,13 +68,6 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
         Object value = ObjectUtils.readField(actual, fieldName);
         checkedFields.add(fieldName);
         return new LinkedCheck<>(new ObjectCheck<>((X) value, levels()), this);
-    }
-
-    @Override
-    public <X, C extends AbstractCheck<X>> C isType(Class<X> type,
-                                                    BiFunction<X, List<String>, C> checkBuilder) {
-        checkInstanceOf(type);
-        return checkBuilder.apply(type.cast(actual()), levels());
     }
 
     @Override

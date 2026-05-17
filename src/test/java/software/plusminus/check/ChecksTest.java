@@ -31,7 +31,7 @@ import static software.plusminus.check.helper.Assertions.assertFail;
  *
  * @author Taras Shpek
  */
-@SuppressWarnings("java:S2699")
+@SuppressWarnings({"java:S2699", "checkstyle:OperatorWrap"})
 public class ChecksTest {
 
     @Test

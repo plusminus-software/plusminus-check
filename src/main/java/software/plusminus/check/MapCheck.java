@@ -39,21 +39,6 @@ public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
         super(actual, levels);
     }
 
-    @Override
-    public void isEqual(Map<K, V> expected) {
-        super.isEqual(expected);
-    }
-
-    @Override
-    public void isType(Map<K, V> expected) {
-        super.isType(expected);
-    }
-
-    @Override
-    public void isType(Class<?> expectedType) {
-        super.isType(expectedType);
-    }
-
     public void isEmpty() {
         isNotNull();
         if (!actual().isEmpty()) {

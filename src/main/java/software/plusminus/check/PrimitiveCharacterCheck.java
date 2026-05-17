@@ -13,6 +13,7 @@ public class PrimitiveCharacterCheck extends AbstractCheck<Character> {
         super(actual, levels);
     }
 
+    @SuppressWarnings("PMD.UselessOverridingMethod")
     public void is(char expected) {
         super.is(expected);
     }

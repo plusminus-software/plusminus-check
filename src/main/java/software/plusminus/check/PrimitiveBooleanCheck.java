@@ -14,6 +14,7 @@ public class PrimitiveBooleanCheck extends AbstractCheck<Boolean> {
         super(actual, levels);
     }
 
+    @SuppressWarnings("PMD.UselessOverridingMethod")
     public void is(boolean expected) {
         super.is(expected);
     }

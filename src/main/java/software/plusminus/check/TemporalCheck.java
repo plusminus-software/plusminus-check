@@ -15,50 +15,37 @@
  */
 package software.plusminus.check;
 
-import lombok.RequiredArgsConstructor;
-
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.Temporal;
+import java.util.List;
+import javax.annotation.Nullable;
 
-import static org.junit.Assert.assertEquals;
+public class TemporalCheck<T extends Temporal> extends AbstractObjectCheck<T> {
 
-/**
- * Temporal checker.
- *
- * @author Taras Shpek
- */
-@RequiredArgsConstructor
-public class TemporalCheck extends AbstractCheck {
-    
-    private final Temporal actual;
-    
-    public void is(Temporal expected) {
-        if (expected == null) {
-            throw new AssertionError("expected should not be null");
-        }
-        if (actual.equals(expected)) {
-            return;
-        }
-        assertEquals(expected, actual);
+    public TemporalCheck(@Nullable T actual) {
+        super(actual);
     }
 
-    public void recent() {
-        recent(1000);
+    public TemporalCheck(@Nullable T actual, List<String> levels) {
+        super(actual, levels);
+    }
+
+    public void isRecent() {
+        isRecent(Duration.ofSeconds(1));
     }
     
-    public void recent(long recentLimitInMillis) {
+    public void isRecent(Duration duration) {
+        isNotNull();
         Instant now = Instant.now();
+        Temporal actual = actual();
         Instant actualInstant = Instant.from(actual);
-        if (actualInstant.equals(now)) {
-            return;
-        }
         if (actualInstant.isAfter(now)) {
-            fail("Expected that " + actual + " is recent",
-                    "Is after the current moment");
+            fail(actual + " is after now", actual + " is recent");
         }
-        if (actualInstant.isBefore(now.minusMillis(recentLimitInMillis))) {
-            fail("Expected that " + actual + " is recent",
-                    "Is more than " + recentLimitInMillis + " milliseconds before the current moment");
+        if (actualInstant.isBefore(now.minus(duration))) {
+            fail(actual + " is more than " + duration + " before now",
+                    actual + " is recent");
         }
     }
 }

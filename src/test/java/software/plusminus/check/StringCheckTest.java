@@ -17,15 +17,11 @@ package software.plusminus.check;
 
 import org.junit.Test;
 
-/**
- * String checker test.
- *
- * @author Taras Shpek
- */
+@SuppressWarnings("java:S2699")
 public class StringCheckTest {
     
     @Test
-    public void successWithResource() throws Exception {
+    public void successWithResource() {
         new StringCheck("One").is("one.txt");
     }
 

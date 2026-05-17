@@ -15,87 +15,86 @@
  */
 package software.plusminus.check;
 
-import lombok.RequiredArgsConstructor;
-import org.junit.Assert;
-import software.plusminus.check.util.CheckUtils;
-import software.plusminus.check.util.JsonUtils;
-import software.plusminus.util.ResourceUtils;
+import software.plusminus.check.util.JsonUtil;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import static org.junit.Assert.assertEquals;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nullable;
 
 /**
  * Json checker.
  *
  * @author Taras Shpek
  */
-@RequiredArgsConstructor
-public class JsonCheck extends AbstractCheck {
-    
-    private final String actual;
-    private BiConsumer<String, String> checker =
-            (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.pretty(a));
+@SuppressWarnings("java:S2160")
+@CheckReturnValue
+public class JsonCheck extends AbstractObjectCheck<String> {
+
     private Set<String> separatelyCheckedFields = new HashSet<>();
-    
+    private boolean ignoreFieldsOrder;
+
+    protected JsonCheck(@Nullable String actual) {
+        super(actual);
+        assertJson(actual);
+    }
+
+    protected JsonCheck(@Nullable String actual, List<String> levels) {
+        super(actual, levels);
+        assertJson(actual);
+    }
+
+    @Override
     public void is(String expected) {
-        check(expected);
+        if (expected == null) {
+            fail(null);
+        }
+        String actual = actual();
+        if (!separatelyCheckedFields.isEmpty()) {
+            actual = replaceSeparatelyCheckedFields(actual);
+            expected = replaceSeparatelyCheckedFields(expected);
+        }
+        actual = JsonUtil.pretty(actual);
+        expected = ignoreFieldsOrder ? JsonUtil.prettyOrdered(expected, actual) : JsonUtil.pretty(actual);
+        if (!actual.equals(expected)) {
+            fail(actual, expected);
+        }
     }
     
-    public void is(Object expected) {
-        is(CheckUtils.toJson(expected));
-    }
-    
-    public JsonCheck checkField(String fieldName, Consumer<Object> fieldValueChecker) {
+    public JsonCheck hasField(String fieldName, Consumer<ObjectCheck<?>> fieldValueChecker) {
         separatelyCheckedFields.add(fieldName);
-        Map actualMap = JsonUtils.fromJson(actual, Map.class);
+        Map<Object, Object> actualMap = JsonUtil.fromJson(actual(), Map.class);
         if (!actualMap.containsKey(fieldName)) {
             fail("Field " + fieldName + " is present", "Field " + fieldName + " is missed");
         }
-        fieldValueChecker.accept(actualMap.get(fieldName));
+        Object value = actualMap.get(fieldName);
+        ObjectCheck<?> objectCheck = new ObjectCheck<>(value);
+        fieldValueChecker.accept(objectCheck);
         return this;
     }
-    
-    public JsonCheck exact() {
-        checker = Assert::assertEquals;
-        return this;
-    }
-    
-    public JsonCheck ignoringFieldsOrder() {
-        checker = (e, a) -> assertEquals(JsonUtils.pretty(e), JsonUtils.prettyOrdered(a, e));
-        return this;
-    }
-    
-    private void check(String expected) {
-        if (expected == null) {
-            throw new AssertionError("expected should not be null");
-        }
-        if (actual.equals(expected)) {
-            return;
-        }
-        if (ResourceUtils.isResource(expected)) {
-            expected = ResourceUtils.toString(expected);
-        }
 
-        if (!JsonUtils.isJson(expected)) {
-            throw new AssertionError("expected should be json");
-        }
-        
-        if (!separatelyCheckedFields.isEmpty()) {
-            checker.accept(replaceSeparatelyCheckedFields(expected),
-                    replaceSeparatelyCheckedFields(actual));
-        } else {
-            checker.accept(expected, actual);
-        }
+    @Override
+    public void isEqual(String expected) {
+        super.isEqual(expected);
+    }
+
+    public JsonCheck ignoringFieldsOrder() {
+        this.ignoreFieldsOrder = true;
+        return this;
     }
     
     private String replaceSeparatelyCheckedFields(String json) {
-        Map jsonMap = JsonUtils.fromJson(json, Map.class);
+        Map<Object, Object> jsonMap = JsonUtil.fromJson(json, Map.class);
         separatelyCheckedFields.forEach(field -> jsonMap.put(field, "SEPARATELY CHECKED"));
-        return JsonUtils.toJson(jsonMap);
+        return JsonUtil.toJson(jsonMap);
+    }
+
+    private void assertJson(String actual) {
+        if (actual == null || JsonUtil.isJson(actual)) {
+            fail("is json");
+        }
     }
 }

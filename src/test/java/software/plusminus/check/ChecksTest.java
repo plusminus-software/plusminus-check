@@ -17,19 +17,21 @@ package software.plusminus.check;
 
 import lombok.Data;
 import org.junit.Test;
+import software.plusminus.check.fixtures.TestEnum;
+import software.plusminus.check.util.JsonUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static software.plusminus.check.Assertions.assertFail;
+import static software.plusminus.check.helper.Assertions.assertFail;
 
 /**
  * Main entry point tests.
  *
  * @author Taras Shpek
  */
-@SuppressWarnings("checkstyle:OperatorWrap")
+@SuppressWarnings("java:S2699")
 public class ChecksTest {
 
     @Test
@@ -50,8 +52,8 @@ public class ChecksTest {
     @Test
     public void numberListFail() {
         assertFail(() -> Checks.check(Arrays.asList(1, 2, 3)).is(1, 2, 4),
-                "[1,2,3]",
-                "[1,2,4]");
+                JsonUtil.pretty("[1,2,3]"),
+                JsonUtil.pretty("[1,2,4]"));
     }
 
     @Test
@@ -72,10 +74,10 @@ public class ChecksTest {
     @Test
     public void stringListFail() {
         Runnable check = () -> Checks.check(Arrays.asList("one", "two", "three"))
-                .is("one", "two", "four"); 
+                .is("one", "two", "four");
         assertFail(check,
-                "[\"one\",\"two\",\"three\"]",
-                "[\"one\",\"two\",\"four\"]");
+                JsonUtil.pretty("[\"one\",\"two\",\"three\"]"),
+                JsonUtil.pretty("[\"one\",\"two\",\"four\"]"));
     }
     
     @Test

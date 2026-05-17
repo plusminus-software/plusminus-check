@@ -1,104 +1,128 @@
-/*
- * Copyright 2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package software.plusminus.check;
 
-import software.plusminus.check.util.CheckUtils;
-import software.plusminus.check.util.JsonUtils;
-import software.plusminus.util.ObjectUtils;
-import software.plusminus.util.ResourceUtils;
+import software.plusminus.check.getter.AbstractGetter;
+import software.plusminus.check.object.ObjectCheckField;
+import software.plusminus.check.object.ObjectCheckType;
+import software.plusminus.check.util.FieldCoverage;
+import software.plusminus.check.util.ObjectUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import javax.annotation.CheckReturnValue;
 
-/**
- * Non-jvm classes checker.
- * Converts object to string (in Json or Jsog formats) before comparing. 
- *
- * @author Taras Shpek
- */
-public class ObjectCheck<T> extends AbstractCheck {
+@SuppressWarnings({"unchecked", "java:S2160"})
+@CheckReturnValue
+public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectCheckType, ObjectCheckField<T> {
 
-    private T actual;
-
+    private List<Field> checkedFields;
+    
     public ObjectCheck(T actual) {
-        this.actual = actual;
+        super(actual);
+        this.checkedFields = new ArrayList<>();
     }
 
-    public void is(T expected) {
-        if (actual == expected) {
-            return;
-        }
-        checkClasses(expected);
-        checkJson(CheckUtils.toString(expected), CheckUtils.toString(actual));
-    }
-    
-    public void is(String expected) {
-        if (actual.equals(expected)) {
-            return;
-        }
-        if (ResourceUtils.isResource(expected)) {
-            expected = ResourceUtils.toString(expected);
-        }
-        if (JsonUtils.isJson(expected)) {
-            checkJson(expected, CheckUtils.toString(actual));
-        } else {
-            assertEquals(expected, actual.toString());
-        }
+    public ObjectCheck(T actual, List<String> levels) {
+        super(actual, levels);
+        this.checkedFields = new ArrayList<>();
     }
 
+    @Override
     public void isEqual(T expected) {
-        if (actual == expected) {
+        super.isEqual(expected);
+    }
+
+    @Override
+    public void isType(T expected) {
+        super.isType(expected);
+    }
+
+    @Override
+    public void isType(Class<?> expectedType) {
+        super.isType(expectedType);
+    }
+
+    public <X> ObjectCheck<X> isInstanceOf(Class<X> expectedType) {
+        checkInstanceOf(expectedType);
+        return new ObjectCheck<>(expectedType.cast(actual()));
+    }
+
+    @Override
+    public void allFieldsChecked(FieldCoverage coverage) {
+        if (actual() == null) {
+            throw new AssertionError("Cannot verify checked fields: actual is null");
+        }
+        Class<?> clazz = actual().getClass();
+        Set<String> required = new TreeSet<>(ObjectUtils.declaredFieldNames(clazz));
+        if (coverage == FieldCoverage.WITH_GETTERS_ONLY) {
+            required.removeIf(name -> !ObjectUtils.hasGetter(clazz, name));
+        }
+        required.removeIf(name -> checkedFields.stream()
+                .anyMatch(field -> field.getName().equals(name)));
+        if (!required.isEmpty()) {
+            fail("there are not checked fields: " + required, "all fields were checked");
+        }
+    }
+
+    @Override
+    public <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(String fieldName) {
+        isNotNull();
+        T actual = actual();
+        Field field = ObjectUtils.findField(actual.getClass(), fieldName);
+        Object value = ObjectUtils.readField(actual, fieldName);
+        checkedFields.add(field);
+        return new LinkedCheck<>(new ObjectCheck<>((X) value, levels()), this);
+    }
+
+    @Override
+    public <X, C extends AbstractCheck<X>> C isType(Class<X> type,
+                                                    BiFunction<X, List<String>, C> checkBuilder) {
+        checkInstanceOf(type);
+        return checkBuilder.apply(type.cast(actual()), levels());
+    }
+
+    @Override
+    public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> fieldOf(
+            AbstractGetter<T, V> getter,
+            BiFunction<V, List<String>, C> checkBuilder) {
+        isNotNull();
+        V value = getter.apply(actual());
+        C check = checkBuilder.apply(value, levels(getter));
+        return new LinkedCheck<>(check, this);
+    }
+
+    @Override
+    public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> fieldOf(
+            Serializable getter,
+            Function<T, V> valueProvider,
+            BiFunction<V, List<String>, C> checkBuilder) {
+        isNotNull();
+        V value = valueProvider.apply(actual());
+        C check = checkBuilder.apply(value, levels(getter));
+        return new LinkedCheck<>(check, this);
+    }
+
+    private List<String> levels(Serializable getter) {
+        Field field = ObjectUtils.toField(getter);
+        checkedFields.add(field);
+        List<String> levels = new ArrayList<>(levels());
+        levels.add("." + field.getName());
+        return levels;
+    }
+
+    private void checkInstanceOf(Class<?> expectedType) {
+        T actual = actual();
+        if (actual == null) {
             return;
         }
-        checkClasses(expected);
-        if (!ObjectUtils.equalsMethodIsOverridden(expected)) {
-            fail("equals() must be overridden", "equals() is not overridden. "
-                    + "Call is() method instead of isEqual()");
-        }
-        assertEquals(expected, actual);
-    }
-    
-    public void isSame(T expected) {
-        assertSame(expected, actual);
-    }
-    
-    public void isNull() {
-        if (actual != null) {
-            fail("is null", CheckUtils.toString(actual));
-        }
-    }
-    
-    public void isNotNull() {
-        if (actual == null) {
-            fail("is not null", "is null");
-        }
-    }
-    
-    public <X> ObjectCheck<X> as(Class<X> expectedType) {
         if (!expectedType.isAssignableFrom(actual.getClass())) {
-            fail("actual object should be an instance of " + expectedType.getName() + " class",
-                    "class of the actual object is " + actual.getClass().getName());
-        }
-        return new ObjectCheck<>(expectedType.cast(actual));
-    }
-    
-    private void checkClasses(Object expected) {
-        if (actual.getClass() != expected.getClass()) {
-            fail("class should be " + expected.getClass().getName(),
-                    "class is " + actual.getClass().getName());
+            fail("class of the object is " + actual.getClass().getName(),
+                    "class of the object is an instance of " + expectedType.getName());
         }
     }
 }

@@ -3,13 +3,13 @@ package software.plusminus.check;
 import java.util.List;
 import javax.annotation.Nullable;
 
-public class BooleanCheck extends PrimitiveBooleanCheck {
+public class CharacterCheck extends PrimitiveCharacterCheck {
 
-    public BooleanCheck(@Nullable Boolean actual) {
+    public CharacterCheck(@Nullable Character actual) {
         super(actual);
     }
 
-    public BooleanCheck(@Nullable Boolean actual, List<String> levels) {
+    public CharacterCheck(@Nullable Character actual, List<String> levels) {
         super(actual, levels);
     }
 

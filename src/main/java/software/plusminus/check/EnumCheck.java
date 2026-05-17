@@ -15,25 +15,26 @@
  */
 package software.plusminus.check;
 
-import lombok.AllArgsConstructor;
+import java.util.List;
+import javax.annotation.Nullable;
 
-import static org.junit.Assert.assertEquals;
+public class EnumCheck<E extends Enum<E>> extends AbstractCheck<E> {
 
-/**
- * Enum checker.
- *
- * @author Taras Shpek
- */
-@AllArgsConstructor
-public class EnumCheck<T extends Enum<T>> {
-    
-    private T actual;
-    
-    public void is(T expected) {
-        assertEquals(expected, actual);
+    public EnumCheck(@Nullable E actual) {
+        super(actual);
     }
 
-    public void is(String expected) {
-        assertEquals(actual.name(), expected);
+    public EnumCheck(@Nullable E actual, List<String> levels) {
+        super(actual, levels);
+    }
+
+    @Override
+    public void isNull() {
+        super.isNull();
+    }
+
+    @Override
+    public void isNotNull() {
+        super.isNotNull();
     }
 }

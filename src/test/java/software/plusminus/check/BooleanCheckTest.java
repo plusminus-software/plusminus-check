@@ -17,8 +17,9 @@ package software.plusminus.check;
 
 import org.junit.Test;
 
-import static software.plusminus.check.Assertions.assertFail;
+import static software.plusminus.check.helper.Assertions.assertFail;
 
+@SuppressWarnings("java:S2699")
 public class BooleanCheckTest {
     
     @Test

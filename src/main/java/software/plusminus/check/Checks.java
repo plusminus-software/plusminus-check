@@ -1,27 +1,16 @@
-/*
- * Copyright 2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package software.plusminus.check;
 
 import lombok.experimental.UtilityClass;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.temporal.Temporal;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedSet;
 import javax.annotation.CheckReturnValue;
 
 /**
@@ -34,57 +23,122 @@ import javax.annotation.CheckReturnValue;
 @CheckReturnValue
 @UtilityClass
 public class Checks {
-    
-    public BooleanCheck check(boolean actual) {
-        return new BooleanCheck(actual);
-    }
-    
-    public IntegerCheck check(int actual) {
-        return new IntegerCheck(actual);
-    }
-    
-    public LongCheck check(long actual) {
-        return new LongCheck(actual);
-    }
-    
-    public DoubleCheck check(double actual) {
-        return new DoubleCheck(actual);
+
+    private CheckFactory factory = new CheckFactory();
+
+    public void factory(CheckFactory factory) {
+        Checks.factory = factory;
     }
 
-    public <T extends Number> NumberCheck<T> check(T actual) {
-        return new NumberCheck<>(actual);
+    public PrimitiveBooleanCheck check(boolean actual) {
+        return factory.build(actual);
     }
-    
+
+    public BooleanCheck check(Boolean actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveCharacterCheck check(char actual) {
+        return factory.build(actual);
+    }
+
+    public CharacterCheck check(Character actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveNumberCheck<Byte> check(byte actual) {
+        return factory.build(actual);
+    }
+
+    public NumberCheck<Byte> check(Byte actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveNumberCheck<Short> check(short actual) {
+        return factory.build(actual);
+    }
+
+    public NumberCheck<Short> check(Short actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveNumberCheck<Integer> check(int actual) {
+        return factory.build(actual);
+    }
+
+    public NumberCheck<Integer> check(Integer actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveNumberCheck<Long> check(long actual) {
+        return factory.build(actual);
+    }
+
+    public NumberCheck<Long> check(Long actual) {
+        return factory.build(actual);
+    }
+
+    public NumberCheck<BigInteger> check(BigInteger actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveDecimalCheck<Float> check(float actual) {
+        return factory.build(actual);
+    }
+
+    public DecimalCheck<Float> check(Float actual) {
+        return factory.build(actual);
+    }
+
+    public PrimitiveDecimalCheck<Double> check(double actual) {
+        return factory.build(actual);
+    }
+
+    public DecimalCheck<Double> check(Double actual) {
+        return factory.build(actual);
+    }
+
+    public DecimalCheck<BigDecimal> check(BigDecimal actual) {
+        return factory.build(actual);
+    }
+
     public StringCheck check(String actual) {
-        return new StringCheck(actual);
-    }
-    
-    public TemporalCheck check(Temporal actual) {
-        return new TemporalCheck(actual);
-    }
-    
-    public <T extends Enum<T>> EnumCheck<T> check(T actual) {
-        return new EnumCheck<>(actual);
+        return factory.build(actual);
     }
 
-    public <T> ObjectCheck<T> check(T actual) {
-        return new ObjectCheck<>(actual);
+    public <T extends Temporal> TemporalCheck<T> check(T actual) {
+        return factory.build(actual);
     }
 
     public <T> OptionalCheck<T> check(Optional<T> actual) {
-        return new OptionalCheck<>(actual);
+        return factory.build(actual);
     }
 
-    public <T> CollectionCheck<T> check(T[] actual) {
-        return new CollectionCheck<>(Arrays.asList(actual));
+    public <T> CollectionCheck<T, Collection<T>, ObjectCheck<T>> check(Collection<T> actual) {
+        return factory.build(actual);
     }
-    
-    public <T> CollectionCheck<T> check(Collection<T> actual) {
-        return new CollectionCheck<>(actual);
+
+    public <T> OrderedCollectionCheck<T, List<T>, ObjectCheck<T>> check(List<T> actual) {
+        return factory.build(actual);
     }
-    
+
+    public <T> OrderedCollectionCheck<T, SortedSet<T>, ObjectCheck<T>> check(SortedSet<T> actual) {
+        return factory.build(actual);
+    }
+
+    public <T> OrderedCollectionCheck<T, Deque<T>, ObjectCheck<T>> check(Deque<T> actual) {
+        return factory.build(actual);
+    }
+
     public <K, V> MapCheck<K, V> check(Map<K, V> actual) {
-        return new MapCheck<>(actual);
+        return factory.build(actual);
     }
-    
+
+    public <E extends Enum<E>> EnumCheck<E> check(E actual) {
+        return factory.build(actual);
+    }
+
+    public <T> ObjectCheck<T> check(T actual) {
+        return factory.build(actual);
+    }
 }

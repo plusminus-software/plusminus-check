@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,7 +30,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.voodoodyne.jackson.jsog.JSOGGenerator;
 import lombok.experimental.UtilityClass;
-import software.plusminus.check.exception.JsonException;
+import software.plusminus.util.ObjectUtils;
 import software.plusminus.util.ResourceUtils;
 import software.plusminus.util.StreamUtils;
 
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 @UtilityClass
-public class JsonUtils {
+public class JsonUtil {
 
     private ObjectMapper jsonMapper;
     private ObjectMapper jsogMapper;
@@ -71,17 +72,12 @@ public class JsonUtils {
     
     public String toJson(Object object) {
         try {
+            if (ObjectUtils.containsCircularReferences(object)) {
+                return toJsog(object);
+            }
             return jsonMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
-        }
-    }
-    
-    public String toJsog(Object object) {
-        try {
-            return jsogMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            throw new IllegalArgumentException(e);
         }
     }
     
@@ -90,31 +86,31 @@ public class JsonUtils {
             json = readJson(json);
             return jsonMapper.readValue(json, type);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            throw new IllegalArgumentException(e);
         }
     }
-    
+
     public <T> List<T> fromJsonList(String json, Class<T[]> type) {
         T[] array;
         try {
             json = readJson(json);
             array = jsonMapper.readValue(json, type);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            throw new IllegalArgumentException(e);
         }
         return Arrays.asList(array);
     }
-    
+
     public String pretty(String json) {
-        if (!json.contains("{")) {
+        if (!isJson(json)) {
             return json;
         }
         JsonElement jsonElement = JsonParser.parseString(json);
         return prettyMapper.toJson(jsonElement);
     }
-    
+
     public String prettyOrdered(String targetJson, String baseJson) {
-        if (!targetJson.contains("{")) {
+        if (!isJson(targetJson)) {
             return targetJson;
         }
         JsonElement baseJsonElement = JsonParser.parseString(baseJson);
@@ -125,7 +121,7 @@ public class JsonUtils {
         }
         return prettyMapper.toJson(targetJsonElement);
     }
-    
+
     public String prettyAlternative(String json) {
         try {
             Object jsonObject = jsonMapper.readValue(json, Object.class);
@@ -145,12 +141,20 @@ public class JsonUtils {
         }
         throw new AssertionError("Unknown json: " + json);
     }
-    
+
+    private String toJsog(Object object) {
+        try {
+            return jsogMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     private ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        mapper.setDateFormat(new ISO8601DateFormat());
+        mapper.setDateFormat(new StdDateFormat());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return mapper;
     }

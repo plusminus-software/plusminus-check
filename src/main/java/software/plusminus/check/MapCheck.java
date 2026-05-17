@@ -15,73 +15,92 @@
  */
 package software.plusminus.check;
 
-import software.plusminus.check.util.CheckUtils;
 import software.plusminus.util.ResourceUtils;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
  * Map (including HashMap, TreeMap etc) checker.
- * Converts Map to to string (in Json or Jsog formats) before comparing.
+ * Converts Map to string (in Json or Jsog formats) before comparing.
  *
  * @author Taras Shpek
  */
 @SuppressWarnings("checkstyle:ParameterNumber")
-public class MapCheck<K, V> extends AbstractCheck {
+public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
 
-    private Map<K, V> actual;
-
-    public MapCheck(Map<K, V> actual) {
-        this.actual = actual;
+    public MapCheck(@Nullable Map<K, V> actual) {
+        super(actual);
     }
 
-    public void hasSize(int expected) {
-        if (actual.size() != expected) {
-            fail("size is " + expected, "size is " + actual.size());
-        }
+    public MapCheck(@Nullable Map<K, V> actual, List<String> levels) {
+        super(actual, levels);
+    }
+
+    @Override
+    public void isEqual(Map<K, V> expected) {
+        super.isEqual(expected);
+    }
+
+    @Override
+    public void isType(Map<K, V> expected) {
+        super.isType(expected);
+    }
+
+    @Override
+    public void isType(Class<?> expectedType) {
+        super.isType(expectedType);
     }
 
     public void isEmpty() {
-        if (!actual.isEmpty()) {
-            fail("to be empty", "contains " + actual.size() + " elements");
+        isNotNull();
+        if (!actual().isEmpty()) {
+            fail("contains " + actual().size() + " elements", "empty");
         }
-    }
-    
-    public void is(Map<K, V> expected) {
-        checkJson(CheckUtils.toJson(expected), CheckUtils.toJson(actual));
-    }
-    
-    public void is(String expected) {
-        if (ResourceUtils.isResource(expected)) {
-            expected = ResourceUtils.toString(expected);
-        }
-        checkJson(expected, CheckUtils.toJson(actual));
     }
 
-    public void is(Object key, Object value) {
+    public MapCheck<K, V> isNotEmpty() {
+        isNotNull();
+        if (actual().isEmpty()) {
+            fail("empty", "not empty");
+        }
+        return this;
+    }
+
+    public MapCheck<K, V> hasSize(int expectedSize) {
+        isNotNull();
+        if (actual().size() != expectedSize) {
+            fail("size is " + actual().size(), "size is " + expectedSize);
+        }
+        return this;
+    }
+
+    public void is(K key, V value) {
         checkMap(key, value);
     }
 
-    public void is(Object key1, Object value1, Object key2, Object value2) {
+    public void is(K key1, V value1, K key2, V value2) {
         checkMap(key1, value1, key2, value2);
     }
 
-    public void is(Object key1, Object value1, Object key2, Object value2, Object key3, Object value3) {
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3) {
         checkMap(key1, value1, key2, value2, key3, value3);
     }
 
-    public void is(Object key1, Object value1, Object key2, Object value2, Object key3, Object value3,
-                   Object key4, Object value4) {
+    @SuppressWarnings("java:S107")
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4) {
         checkMap(key1, value1, key2, value2, key3, value3, key4, value4);
     }
 
     private void checkMap(Object... expectedKeyValues) {
         Map<Object, Object> expected = toMap(expectedKeyValues);
         expected = prepareExpectedMap(expected);
-        checkJson(CheckUtils.toJson(prepareExpectedMap(expected)), CheckUtils.toJson(actual));
+        isLike(expected);
     }
 
     private Map<Object, Object> prepareExpectedMap(Map<Object, Object> expected) {
@@ -93,7 +112,6 @@ public class MapCheck<K, V> extends AbstractCheck {
                             e = new AbstractMap.SimpleEntry<>(ResourceUtils.toString(keyString), e.getValue());
                         }
                     }
-                    
                     if (e.getValue().getClass() == String.class) {
                         String valueString = (String) e.getKey();
                         if (ResourceUtils.isResource(valueString)) {
@@ -104,7 +122,7 @@ public class MapCheck<K, V> extends AbstractCheck {
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
-    
+
     private Map<Object, Object> toMap(Object... keyValues) {
         Map<Object, Object> map = new HashMap<>();
         for (int i = 0; i < keyValues.length; i = i + 2) {
@@ -112,5 +130,4 @@ public class MapCheck<K, V> extends AbstractCheck {
         }
         return map;
     }
-
 }

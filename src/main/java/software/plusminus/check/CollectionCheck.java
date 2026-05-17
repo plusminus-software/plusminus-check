@@ -15,104 +15,161 @@
  */
 package software.plusminus.check;
 
-import software.plusminus.check.util.CheckUtils;
-import software.plusminus.util.ResourceUtils;
+import software.plusminus.check.util.StringUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nullable;
 
-/**
- * Collection (including implementations of List, Set etc) checker. 
- * Converts Collection to string (in Json or Jsog formats) before comparing.
- *
- * @author Taras Shpek
- */
-public class CollectionCheck<T> extends AbstractCheck {
-    
-    private Collection<T> actual;
+@SuppressWarnings("java:S2160")
+@CheckReturnValue
+public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
+        extends AbstractObjectCheck<C> {
 
-    public CollectionCheck(Collection<T> actual) {
-        this.actual = actual;
+    private BiFunction<T, List<String>, E> elementCheck;
+
+    public CollectionCheck(@Nullable C actual, BiFunction<T, List<String>, E> elementCheck) {
+        super(actual);
+        this.elementCheck = elementCheck;
     }
 
-    public void is(Object... expected) {
-        if (expected.length == 1) {
-            checkSingle(expected[0]);
-        } else {
-            checkElements(expected);
-        }
-    }
-    
-    public void contains(T expected) {
-        if (!actual.contains(expected)) {
-            fail("should contain " + expected, "does not contain in " + actual);
-        }
+    public CollectionCheck(@Nullable C actual, List<String> levels, BiFunction<T, List<String>, E> elementCheck) {
+        super(actual, levels);
+        this.elementCheck = elementCheck;
     }
 
-    public void hasSize(int expected) {
-        if (actual.size() != expected) {
-            fail("size is " + expected, "size is " + actual.size());
-        }
+    @Override
+    public void isEqual(C expected) {
+        super.isEqual(expected);
     }
-    
+
+    @Override
+    public void isType(C expected) {
+        super.isType(expected);
+    }
+
+    @Override
+    public void isType(Class<?> expectedType) {
+        super.isType(expectedType);
+    }
+
     public void isEmpty() {
-        if (!actual.isEmpty()) {
-            fail("to be empty", "contains " + actual.size() + " elements");
+        isNotNull();
+        if (!actual().isEmpty()) {
+            fail("not empty", "empty");
         }
     }
 
-    public void isNotEmpty() {
-        if (actual.isEmpty()) {
-            fail("to not be empty", "contains " + actual.size() + " elements");
+    public CollectionCheck<T, C, E> isNotEmpty() {
+        isNotNull();
+        if (actual().isEmpty()) {
+            fail("empty", "not empty");
+        }
+        return this;
+    }
+
+    public CollectionCheck<T, C, E> hasSize(int expectedSize) {
+        isNotNull();
+        if (actual().size() != expectedSize) {
+            fail("size is " + actual().size(), "size is " + expectedSize);
+        }
+        return this;
+    }
+
+    public CollectionCheck<T, C, E> contains(Object... expectedElements) {
+        isNotNull();
+        List<T> actualElements = new ArrayList<>(actual());
+        List<Object> expectedElementList = new ArrayList<>(Arrays.asList(expectedElements));
+        removeIntersections(actualElements, expectedElementList);
+        if (!expectedElementList.isEmpty()) {
+            fail("does not contain " + StringUtil.toString(expectedElementList), "contains all elements");
+        }
+        return this;
+    }
+
+    public void containsExactly(Object... expectedElements) {
+        isNotNull();
+        List<T> actualElements = new ArrayList<>(actual());
+        List<Object> expectedElementList = new ArrayList<>(Arrays.asList(expectedElements));
+        removeIntersections(actualElements, expectedElementList);
+        if (!expectedElementList.isEmpty() || !actualElements.isEmpty()) {
+            String missedElements = expectedElementList.isEmpty()
+                    ? null
+                    : "does not contain: " + StringUtil.toString(expectedElementList);
+            String unexpectedElements = actualElements.isEmpty()
+                    ? null
+                    : "contains unexpected elements: " + StringUtil.toString(actualElements);
+            String actualMessage;
+            if (missedElements != null && unexpectedElements == null) {
+                actualMessage = missedElements;
+            } else if (missedElements == null && unexpectedElements != null) {
+                actualMessage = unexpectedElements;
+            } else {
+                actualMessage = missedElements + "\nbut " + unexpectedElements;
+            }
+            fail(actualMessage, "contains exactly elements");
         }
     }
 
-    private void checkSingle(Object expected) {
-        if (actual.size() == 1 && isEqualToFirstElement(expected)) {
-            return;
-        } else if (Collection.class.isAssignableFrom(expected.getClass())) {
-            checkCollection((Collection) expected);
-        } else if (expected.getClass() == String.class) {
-            checkString((String) expected);
-        } else {
-            checkElements(expected);
+    @SafeVarargs
+    public final CollectionCheck<T, C, E> contains(Consumer<E>... elementChecks) {
+        isNotNull();
+        List<T> actualElements = new ArrayList<>(actual());
+        List<Consumer<E>> remainingChecks = new ArrayList<>(Arrays.asList(elementChecks));
+        Iterator<Consumer<E>> checkIterator = remainingChecks.iterator();
+        while (checkIterator.hasNext()) {
+            Consumer<E> check = checkIterator.next();
+            Iterator<T> elementIterator = actualElements.iterator();
+            while (elementIterator.hasNext()) {
+                T element = elementIterator.next();
+                if (predicate(element, levels(), elementCheck, check)) {
+                    elementIterator.remove();
+                    checkIterator.remove();
+                    break;
+                }
+            }
+        }
+        if (!remainingChecks.isEmpty()) {
+            fail("does not contain " + remainingChecks.size() + " matching element(s)",
+                    "contains elements matching all checks");
+        }
+        return this;
+    }
+
+    private void removeIntersections(List<T> actualElements, List<Object> expectedElements) {
+        Iterator<T> actualElementsIterator = actualElements.iterator();
+        while (actualElementsIterator.hasNext()) {
+            T actualElement = actualElementsIterator.next();
+            Iterator<Object> expectedElementsIterator = expectedElements.iterator();
+            while (expectedElementsIterator.hasNext()) {
+                Object expectedElement = expectedElementsIterator.next();
+                if (contains(actualElement, expectedElement)) {
+                    actualElementsIterator.remove();
+                    expectedElementsIterator.remove();
+                }
+            }
         }
     }
 
-    private boolean isEqualToFirstElement(Object expected) {
-        T singleElement = actual.iterator().next();
-        return singleElement != null 
-                && CheckUtils.toString(singleElement).equals(CheckUtils.toString(expected));
-    }
-    
-    private void checkCollection(Collection<T> expected) {
-        new ObjectCheck<>(actual).is(expected);
+    private boolean contains(T element, Object value) {
+        if (value instanceof String) {
+            return predicate(element, levels(), ObjectCheck::new, check -> check.isString(value.toString()));
+        }
+        return predicate(element, levels(), ObjectCheck::new, check -> check.isLike(value));
     }
 
-    private void checkString(String expected) {
-        new ObjectCheck<>(actual).is(expected);
+    public static <T, C extends Collection<T>> CollectionCheck<T, C, ObjectCheck<T>> create(C actual) {
+        return new CollectionCheck<>(actual, ObjectCheck::new);
     }
 
-    private void checkElements(Object... expected) {
-        checkJson(CheckUtils.toJson(expectedList(expected)), CheckUtils.toJson(actual));
-    }
-    
-    private List<?> expectedList(Object... expected) {
-        return Stream.of(expected)
-                .map(e -> {
-                    if (e == null) {
-                        return null;
-                    }
-                    if (e.getClass() == String.class) {
-                        String expectedString = (String) e;
-                        if (ResourceUtils.isResource(expectedString)) {
-                            return ResourceUtils.toString(expectedString);
-                        }
-                    }
-                    return e;
-                })
-                .collect(Collectors.toList());
+    public static <T, C extends Collection<T>> CollectionCheck<T, C, ObjectCheck<T>> create(
+            C actual, List<String> levels) {
+        return new CollectionCheck<>(actual, levels, ObjectCheck::new);
     }
 }

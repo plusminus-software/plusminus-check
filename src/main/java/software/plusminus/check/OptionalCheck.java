@@ -15,49 +15,34 @@
  */
 package software.plusminus.check;
 
-import lombok.AllArgsConstructor;
-
+import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
-/**
- * Optional checker.
- *
- * @author Taras Shpek
- */
-@AllArgsConstructor
-public class OptionalCheck<T> extends AbstractCheck {
-    
-    private Optional<T> actual;
-    
-    public void is(Optional<T> expected) {
-        if (!actual.isPresent() && !expected.isPresent()) {
-            return;
-        } else if (!actual.isPresent() && expected.isPresent()) {
-            fail("not empty", "empty");
-        } else if (actual.isPresent() && !expected.isPresent()) {
-            fail("to be empty", "not empty");
-        } else {
-            new ObjectCheck<>(actual.get()).is(expected.get());
-        }
+@SuppressWarnings("java:S2789")
+public class OptionalCheck<T> extends AbstractObjectCheck<Optional<T>> {
+
+    public OptionalCheck(@Nullable Optional<T> actual) {
+        super(actual);
     }
-    
-    public void is(T expected) {
-        if (!actual.isPresent()) {
-            fail("not empty", "empty");
-        } else {
-            new ObjectCheck<>(actual.get()).is(expected);
-        }
+
+    public OptionalCheck(@Nullable Optional<T> actual, List<String> levels) {
+        super(actual, levels);
     }
-    
+
     public void isEmpty() {
-        if (actual.isPresent()) {
+        isNotNull();
+        if (actual().isPresent()) {
+            fail("not empty", "empty");
+        }
+    }
+
+    public ObjectCheck<T> isNotEmpty() {
+        isNotNull();
+        Optional<T> actual = actual();
+        if (!actual.isPresent()) {
             fail("empty", "not empty");
         }
-    }
-    
-    public void isPresent() {
-        if (!actual.isPresent()) {
-            fail("not empty", "empty");
-        }
+        return new ObjectCheck<>(actual.get());
     }
 }

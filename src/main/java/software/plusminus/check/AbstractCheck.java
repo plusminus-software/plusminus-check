@@ -1,55 +1,216 @@
-/*
- * Copyright 2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package software.plusminus.check;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import software.plusminus.check.util.JsonUtils;
+import software.plusminus.check.util.JsonUtil;
+import software.plusminus.check.util.StringUtil;
+import software.plusminus.check.util.TypeUtil;
+import software.plusminus.util.ResourceUtils;
 
-import static org.junit.Assert.assertEquals;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
-/**
- * Base class for all checkers.
- *
- * @author Taras Shpek
- */
-public abstract class AbstractCheck {
-    
-    @SuppressFBWarnings({ "EQ_UNUSUAL", "HE_EQUALS_USE_HASHCODE"})
-    @SuppressWarnings({ "checkstyle:EqualsHashCode", "PMD.OverrideBothEqualsAndHashcode" })
+public abstract class AbstractCheck<T> implements Check<T> {
+
+    private static final String MESSAGE_PATTERN = "%sexpected:<%s> but was:<%s>";
+    public static final String EMPTY = "empty";
+    public static final String NOT_EMPTY = "not empty";
+
+    @Nullable
+    private T actual;
+    private List<String> levels;
+
+    protected AbstractCheck(@Nullable T actual) {
+        this(actual, Collections.emptyList());
+    }
+
+    protected AbstractCheck(@Nullable T actual, List<String> levels) {
+        this.actual = actual;
+        this.levels = levels;
+    }
+
+    public void is(T expected) {
+        if (TypeUtil.isSimpleType(actual)) {
+            check(expected, this::checkNull, this::checkType, this::checkEquals);
+            return;
+        }
+        check(expected, this::checkNull, this::checkType, this::checkEmpty, this::checkEquals,
+                this::checkJson);
+    }
+
+    /**
+     * @deprecated equals() and hashCode() must not be called on checks
+     */
     @Override
     @Deprecated
     public boolean equals(Object object) {
-        throw new UnsupportedOperationException("Method 'equals' is not supported. Maybe you intended to call 'is'?");
+        throw new UnsupportedOperationException("Method equals() is not supported. Did you mean is()?");
     }
-    
-    protected void checkJson(String expected, String actual) {
-        if (expected.equals(actual)) {
+
+    /**
+     * @deprecated equals() and hashCode() must not be called on checks
+     */
+    @Override
+    @Deprecated
+    public int hashCode() {
+        throw new UnsupportedOperationException("Method hashCode() is not supported.");
+    }
+
+    protected void isString(String expected) {
+        if (TypeUtil.isSimpleType(actual)) {
+            check(expected, this::checkNull, this::checkType, this::checkEquals);
             return;
         }
-        String expectedPretty = JsonUtils.pretty(expected); 
-        String actualPretty = JsonUtils.pretty(actual);
-        if (!expectedPretty.equals(actualPretty)) {
-            fail(expectedPretty, actualPretty);
+        check(expected, this::checkNull, this::checkType, this::checkEmpty, this::checkEquals,
+                this::checkJson, this::checkResource);
+    }
+
+    protected void isLike(Object expected) {
+        check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson);
+    }
+
+    protected void isNull() {
+        if (actual != null) {
+            fail(actual, null);
         }
     }
-    
-    protected void fail(String expected, String actual) {
-        if (expected.equals(actual)) {
-            throw new IllegalArgumentException("Expected and actual strings should not be equal");
+
+    protected void isNotNull() {
+        if (actual == null) {
+            fail(actual, "not null");
         }
-        assertEquals(expected, actual);
+    }
+
+    protected void isEqual(T expected) {
+        check(expected, this::checkNull, this::checkType, this::checkEquals);
+    }
+
+    protected void isSame(T expected) {
+        if (actual != expected) {
+            fail("same as " + StringUtil.toString(expected));
+        }
+    }
+
+    protected void isType(T expected) {
+        checkType(expected);
+    }
+
+    protected void isType(Class<?> expectedType) {
+        Class<?> actualType = actual.getClass();
+        if (actualType != expectedType) {
+            fail(actualType, expectedType);
+        }
+    }
+
+    protected T actual() {
+        return actual;
+    }
+
+    protected List<String> levels() {
+        return levels;
+    }
+
+    @SafeVarargs
+    protected final void check(Object expected, Predicate<Object>... checks) {
+        for (Predicate<Object> check : checks) {
+            boolean completed = check.test(expected);
+            if (completed) {
+                return;
+            }
+        }
+        fail(StringUtil.toString(actual), StringUtil.toString(expected));
+    }
+
+    protected boolean checkNull(Object expected) {
+        if (actual == null && expected == null) {
+            return true;
+        }
+        if (actual == null || expected == null) {
+            fail(expected);
+        }
+        return false;
+    }
+
+    protected boolean checkEquals(Object expected) {
+        return Objects.equals(actual, expected);
+    }
+
+    protected boolean checkType(Object expected) {
+        isType(expected.getClass());
+        return false;
+    }
+
+    protected boolean checkEmpty(Object expected) {
+        if (actual instanceof Optional && expected instanceof Optional) {
+            return checkEmptyOptional(expected);
+        }
+        if (actual instanceof Collection && expected instanceof Collection) {
+            return checkEmptyCollection(expected);
+        }
+        return false;
+    }
+
+    protected boolean checkJson(Object expected) {
+        String actualJson = StringUtil.toString(actual);
+        String expectedJson = StringUtil.toString(expected);
+        return actualJson.equals(expectedJson);
+    }
+
+    protected boolean checkResource(Object expected) {
+        if (!(expected instanceof String)) {
+            return false;
+        }
+        String expectedString = expected.toString();
+        if (!ResourceUtils.isResource(expectedString)) {
+            return false;
+        }
+        String actualString = JsonUtil.pretty(StringUtil.toString(actual));
+        expectedString = JsonUtil.pretty(ResourceUtils.toString(expectedString));
+        return actualString.equals(expectedString);
+    }
+
+    protected void fail(@Nullable Object expected) {
+        fail(actual, expected);
+    }
+
+    protected void fail(@Nullable Object actual, @Nullable Object expected) {
+        String message = String.format(MESSAGE_PATTERN,
+                String.join(" -> ", levels) + (levels.isEmpty() ? "" : " "),
+                StringUtil.toString(expected, true),
+                StringUtil.toString(actual));
+        throw new AssertionError(message);
+    }
+
+    private boolean checkEmptyOptional(Object expected) {
+        Optional<?> actualOptional = (Optional<?>) actual;
+        Optional<?> expectedOptional = (Optional<?>) expected;
+        if (!actualOptional.isPresent() && !expectedOptional.isPresent()) {
+            return true;
+        }
+        if (!actualOptional.isPresent()) {
+            fail(EMPTY, NOT_EMPTY);
+        }
+        if (!expectedOptional.isPresent()) {
+            fail(NOT_EMPTY, EMPTY);
+        }
+        return false;
+    }
+
+    private boolean checkEmptyCollection(Object expected) {
+        Collection<?> actualCollection = (Collection<?>) actual;
+        Collection<?> expectedCollection = (Collection<?>) expected;
+        if (actualCollection.isEmpty() && expectedCollection.isEmpty()) {
+            return true;
+        }
+        if (actualCollection.isEmpty()) {
+            fail(EMPTY, NOT_EMPTY);
+        }
+        if (expectedCollection.isEmpty()) {
+            fail(NOT_EMPTY, EMPTY);
+        }
+        return false;
     }
 }

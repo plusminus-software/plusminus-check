@@ -1,5 +1,7 @@
 package software.plusminus.check;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -55,8 +57,21 @@ public class PrimitiveNumberCheck<T extends Number> extends AbstractCheck<T> {
         if (checkNull(expected)) {
             return;
         }
-        if (actual().doubleValue() != expected.doubleValue()) {
+        if (toBigDecimal(actual()).compareTo(toBigDecimal(expected)) != 0) {
             fail(expected);
         }
+    }
+
+    private BigDecimal toBigDecimal(Number number) {
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+        if (number instanceof BigInteger) {
+            return new BigDecimal((BigInteger) number);
+        }
+        if (number instanceof Double || number instanceof Float) {
+            return new BigDecimal(number.toString());
+        }
+        return BigDecimal.valueOf(number.longValue());
     }
 }

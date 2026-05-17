@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
@@ -34,8 +33,6 @@ import software.plusminus.util.ObjectUtils;
 import software.plusminus.util.ResourceUtils;
 import software.plusminus.util.StreamUtils;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -120,16 +117,6 @@ public class JsonUtil {
                     baseJsonElement.getAsJsonObject());
         }
         return prettyMapper.toJson(targetJsonElement);
-    }
-
-    public String prettyAlternative(String json) {
-        try {
-            Object jsonObject = jsonMapper.readValue(json, Object.class);
-            return jsonMapper.writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(jsonObject);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
     public String readJson(String json) {

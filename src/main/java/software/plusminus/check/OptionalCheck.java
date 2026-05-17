@@ -37,12 +37,13 @@ public class OptionalCheck<T> extends AbstractObjectCheck<Optional<T>> {
         }
     }
 
+    @SuppressWarnings("java:S3655")
     public ObjectCheck<T> isNotEmpty() {
         isNotNull();
         Optional<T> actual = actual();
         if (!actual.isPresent()) {
             fail("empty", "not empty");
         }
-        return new ObjectCheck<>(actual.get());
+        return new ObjectCheck<>(actual.get(), levels());
     }
 }

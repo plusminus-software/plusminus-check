@@ -19,9 +19,8 @@ public class AbstractObjectCheck<T> extends AbstractCheck<T> {
         super.isString(expected);
     }
 
-    @Override
     public void isLike(Object expected) {
-        super.isLike(expected);
+        check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson);
     }
 
     @Override
@@ -34,9 +33,21 @@ public class AbstractObjectCheck<T> extends AbstractCheck<T> {
         super.isNotNull();
     }
 
+    public void isEqual(T expected) {
+        check(expected, this::checkNull, this::checkType, this::checkEquals);
+    }
+
     @Override
     public void isSame(T expected) {
         super.isSame(expected);
+    }
+
+    public void isType(T expected) {
+        checkType(expected);
+    }
+
+    public void isType(Class<?> expectedType) {
+        checkType(expectedType);
     }
 
     protected <O, C extends AbstractCheck<O>> boolean predicate(O object,

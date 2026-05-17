@@ -17,11 +17,9 @@ package software.plusminus.check;
 
 import software.plusminus.util.ResourceUtils;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -104,27 +102,25 @@ public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
     }
 
     private Map<Object, Object> prepareExpectedMap(Map<Object, Object> expected) {
-        return expected.entrySet().stream()
-                .map(e -> {
-                    if (e.getKey().getClass() == String.class) {
-                        String keyString = (String) e.getKey();
-                        if (ResourceUtils.isResource(keyString)) {
-                            e = new AbstractMap.SimpleEntry<>(ResourceUtils.toString(keyString), e.getValue());
-                        }
-                    }
-                    if (e.getValue().getClass() == String.class) {
-                        String valueString = (String) e.getKey();
-                        if (ResourceUtils.isResource(valueString)) {
-                            e = new AbstractMap.SimpleEntry<>(e.getKey(), ResourceUtils.toString(valueString));
-                        }
-                    }
-                    return e;
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<Object, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<Object, Object> e : expected.entrySet()) {
+            result.put(resolveResource(e.getKey()), resolveResource(e.getValue()));
+        }
+        return result;
+    }
+
+    private Object resolveResource(Object value) {
+        if (value instanceof String) {
+            String string = (String) value;
+            if (ResourceUtils.isResource(string)) {
+                return ResourceUtils.toString(string);
+            }
+        }
+        return value;
     }
 
     private Map<Object, Object> toMap(Object... keyValues) {
-        Map<Object, Object> map = new HashMap<>();
+        Map<Object, Object> map = new LinkedHashMap<>();
         for (int i = 0; i < keyValues.length; i = i + 2) {
             map.put(keyValues[i], keyValues[i + 1]);
         }

@@ -16,10 +16,12 @@ import java.util.concurrent.ConcurrentMap;
 @UtilityClass
 public class ObjectUtils {
 
-    private final ConcurrentMap<Class<?>, Field> CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Field> CACHE = new ConcurrentHashMap<>();
 
     public Field toField(Serializable getter) {
-        return CACHE.computeIfAbsent(getter.getClass(), c -> resolveField(getter));
+        SerializedLambda lambda = serializedLambda(getter);
+        String key = lambda.getImplClass() + "::" + lambda.getImplMethodName();
+        return CACHE.computeIfAbsent(key, k -> resolveField(lambda));
     }
 
     public Set<String> declaredFieldNames(Class<?> clazz) {
@@ -77,10 +79,14 @@ public class ObjectUtils {
     }
 
     @SneakyThrows
-    private Field resolveField(Serializable getter) {
+    private SerializedLambda serializedLambda(Serializable getter) {
         Method writeReplace = getter.getClass().getDeclaredMethod("writeReplace");
         writeReplace.setAccessible(true);
-        SerializedLambda lambda = (SerializedLambda) writeReplace.invoke(getter);
+        return (SerializedLambda) writeReplace.invoke(getter);
+    }
+
+    @SneakyThrows
+    private Field resolveField(SerializedLambda lambda) {
         String implMethodName = lambda.getImplMethodName();
         if (implMethodName.startsWith("lambda$")) {
             throw new IllegalArgumentException(

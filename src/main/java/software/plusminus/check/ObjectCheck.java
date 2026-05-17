@@ -9,6 +9,7 @@ import software.plusminus.check.util.ObjectUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,16 +21,16 @@ import javax.annotation.CheckReturnValue;
 @CheckReturnValue
 public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectCheckType, ObjectCheckField<T> {
 
-    private List<Field> checkedFields;
-    
+    private Set<String> checkedFields;
+
     public ObjectCheck(T actual) {
         super(actual);
-        this.checkedFields = new ArrayList<>();
+        this.checkedFields = new HashSet<>();
     }
 
     public ObjectCheck(T actual, List<String> levels) {
         super(actual, levels);
-        this.checkedFields = new ArrayList<>();
+        this.checkedFields = new HashSet<>();
     }
 
     @Override
@@ -49,7 +50,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
 
     public <X> ObjectCheck<X> isInstanceOf(Class<X> expectedType) {
         checkInstanceOf(expectedType);
-        return new ObjectCheck<>(expectedType.cast(actual()));
+        return new ObjectCheck<>(expectedType.cast(actual()), levels());
     }
 
     @Override
@@ -62,8 +63,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
         if (coverage == FieldCoverage.WITH_GETTERS_ONLY) {
             required.removeIf(name -> !ObjectUtils.hasGetter(clazz, name));
         }
-        required.removeIf(name -> checkedFields.stream()
-                .anyMatch(field -> field.getName().equals(name)));
+        required.removeAll(checkedFields);
         if (!required.isEmpty()) {
             fail("there are not checked fields: " + required, "all fields were checked");
         }
@@ -73,9 +73,8 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
     public <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(String fieldName) {
         isNotNull();
         T actual = actual();
-        Field field = ObjectUtils.findField(actual.getClass(), fieldName);
         Object value = ObjectUtils.readField(actual, fieldName);
-        checkedFields.add(field);
+        checkedFields.add(fieldName);
         return new LinkedCheck<>(new ObjectCheck<>((X) value, levels()), this);
     }
 
@@ -109,16 +108,17 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
 
     private List<String> levels(Serializable getter) {
         Field field = ObjectUtils.toField(getter);
-        checkedFields.add(field);
+        checkedFields.add(field.getName());
         List<String> levels = new ArrayList<>(levels());
         levels.add("." + field.getName());
         return levels;
     }
 
+    @SuppressWarnings("java:S2259")
     private void checkInstanceOf(Class<?> expectedType) {
         T actual = actual();
         if (actual == null) {
-            return;
+            fail("null", "an instance of " + expectedType.getName());
         }
         if (!expectedType.isAssignableFrom(actual.getClass())) {
             fail("class of the object is " + actual.getClass().getName(),

@@ -58,12 +58,12 @@ public interface ObjectCheckType {
     }
 
     default <X extends Enum<X>> EnumCheck<X> isEnum() {
-        Class<X> type = (Class<X>) Enum.class;
+        Class<X> type = (Class<X>) (Class<?>) Enum.class;
         return isType(type, EnumCheck::new);
     }
 
     default <N extends Number> NumberCheck<N> isNumber() {
-        Class<N> type = (Class<N>) Number.class;
+        Class<N> type = (Class<N>) (Class<?>) Number.class;
         return isType(type, NumberCheck::new);
     }
 
@@ -94,7 +94,7 @@ public interface ObjectCheckType {
     }
 
     default <X extends Temporal> TemporalCheck<X> isTemporal() {
-        Class<X> type = (Class<X>) Temporal.class;
+        Class<X> type = (Class<X>) (Class<?>) Temporal.class;
         return isType(type, TemporalCheck::new);
     }
 

@@ -68,10 +68,6 @@ public abstract class AbstractCheck<T> implements Check<T> {
                 this::checkJson, this::checkResource);
     }
 
-    protected void isLike(Object expected) {
-        check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson);
-    }
-
     protected void isNull() {
         if (actual != null) {
             fail(actual, null);
@@ -84,24 +80,9 @@ public abstract class AbstractCheck<T> implements Check<T> {
         }
     }
 
-    protected void isEqual(T expected) {
-        check(expected, this::checkNull, this::checkType, this::checkEquals);
-    }
-
     protected void isSame(T expected) {
         if (actual != expected) {
             fail("same as " + StringUtil.toString(expected));
-        }
-    }
-
-    protected void isType(T expected) {
-        checkType(expected);
-    }
-
-    protected void isType(Class<?> expectedType) {
-        Class<?> actualType = actual.getClass();
-        if (actualType != expectedType) {
-            fail(actualType, expectedType);
         }
     }
 
@@ -139,7 +120,17 @@ public abstract class AbstractCheck<T> implements Check<T> {
     }
 
     protected boolean checkType(Object expected) {
-        isType(expected.getClass());
+        return checkType(expected == null ? null : expected.getClass());
+    }
+
+    protected boolean checkType(Class<?> expectedType) {
+        if (actual == null) {
+            fail(null, "not null");
+        }
+        Class<?> actualType = actual.getClass();
+        if (actualType != expectedType) {
+            fail(actualType, expectedType);
+        }
         return false;
     }
 

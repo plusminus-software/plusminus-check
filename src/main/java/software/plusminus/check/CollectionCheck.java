@@ -93,30 +93,6 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
         return this;
     }
 
-    public void containsExactly(Object... expectedElements) {
-        isNotNull();
-        List<T> actualElements = new ArrayList<>(actual());
-        List<Object> expectedElementList = new ArrayList<>(Arrays.asList(expectedElements));
-        removeIntersections(actualElements, expectedElementList);
-        if (!expectedElementList.isEmpty() || !actualElements.isEmpty()) {
-            String missedElements = expectedElementList.isEmpty()
-                    ? null
-                    : "does not contain: " + StringUtil.toString(expectedElementList);
-            String unexpectedElements = actualElements.isEmpty()
-                    ? null
-                    : "contains unexpected elements: " + StringUtil.toString(actualElements);
-            String actualMessage;
-            if (missedElements != null && unexpectedElements == null) {
-                actualMessage = missedElements;
-            } else if (missedElements == null && unexpectedElements != null) {
-                actualMessage = unexpectedElements;
-            } else {
-                actualMessage = missedElements + "\nbut " + unexpectedElements;
-            }
-            fail(actualMessage, "contains exactly elements");
-        }
-    }
-
     @SafeVarargs
     public final CollectionCheck<T, C, E> contains(Consumer<E>... elementChecks) {
         isNotNull();
@@ -140,6 +116,30 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
                     "contains elements matching all checks");
         }
         return this;
+    }
+
+    public void containsExactly(Object... expectedElements) {
+        isNotNull();
+        List<T> actualElements = new ArrayList<>(actual());
+        List<Object> expectedElementList = new ArrayList<>(Arrays.asList(expectedElements));
+        removeIntersections(actualElements, expectedElementList);
+        if (!expectedElementList.isEmpty() || !actualElements.isEmpty()) {
+            String missedElements = expectedElementList.isEmpty()
+                    ? null
+                    : "does not contain: " + StringUtil.toString(expectedElementList);
+            String unexpectedElements = actualElements.isEmpty()
+                    ? null
+                    : "contains unexpected elements: " + StringUtil.toString(actualElements);
+            String actualMessage;
+            if (missedElements != null && unexpectedElements == null) {
+                actualMessage = missedElements;
+            } else if (missedElements == null && unexpectedElements != null) {
+                actualMessage = unexpectedElements;
+            } else {
+                actualMessage = missedElements + "\nbut " + unexpectedElements;
+            }
+            fail(actualMessage, "contains exactly elements");
+        }
     }
 
     private void removeIntersections(List<T> actualElements, List<Object> expectedElements) {

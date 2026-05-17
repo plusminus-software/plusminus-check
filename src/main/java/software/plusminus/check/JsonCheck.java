@@ -58,7 +58,7 @@ public class JsonCheck extends AbstractObjectCheck<String> {
             expected = replaceSeparatelyCheckedFields(expected);
         }
         actual = JsonUtil.pretty(actual);
-        expected = ignoreFieldsOrder ? JsonUtil.prettyOrdered(expected, actual) : JsonUtil.pretty(actual);
+        expected = ignoreFieldsOrder ? JsonUtil.prettyOrdered(expected, actual) : JsonUtil.pretty(expected);
         if (!actual.equals(expected)) {
             fail(actual, expected);
         }
@@ -93,8 +93,8 @@ public class JsonCheck extends AbstractObjectCheck<String> {
     }
 
     private void assertJson(String actual) {
-        if (actual == null || JsonUtil.isJson(actual)) {
-            fail("is json");
+        if (actual == null || !JsonUtil.isJson(actual)) {
+            fail("is not json", "is json");
         }
     }
 }

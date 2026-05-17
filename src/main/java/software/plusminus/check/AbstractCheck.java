@@ -1,5 +1,6 @@
 package software.plusminus.check;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.plusminus.check.util.JsonUtil;
 import software.plusminus.check.util.StringUtil;
 import software.plusminus.check.util.TypeUtil;
@@ -47,6 +48,8 @@ public abstract class AbstractCheck<T> implements Check<T> {
      */
     @Override
     @Deprecated
+    @SuppressFBWarnings(value = "EQ_UNUSUAL",
+            justification = "intentionally throws so callers don't confuse equals() with is()")
     public boolean equals(Object object) {
         throw new UnsupportedOperationException("Method equals() is not supported. Did you mean is()?");
     }

@@ -31,6 +31,7 @@ public class StringCheck extends AbstractCheck<String> {
     }
 
     @Override
+    @SuppressWarnings("PMD.UselessOverridingMethod")
     public void isSame(String expected) {
         super.isSame(expected);
     }

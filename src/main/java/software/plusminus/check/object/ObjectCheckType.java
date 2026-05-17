@@ -23,10 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.function.BiFunction;
-import javax.annotation.CheckReturnValue;
 
 @SuppressWarnings("unchecked")
-@CheckReturnValue
 public interface ObjectCheckType {
 
     default BooleanCheck isBoolean() {

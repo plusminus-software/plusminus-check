@@ -28,7 +28,6 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("java:S2160")
-@CheckReturnValue
 public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
         extends AbstractObjectCheck<C> {
 
@@ -149,10 +148,12 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
         return predicate(element, levels(), ObjectCheck::new, check -> check.isLike(value));
     }
 
+    @CheckReturnValue
     public static <T, C extends Collection<T>> CollectionCheck<T, C, ObjectCheck<T>> create(C actual) {
         return new CollectionCheck<>(actual, ObjectCheck::new);
     }
 
+    @CheckReturnValue
     public static <T, C extends Collection<T>> CollectionCheck<T, C, ObjectCheck<T>> create(
             C actual, List<String> levels) {
         return new CollectionCheck<>(actual, levels, ObjectCheck::new);

@@ -1,9 +1,13 @@
 package software.plusminus.check;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.List;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
+@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED",
+        justification = "super calls return this; narrowing override return type")
 public class DecimalCheck<T extends Number> extends PrimitiveDecimalCheck<T> {
 
     public DecimalCheck(@Nullable T actual) {

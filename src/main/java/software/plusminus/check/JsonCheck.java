@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
  * @author Taras Shpek
  */
 @SuppressWarnings("java:S2160")
-@CheckReturnValue
 public class JsonCheck extends AbstractCheck<String> {
 
     private Set<String> separatelyCheckedFields = new HashSet<>();
@@ -76,6 +75,7 @@ public class JsonCheck extends AbstractCheck<String> {
         return this;
     }
 
+    @CheckReturnValue
     public JsonCheck ignoringFieldsOrder() {
         this.ignoreFieldsOrder = true;
         return this;

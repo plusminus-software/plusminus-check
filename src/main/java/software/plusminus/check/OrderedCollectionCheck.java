@@ -1,11 +1,16 @@
 package software.plusminus.check;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
+@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED",
+        justification = "super calls return this; narrowing override return type")
 public class OrderedCollectionCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
         extends CollectionCheck<T, C, E> {
 
@@ -41,10 +46,12 @@ public class OrderedCollectionCheck<T, C extends Collection<T>, E extends Abstra
         return this;
     }
 
+    @CheckReturnValue
     public static <T, C extends Collection<T>> OrderedCollectionCheck<T, C, ObjectCheck<T>> create(C actual) {
         return new OrderedCollectionCheck<>(actual, ObjectCheck::new);
     }
 
+    @CheckReturnValue
     public static <T, C extends Collection<T>> OrderedCollectionCheck<T, C, ObjectCheck<T>> create(
             C actual, List<String> levels) {
         return new OrderedCollectionCheck<>(actual, levels, ObjectCheck::new);

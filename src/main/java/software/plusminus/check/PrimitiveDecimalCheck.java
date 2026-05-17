@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-@CheckReturnValue
 public class PrimitiveDecimalCheck<T extends Number> extends PrimitiveNumberCheck<T> {
 
     private final Scale scale = new Scale();
@@ -19,11 +18,13 @@ public class PrimitiveDecimalCheck<T extends Number> extends PrimitiveNumberChec
         super(actual, levels);
     }
 
+    @CheckReturnValue
     public PrimitiveDecimalCheck<T> limitScale() {
         scale.limit();
         return this;
     }
 
+    @CheckReturnValue
     @SuppressWarnings("checkstyle:HiddenField")
     public PrimitiveDecimalCheck<T> limitScale(int scale) {
         this.scale.limit(scale);

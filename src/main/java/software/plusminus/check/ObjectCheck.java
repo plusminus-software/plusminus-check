@@ -15,10 +15,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import javax.annotation.CheckReturnValue;
 
 @SuppressWarnings({"unchecked", "java:S2160"})
-@CheckReturnValue
 public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectCheckType, ObjectCheckField<T> {
 
     private Set<String> checkedFields;

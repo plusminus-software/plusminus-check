@@ -17,12 +17,43 @@ package software.plusminus.check;
 
 import org.junit.Test;
 
+import static software.plusminus.check.helper.Assertions.assertFail;
+
 @SuppressWarnings("java:S2699")
 public class StringCheckTest {
-    
+
+    @Test
+    public void isStringSuccess() {
+        new StringCheck("hello").is("hello");
+    }
+
+    @Test
+    public void isStringFail() {
+        assertFail(() -> new StringCheck("hello").is("world"), "hello", "world");
+    }
+
     @Test
     public void successWithResource() {
         new StringCheck("One").is("one.txt");
     }
 
+    @Test
+    public void isNullSuccess() {
+        new StringCheck(null).isNull();
+    }
+
+    @Test
+    public void isNullFail() {
+        assertFail(() -> new StringCheck("x").isNull(), "x", "null");
+    }
+
+    @Test
+    public void isNotNullSuccess() {
+        new StringCheck("x").isNotNull();
+    }
+
+    @Test
+    public void isNotNullFail() {
+        assertFail(() -> new StringCheck(null).isNotNull(), "null", "not null");
+    }
 }

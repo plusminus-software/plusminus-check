@@ -17,63 +17,76 @@ package software.plusminus.check;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import java.math.BigInteger;
+
+import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
 public class NumberCheckTest {
-    
+
     @Test
     public void isPositiveSuccess() {
-        NumberCheck<Double> integerCheck = new NumberCheck<>(1d);
-        integerCheck.isPositive();
+        new NumberCheck<>(1d).isPositive();
     }
-    
+
     @Test
     public void isPositiveFail() {
-        NumberCheck<Double> integerCheck = new NumberCheck<>(0d);
-        try {
-            integerCheck.isPositive();
-        } catch (AssertionError e) {
-            assertEquals("expected:<positive> but was:<zero>", e.getMessage());
-            return;
-        }
-        fail();
+        assertFail(() -> new NumberCheck<>(0d).isPositive(), "zero", "positive");
     }
 
     @Test
     public void isNegativeSuccess() {
-        NumberCheck<Double> integerCheck = new NumberCheck<>(-1d);
-        integerCheck.isNegative();
+        new NumberCheck<>(-1d).isNegative();
     }
-    
+
     @Test
     public void isNegativeFail() {
-        NumberCheck<Double> integerCheck = new NumberCheck<>(0d);
-        try {
-            integerCheck.isNegative();
-        } catch (AssertionError e) {
-            assertEquals("expected:<negative> but was:<zero>", e.getMessage());
-            return;
-        }
-        fail();
+        assertFail(() -> new NumberCheck<>(0d).isNegative(), "zero", "negative");
     }
 
     @Test
     public void isZeroSuccess() {
-        NumberCheck<Double> integerCheck = new NumberCheck<>(0d);
-        integerCheck.isZero();
+        new NumberCheck<>(0d).isZero();
     }
-    
+
     @Test
     public void isZeroFail() {
-        NumberCheck<Double> integerCheck = new NumberCheck<>(1d);
-        try {
-            integerCheck.isZero();
-        } catch (AssertionError e) {
-            assertEquals("expected:<zero> but was:<positive>", e.getMessage());
-            return;
-        }
-        fail();
+        assertFail(() -> new NumberCheck<>(1d).isZero(), "positive", "zero");
+    }
+
+    @Test
+    public void isIntSuccess() {
+        new NumberCheck<>(1L).is(1);
+    }
+
+    @Test
+    public void isIntFail() {
+        assertFail(() -> new NumberCheck<>(1L).is(2), 1L, 2);
+    }
+
+    @Test
+    public void isBigIntegerSuccess() {
+        new NumberCheck<>(new BigInteger("123456789012345678901234567890"))
+                .is(new BigInteger("123456789012345678901234567890"));
+    }
+
+    @Test
+    public void isNullSuccess() {
+        new NumberCheck<Integer>(null).isNull();
+    }
+
+    @Test
+    public void isNullFail() {
+        assertFail(() -> new NumberCheck<>(1).isNull(), 1, "null");
+    }
+
+    @Test
+    public void isNotNullSuccess() {
+        new NumberCheck<>(1).isNotNull();
+    }
+
+    @Test
+    public void isNotNullFail() {
+        assertFail(() -> new NumberCheck<Integer>(null).isNotNull(), "null", "not null");
     }
 }

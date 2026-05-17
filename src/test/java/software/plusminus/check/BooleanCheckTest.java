@@ -21,25 +21,54 @@ import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
 public class BooleanCheckTest {
-    
+
     @Test
     public void testTrueSuccess() {
         new BooleanCheck(true).isTrue();
     }
-    
+
     @Test
     public void testTrueFail() {
         assertFail(() -> new BooleanCheck(true).isFalse(), "true", "false");
     }
-    
+
     @Test
     public void testFalseSuccess() {
         new BooleanCheck(false).isFalse();
     }
-    
+
     @Test
     public void testFalseFail() {
         assertFail(() -> new BooleanCheck(false).isTrue(), "false", "true");
     }
 
+    @Test
+    public void isBooleanSuccess() {
+        new BooleanCheck(true).is(true);
+    }
+
+    @Test
+    public void isBooleanFail() {
+        assertFail(() -> new BooleanCheck(true).is(false), "true", "false");
+    }
+
+    @Test
+    public void isNullSuccess() {
+        new BooleanCheck(null).isNull();
+    }
+
+    @Test
+    public void isNullFail() {
+        assertFail(() -> new BooleanCheck(true).isNull(), "true", "null");
+    }
+
+    @Test
+    public void isNotNullSuccess() {
+        new BooleanCheck(true).isNotNull();
+    }
+
+    @Test
+    public void isNotNullFail() {
+        assertFail(() -> new BooleanCheck(null).isNotNull(), "null", "not null");
+    }
 }

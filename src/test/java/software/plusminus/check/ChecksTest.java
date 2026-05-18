@@ -20,10 +20,19 @@ import org.junit.Test;
 import software.plusminus.check.fixtures.TestEnum;
 import software.plusminus.check.util.JsonUtil;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static software.plusminus.check.Checks.checkOf;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 /**
@@ -67,12 +76,12 @@ public class ChecksTest {
     }
 
     @Test
-    public void stringListSuccess() {
+    public void listSuccess() {
         Checks.check(Arrays.asList("one", "two", "three")).is("one", "two", "three");
     }
 
     @Test
-    public void stringListFail() {
+    public void listFail() {
         Runnable check = () -> Checks.check(Arrays.asList("one", "two", "three"))
                 .is("one", "two", "four");
         assertFail(check,
@@ -196,10 +205,237 @@ public class ChecksTest {
         }
         return map;
     }
+
+
+    @Test
+    public void enumCollectionReturnsCollectionCheck() {
+        Collection<Color> coll = new HashSet<>(Arrays.asList(Color.RED, Color.GREEN));
+        CollectionCheck<Color, Collection<Color>, EnumCheck<Color>> check = checkOf(() -> coll);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void enumListReturnsOrderedCheck() {
+        List<Color> list = Arrays.asList(Color.RED, Color.GREEN, Color.BLUE);
+        OrderedCollectionCheck<Color, List<Color>, EnumCheck<Color>> check = checkOf(() -> list);
+        check.hasSize(3).contains(Color.RED);
+    }
+
+    @Test
+    public void temporalCollectionReturnsCollectionCheck() {
+        Collection<LocalDate> coll = new HashSet<>(Arrays.asList(LocalDate.of(2020, 1, 1)));
+        CollectionCheck<LocalDate, Collection<LocalDate>, TemporalCheck<LocalDate>> check = checkOf(() -> coll);
+        check.hasSize(1);
+    }
+
+    @Test
+    public void temporalListReturnsOrderedCheck() {
+        List<LocalDate> list = Arrays.asList(LocalDate.of(2020, 1, 1), LocalDate.of(2021, 1, 1));
+        OrderedCollectionCheck<LocalDate, List<LocalDate>, TemporalCheck<LocalDate>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void stringListReturnsOrderedCheck() {
+        List<String> list = Arrays.asList("a", "b", "c");
+        OrderedCollectionCheck<String, List<String>, StringCheck> check = checkOf(() -> list);
+        check.hasSize(3).contains("a");
+    }
+
+    @Test
+    public void stringListElementUsesStringCheck() {
+        List<String> list = Arrays.asList("One");
+        checkOf(() -> list).contains(c -> c.is("one.txt"));
+    }
+
+    @Test
+    public void stringListFail() {
+        List<String> list = Arrays.asList("a", "b");
+        assertFail(() -> checkOf(() -> list).hasSize(3), "size is 2", "size is 3");
+    }
+
+    @Test
+    public void stringCollectionReturnsCollectionCheck() {
+        Collection<String> coll = new HashSet<>(Arrays.asList("a", "b"));
+        CollectionCheck<String, Collection<String>, StringCheck> check = checkOf(() -> coll);
+        check.hasSize(2).contains("a");
+    }
+
+    @Test
+    public void booleanListReturnsOrderedCheck() {
+        List<Boolean> list = Arrays.asList(true, false, true);
+        OrderedCollectionCheck<Boolean, List<Boolean>, BooleanCheck> check = checkOf(() -> list);
+        check.hasSize(3).contains(true);
+    }
+
+    @Test
+    public void booleanListElementUsesBooleanCheck() {
+        List<Boolean> list = Arrays.asList(true);
+        checkOf(() -> list).contains(BooleanCheck::isTrue);
+    }
+
+    @Test
+    public void booleanListFail() {
+        List<Boolean> list = Arrays.asList(true, false);
+        assertFail(() -> checkOf(() -> list).hasSize(3), "size is 2", "size is 3");
+    }
+
+    @Test
+    public void booleanCollectionReturnsCollectionCheck() {
+        Collection<Boolean> coll = new HashSet<>(Arrays.asList(true, false));
+        CollectionCheck<Boolean, Collection<Boolean>, BooleanCheck> check = checkOf(() -> coll);
+        check.hasSize(2).contains(true);
+    }
+
+    @Test
+    public void characterList() {
+        List<Character> list = Arrays.asList('a', 'b');
+        OrderedCollectionCheck<Character, List<Character>, CharacterCheck> check = checkOf(() -> list);
+        check.hasSize(2).contains('a');
+    }
+
+    @Test
+    public void byteList() {
+        List<Byte> list = Arrays.asList((byte) 1, (byte) 2);
+        OrderedCollectionCheck<Byte, List<Byte>, NumberCheck<Byte>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void shortList() {
+        List<Short> list = Arrays.asList((short) 1, (short) 2);
+        OrderedCollectionCheck<Short, List<Short>, NumberCheck<Short>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void integerList() {
+        List<Integer> list = Arrays.asList(1, 2, 3);
+        OrderedCollectionCheck<Integer, List<Integer>, NumberCheck<Integer>> check = checkOf(() -> list);
+        check.hasSize(3).contains(2);
+    }
+
+    @Test
+    public void integerListElementUsesNumberCheck() {
+        List<Integer> list = Arrays.asList(1);
+        checkOf(() -> list).contains(NumberCheck::isPositive);
+    }
+
+    @Test
+    public void longList() {
+        List<Long> list = Arrays.asList(1L, 2L);
+        OrderedCollectionCheck<Long, List<Long>, NumberCheck<Long>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void bigIntegerList() {
+        List<BigInteger> list = Arrays.asList(BigInteger.ONE, BigInteger.TEN);
+        OrderedCollectionCheck<BigInteger, List<BigInteger>, NumberCheck<BigInteger>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void floatList() {
+        List<Float> list = Arrays.asList(1.0f, 2.0f);
+        OrderedCollectionCheck<Float, List<Float>, DecimalCheck<Float>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void doubleList() {
+        List<Double> list = Arrays.asList(1.0d, 2.0d);
+        OrderedCollectionCheck<Double, List<Double>, DecimalCheck<Double>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void doubleListElementUsesDecimalCheck() {
+        List<Double> list = Arrays.asList(1.234567d);
+        checkOf(() -> list).contains(c -> c.limitScale(2).is(1.23d));
+    }
+
+    @Test
+    public void bigDecimalList() {
+        List<BigDecimal> list = Arrays.asList(BigDecimal.ONE, BigDecimal.TEN);
+        OrderedCollectionCheck<BigDecimal, List<BigDecimal>, DecimalCheck<BigDecimal>> check = checkOf(() -> list);
+        check.hasSize(2);
+    }
+
+    @Test
+    public void listOfLists() {
+        List<List<String>> nested = Arrays.asList(
+                Arrays.asList("a", "b"),
+                Arrays.asList("c"));
+        OrderedCollectionCheck<List<String>, List<List<String>>,
+                CollectionCheck<String, List<String>, ObjectCheck<String>>> check = checkOf(() -> nested);
+        check.hasSize(2).contains(inner -> inner.hasSize(2));
+    }
+
+    @Test
+    public void listOfListsFail() {
+        List<List<String>> nested = Arrays.asList(Arrays.asList("a"));
+        assertFail(() -> checkOf(() -> nested).hasSize(2), "size is 1", "size is 2");
+    }
+
+    @Test
+    public void listOfMaps() {
+        List<Map<String, String>> maps = Arrays.asList(
+                Collections.singletonMap("k1", "v1"),
+                Collections.singletonMap("k2", "v2"));
+        OrderedCollectionCheck<Map<String, String>, List<Map<String, String>>, MapCheck<String, String>>
+                check = checkOf(() -> maps);
+        check.hasSize(2).contains(inner -> inner.hasSize(1));
+    }
+
+    @Test
+    public void listOfMapsFail() {
+        List<Map<String, String>> maps = Arrays.asList(Collections.singletonMap("k", "v"));
+        assertFail(() -> checkOf(() -> maps).hasSize(2), "size is 1", "size is 2");
+    }
+
+    @Test
+    public void listOfOptionals() {
+        List<Optional<String>> opts = Arrays.asList(Optional.of("a"), Optional.empty());
+        checkOf(() -> opts)
+                .hasSize(2)
+                .contains(OptionalCheck::isEmpty);
+    }
+
+    @Test
+    public void listOfCollections() {
+        List<Collection<String>> nested = Arrays.asList(
+                new HashSet<>(Arrays.asList("a", "b")),
+                new HashSet<>(Arrays.asList("c")));
+        checkOf(() -> nested).hasSize(2).contains(inner -> inner.hasSize(2));
+    }
+
+    @Test
+    public void collectionOfLists() {
+        Collection<List<String>> nested = new HashSet<>(Arrays.asList(
+                Arrays.asList("a"),
+                Arrays.asList("b", "c")));
+        checkOf(() -> nested).hasSize(2);
+    }
+
+    @Test
+    public void collectionOfMaps() {
+        Collection<Map<String, String>> maps = new HashSet<>(Arrays.asList(
+                Collections.singletonMap("k", "v")));
+        checkOf(() -> maps).hasSize(1);
+    }
+
+    @Test
+    public void collectionOfOptionals() {
+        Collection<Optional<String>> opts = new HashSet<>(Arrays.asList(Optional.of("a")));
+        checkOf(() -> opts).hasSize(1);
+    }
     
     @Data
     private static class TestClass {
         private String string;
         private Integer integer;
     }
+
+    private enum Color { RED, GREEN, BLUE }
 }

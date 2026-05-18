@@ -89,7 +89,7 @@ public class AbstractCheckTest {
     @Test(expected = UnsupportedOperationException.class)
     public void equalsThrowsException() {
         AbstractCheck<String> abstractCheck = new AbstractCheck<String>(actual) {};
-        abstractCheck.equals("hello");
+        abstractCheck.equals(abstractCheck);
     }
 
     @Test(expected = UnsupportedOperationException.class)

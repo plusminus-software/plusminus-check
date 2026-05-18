@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
         extends AbstractObjectCheck<C> {
 
-    private BiFunction<T, List<String>, E> elementCheck;
+    protected BiFunction<T, List<String>, E> elementCheck;
 
     public CollectionCheck(@Nullable C actual, BiFunction<T, List<String>, E> elementCheck) {
         super(actual);

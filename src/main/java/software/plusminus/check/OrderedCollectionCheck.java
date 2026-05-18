@@ -2,8 +2,10 @@ package software.plusminus.check;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.CheckReturnValue;
@@ -47,6 +49,20 @@ public class OrderedCollectionCheck<T, C extends Collection<T>, E extends Abstra
     }
 
     @CheckReturnValue
+    public LinkedCheck<T, E, OrderedCollectionCheck<T, C, E>> at(int index) {
+        isNotNull();
+        int size = actual().size();
+        if (index < 0 || index >= size) {
+            fail("size is " + size, "has element at index " + index);
+        }
+        T element = get(index);
+        List<String> elementLevels = new ArrayList<>(levels());
+        elementLevels.add("[" + index + "]");
+        E check = elementCheck.apply(element, elementLevels);
+        return new LinkedCheck<>(check, this);
+    }
+
+    @CheckReturnValue
     public static <T, C extends Collection<T>> OrderedCollectionCheck<T, C, ObjectCheck<T>> create(C actual) {
         return new OrderedCollectionCheck<>(actual, ObjectCheck::new);
     }
@@ -55,5 +71,18 @@ public class OrderedCollectionCheck<T, C extends Collection<T>, E extends Abstra
     public static <T, C extends Collection<T>> OrderedCollectionCheck<T, C, ObjectCheck<T>> create(
             C actual, List<String> levels) {
         return new OrderedCollectionCheck<>(actual, levels, ObjectCheck::new);
+    }
+
+    private T get(int index) {
+        if (actual() instanceof List) {
+            return ((List<T>) actual()).get(index);
+        } else {
+            Iterator<T> iterator = actual().iterator();
+            T current = null;
+            for (int i = 0; i <= index; i++) {
+                current = iterator.next();
+            }
+            return current;
+        }
     }
 }

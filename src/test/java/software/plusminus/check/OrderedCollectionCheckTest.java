@@ -4,7 +4,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
+import static software.plusminus.check.Checks.checkOf;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
@@ -39,5 +41,29 @@ public class OrderedCollectionCheckTest {
     @Test
     public void containsSuccess() {
         OrderedCollectionCheck.create(Arrays.asList("a", "b", "c")).contains("a");
+    }
+
+    @Test
+    public void atSuccess() {
+        List<Integer> list = Arrays.asList(0, 1, -2);
+        checkOf(() -> list)
+                .at(0).is(c -> c.isZero())
+                .at(1).is(c -> c.isPositive())
+                .at(2).is(c -> c.isNegative())
+                .hasSize(3);
+    }
+
+    @Test
+    public void atFail() {
+        List<String> list = Arrays.asList("a", "b");
+        assertFail(() -> checkOf(() -> list).at(0).is("b"),
+                "[0] ", "a", "b");
+    }
+
+    @Test
+    public void outOfBounds() {
+        List<String> list = Arrays.asList("a", "b");
+        assertFail(() -> checkOf(() -> list).at(5).is("x"),
+                "size is 2", "has element at index 5");
     }
 }

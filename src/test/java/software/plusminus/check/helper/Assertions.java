@@ -27,6 +27,10 @@ public final class Assertions {
     }
 
     public static void assertFail(Runnable lambda, Object actual, Object expected) {
+        assertFail(lambda, "", actual, expected);
+    }
+
+    public static void assertFail(Runnable lambda, String prefix, Object actual, Object expected) {
         try {
             lambda.run();
         } catch (ComparisonFailure e) {
@@ -34,10 +38,9 @@ public final class Assertions {
             assertEquals(actual, e.getActual());
             return;
         } catch (AssertionError e) {
-            assertEquals("expected:<" + expected + "> but was:<" + actual + ">", e.getMessage());
+            assertEquals(prefix + "expected:<" + expected + "> but was:<" + actual + ">", e.getMessage());
             return;
         }
         fail();
     }
-    
 }

@@ -1,6 +1,7 @@
 package software.plusminus.check.object;
 
 import software.plusminus.check.types.AbstractCheck;
+import software.plusminus.check.types.ArrayCheck;
 import software.plusminus.check.types.CollectionCheck;
 import software.plusminus.check.types.EnumCheck;
 import software.plusminus.check.types.ListCheck;
@@ -33,6 +34,11 @@ public interface ObjectCheckType {
 
     default NullableCharacterCheck isCharacter() {
         return isType(Character.class, NullableCharacterCheck::new);
+    }
+
+    default <X> ArrayCheck<X, ObjectCheck<X>> isArray() {
+        Class<X[]> type = (Class<X[]>) (Class<?>) Object[].class;
+        return isType(type, ArrayCheck::create);
     }
 
     default <X> CollectionCheck<X, Collection<X>, ObjectCheck<X>> isCollection() {

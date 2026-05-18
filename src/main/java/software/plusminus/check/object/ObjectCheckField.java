@@ -1,6 +1,7 @@
 package software.plusminus.check.object;
 
 import software.plusminus.check.getter.AbstractGetter;
+import software.plusminus.check.getter.ArrayGetter;
 import software.plusminus.check.getter.BigDecimalGetter;
 import software.plusminus.check.getter.BigIntegerGetter;
 import software.plusminus.check.getter.BooleanGetter;
@@ -27,6 +28,7 @@ import software.plusminus.check.getter.ShortGetter;
 import software.plusminus.check.getter.SortedSetGetter;
 import software.plusminus.check.getter.StringGetter;
 import software.plusminus.check.types.AbstractCheck;
+import software.plusminus.check.types.ArrayCheck;
 import software.plusminus.check.types.BooleanCheck;
 import software.plusminus.check.types.CharacterCheck;
 import software.plusminus.check.types.CollectionCheck;
@@ -182,6 +184,11 @@ public interface ObjectCheckField<T> {
 
     default <K, V> LinkedCheck<Map<K, V>, MapCheck<K, V>, ObjectCheck<T>> fieldOf(MapGetter<T, K, V> getter) {
         return fieldOf(getter, MapCheck::new);
+    }
+
+    default <E> LinkedCheck<E[], ArrayCheck<E, ObjectCheck<E>>, ObjectCheck<T>> fieldOf(ArrayGetter<T, E> getter) {
+        BiFunction<E, List<String>, ObjectCheck<E>> elementCheckBuilder = ObjectCheck::new;
+        return fieldOf(getter, (v, l) -> new ArrayCheck<>(v, l, elementCheckBuilder));
     }
 
     <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> fieldOf(

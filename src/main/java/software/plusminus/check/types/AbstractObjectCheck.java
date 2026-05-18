@@ -19,8 +19,9 @@ public class AbstractObjectCheck<T> extends AbstractCheck<T> {
         super.isString(expected);
     }
 
+    @Override
     public void isLike(Object expected) {
-        check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson);
+        super.isLike(expected);
     }
 
     @Override

@@ -1,17 +1,11 @@
 package software.plusminus.check.types;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-/**
- * Check for ordered collections — {@link List}, {@link java.util.Deque},
- * {@link java.util.SortedSet}. Exposes indexed access via {@link #at(int)}
- * and an order-sensitive {@link #is(Object[])} comparison.
- */
 public class ListCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
         extends AbstractCollectionCheck<T, C, E, ListCheck<T, C, E>> {
 
@@ -29,9 +23,9 @@ public class ListCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
         return super.at(index);
     }
 
-    @SafeVarargs
-    public final void is(T... expected) {
-        isLike(Arrays.asList(expected));
+    @Override
+    public final void is(Object... expectedElements) {
+        super.is(expectedElements);
     }
 
     @CheckReturnValue

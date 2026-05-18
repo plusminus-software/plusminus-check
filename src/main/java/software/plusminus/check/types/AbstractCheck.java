@@ -67,10 +67,14 @@ public abstract class AbstractCheck<T> implements Check<T> {
 
     protected void isString(String expected) {
         if (TypeUtil.isSimpleType(actual)) {
-            check(expected, this::checkNull, this::checkType, this::checkEquals);
+            check(expected, this::checkNull, this::checkType, this::checkEquals, this::checkResource);
             return;
         }
         check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson, this::checkResource);
+    }
+
+    protected void isLike(Object expected) {
+        check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson);
     }
 
     protected void isNull() {

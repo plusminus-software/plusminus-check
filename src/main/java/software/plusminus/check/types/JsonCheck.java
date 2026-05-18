@@ -16,6 +16,7 @@
 package software.plusminus.check.types;
 
 import software.plusminus.check.util.JsonUtil;
+import software.plusminus.util.ResourceUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +51,13 @@ public class JsonCheck extends AbstractCheck<String> {
     public void is(String expected) {
         if (expected == null) {
             fail(null);
+        }
+        if (!JsonUtil.isJson(expected)
+                && ResourceUtils.isResource(expected)) {
+            expected = ResourceUtils.toString(expected);
+        }
+        if (!JsonUtil.isJson(expected)) {
+            fail("is json", "is not json");
         }
         String actual = actual();
         if (!separatelyCheckedFields.isEmpty()) {

@@ -11,19 +11,6 @@ import java.util.function.Consumer;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-/**
- * Base for checks over an indexable element sequence — {@link java.util.Collection},
- * {@code T[]}, or any other ordered/iterable shape. Subclasses provide the
- * accessors ({@link #size()}, {@link #actualList()}, {@link #get(int)}) and
- * inherit the common public assertions ({@code isEmpty}, {@code hasSize},
- * {@code contains}, {@code containsExactly}). Indexed access ({@link #at(int)})
- * is {@code protected} here so subclasses can opt-in to expose it publicly.
- *
- * @param <T>    element type
- * @param <A>    actual type (e.g. {@code Collection<T>}, {@code T[]})
- * @param <E>    element-check type
- * @param <Self> self-type, for fluent chaining returns
- */
 @SuppressWarnings({"checkstyle:ClassTypeParameterName", "java:S2160", "java:S119"})
 public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         Self extends AbstractArrayCheck<T, A, E, Self>> extends AbstractObjectCheck<A> {
@@ -48,6 +35,40 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
     protected abstract List<T> actualList();
 
     protected abstract T get(int index);
+
+    @Override
+    public void is(String expected) {
+        if (actual() == null || size() != 1) {
+            super.is(expected);
+            return;
+        }
+        try {
+            super.is(expected);
+        } catch (AssertionError firstError) {
+            try {
+                at(0).is(check -> check.isString(expected));
+            } catch (AssertionError ignored) {
+                throw firstError;
+            }
+        }
+    }
+
+    protected void is(Object... expectedElements) {
+        try {
+            isNotNull();
+            hasSize(expectedElements.length);
+            for (int i = 0; i < expectedElements.length; i++) {
+                int index = i;
+                if (expectedElements[i] instanceof String) {
+                    at(i).is(check -> check.isString((String) expectedElements[index]));
+                } else {
+                    at(i).is(check -> check.isLike(expectedElements[index]));
+                }
+            }
+        } catch (AssertionError fail) {
+            fail(StringUtil.toString(expectedElements));
+        }
+    }
 
     public void isEmpty() {
         isNotNull();

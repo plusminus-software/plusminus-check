@@ -44,6 +44,17 @@ public class JsonCheckTest {
     }
 
     @Test
+    public void isResourceOk() {
+        check("{\"name\":\"a\"}").isJson().is("json-object.json");
+    }
+
+    @Test
+    public void isResourceFail() {
+        assertFail(() -> check("{\"name\":\"b\"}").isJson().is("json-object.json"),
+                "{\n  \"name\": \"b\"\n}", "{\n  \"name\": \"a\"\n}");
+    }
+
+    @Test
     public void notJsonFail() {
         assertFail(() -> check("not json").isJson(), "not json", "json");
     }

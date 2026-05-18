@@ -7,11 +7,6 @@ import java.util.function.BiFunction;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-/**
- * Check for object arrays. Holds the array as the raw actual ({@code T[]}),
- * exposes indexed access via {@link #at(int)} and array-equality via
- * {@link #is(Object[])}.
- */
 public class ArrayCheck<T, E extends AbstractCheck<T>>
         extends AbstractArrayCheck<T, T[], E, ArrayCheck<T, E>> {
 
@@ -45,12 +40,8 @@ public class ArrayCheck<T, E extends AbstractCheck<T>>
     }
 
     @Override
-    @SafeVarargs
-    public final void is(T... expected) {
-        isNotNull();
-        if (!Arrays.equals(actual(), expected)) {
-            fail(Arrays.asList(actual()), Arrays.asList(expected));
-        }
+    public void is(Object... expectedElements) {
+        super.is(expectedElements);
     }
 
     @CheckReturnValue

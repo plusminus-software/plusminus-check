@@ -2,6 +2,7 @@ package software.plusminus.check.types;
 
 import org.junit.Before;
 import org.junit.Test;
+import software.plusminus.check.fixtures.TestObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
@@ -108,5 +110,33 @@ public class AbstractArrayCheckTest {
     @Test
     public void atOutOfBounds() {
         assertFail(() -> check.at(5).is("0"), "size is 3", "has element at index 5");
+    }
+
+    @Test
+    public void isStringArrayResourceOk() {
+        String[] array = {"One"};
+        check(array).is("list-one.txt");
+    }
+
+    @Test
+    public void isStringArrayResourceFail() {
+        String[] array = {"Other"};
+        assertFail(() -> check(array).is("list-one.txt"),
+                "[\n  \"Other\"\n]", "[\n  \"One\"\n]");
+    }
+
+    @Test
+    public void isObjectArrayResourceOk() {
+        TestObject[] array = {new TestObject("One", 1)};
+        check(array).is("one-object.json");
+    }
+
+    @Test
+    public void isObjectArrayResourceFail() {
+        TestObject[] array = {new TestObject("One", 1), new TestObject("One", 1)};
+        assertFail(() -> check(array).is("one-object.json"),
+                "[\n  {\n    \"name\": \"One\",\n    \"count\": 1\n  },"
+                        + "\n  {\n    \"name\": \"One\",\n    \"count\": 1\n  }\n]",
+                "{\n  \"name\": \"One\",\n  \"count\": 1\n}");
     }
 }

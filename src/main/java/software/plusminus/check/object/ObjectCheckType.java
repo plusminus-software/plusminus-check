@@ -1,18 +1,18 @@
 package software.plusminus.check.object;
 
-import software.plusminus.check.AbstractCheck;
-import software.plusminus.check.CollectionCheck;
-import software.plusminus.check.EnumCheck;
-import software.plusminus.check.MapCheck;
-import software.plusminus.check.NullableBooleanCheck;
-import software.plusminus.check.NullableCharacterCheck;
-import software.plusminus.check.NullableDecimalCheck;
-import software.plusminus.check.NullableNumberCheck;
-import software.plusminus.check.ObjectCheck;
-import software.plusminus.check.OptionalCheck;
-import software.plusminus.check.OrderedCollectionCheck;
-import software.plusminus.check.StringCheck;
-import software.plusminus.check.TemporalCheck;
+import software.plusminus.check.types.AbstractCheck;
+import software.plusminus.check.types.CollectionCheck;
+import software.plusminus.check.types.EnumCheck;
+import software.plusminus.check.types.ListCheck;
+import software.plusminus.check.types.MapCheck;
+import software.plusminus.check.types.NullableBooleanCheck;
+import software.plusminus.check.types.NullableCharacterCheck;
+import software.plusminus.check.types.NullableDecimalCheck;
+import software.plusminus.check.types.NullableNumberCheck;
+import software.plusminus.check.types.ObjectCheck;
+import software.plusminus.check.types.OptionalCheck;
+import software.plusminus.check.types.StringCheck;
+import software.plusminus.check.types.TemporalCheck;
 
 import java.math.BigDecimal;
 import java.time.temporal.Temporal;
@@ -40,19 +40,19 @@ public interface ObjectCheckType {
         return isType(type, CollectionCheck::create);
     }
 
-    default <X> OrderedCollectionCheck<X, List<X>, ObjectCheck<X>> isList() {
+    default <X> ListCheck<X, List<X>, ObjectCheck<X>> isList() {
         Class<List<X>> type = (Class<List<X>>) (Class<?>) List.class;
-        return isType(type, OrderedCollectionCheck::create);
+        return isType(type, ListCheck::create);
     }
 
-    default <X> OrderedCollectionCheck<X, SortedSet<X>, ObjectCheck<X>> isSortedSet() {
+    default <X> ListCheck<X, SortedSet<X>, ObjectCheck<X>> isSortedSet() {
         Class<SortedSet<X>> type = (Class<SortedSet<X>>) (Class<?>) SortedSet.class;
-        return isType(type, OrderedCollectionCheck::create);
+        return isType(type, ListCheck::create);
     }
 
-    default <X> OrderedCollectionCheck<X, Deque<X>, ObjectCheck<X>> isDeque() {
+    default <X> ListCheck<X, Deque<X>, ObjectCheck<X>> isDeque() {
         Class<Deque<X>> type = (Class<Deque<X>>) (Class<?>) Deque.class;
-        return isType(type, OrderedCollectionCheck::create);
+        return isType(type, ListCheck::create);
     }
 
     default <X extends Enum<X>> EnumCheck<X> isEnum() {

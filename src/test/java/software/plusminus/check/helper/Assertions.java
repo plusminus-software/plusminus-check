@@ -26,6 +26,15 @@ public final class Assertions {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
+    public static void assertFail(Runnable lambda) {
+        try {
+            lambda.run();
+        } catch (AssertionError e) {
+            return;
+        }
+        fail();
+    }
+
     public static void assertFail(Runnable lambda, Object actual, Object expected) {
         assertFail(lambda, "", actual, expected);
     }

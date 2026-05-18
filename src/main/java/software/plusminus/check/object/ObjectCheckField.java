@@ -1,21 +1,5 @@
 package software.plusminus.check.object;
 
-import software.plusminus.check.AbstractCheck;
-import software.plusminus.check.BooleanCheck;
-import software.plusminus.check.CharacterCheck;
-import software.plusminus.check.CollectionCheck;
-import software.plusminus.check.DecimalCheck;
-import software.plusminus.check.LinkedCheck;
-import software.plusminus.check.MapCheck;
-import software.plusminus.check.NullableBooleanCheck;
-import software.plusminus.check.NullableCharacterCheck;
-import software.plusminus.check.NullableDecimalCheck;
-import software.plusminus.check.NullableNumberCheck;
-import software.plusminus.check.NumberCheck;
-import software.plusminus.check.ObjectCheck;
-import software.plusminus.check.OptionalCheck;
-import software.plusminus.check.OrderedCollectionCheck;
-import software.plusminus.check.StringCheck;
 import software.plusminus.check.getter.AbstractGetter;
 import software.plusminus.check.getter.BigDecimalGetter;
 import software.plusminus.check.getter.BigIntegerGetter;
@@ -42,6 +26,22 @@ import software.plusminus.check.getter.PrimitiveShortGetter;
 import software.plusminus.check.getter.ShortGetter;
 import software.plusminus.check.getter.SortedSetGetter;
 import software.plusminus.check.getter.StringGetter;
+import software.plusminus.check.types.AbstractCheck;
+import software.plusminus.check.types.BooleanCheck;
+import software.plusminus.check.types.CharacterCheck;
+import software.plusminus.check.types.CollectionCheck;
+import software.plusminus.check.types.DecimalCheck;
+import software.plusminus.check.types.LinkedCheck;
+import software.plusminus.check.types.ListCheck;
+import software.plusminus.check.types.MapCheck;
+import software.plusminus.check.types.NullableBooleanCheck;
+import software.plusminus.check.types.NullableCharacterCheck;
+import software.plusminus.check.types.NullableDecimalCheck;
+import software.plusminus.check.types.NullableNumberCheck;
+import software.plusminus.check.types.NumberCheck;
+import software.plusminus.check.types.ObjectCheck;
+import software.plusminus.check.types.OptionalCheck;
+import software.plusminus.check.types.StringCheck;
 import software.plusminus.check.util.FieldCoverage;
 
 import java.io.Serializable;
@@ -160,20 +160,20 @@ public interface ObjectCheckField<T> {
         return fieldOf(getter, CollectionCheck::create);
     }
 
-    default <E> LinkedCheck<List<E>, OrderedCollectionCheck<E, List<E>, ObjectCheck<E>>, ObjectCheck<T>> fieldOf(
+    default <E> LinkedCheck<List<E>, ListCheck<E, List<E>, ObjectCheck<E>>, ObjectCheck<T>> fieldOf(
             ListGetter<T, E> getter) {
         BiFunction<E, List<String>, ObjectCheck<E>> elementCheckBuilder = ObjectCheck::new;
-        return fieldOf(getter, (v, l) -> new OrderedCollectionCheck<>(v, l, elementCheckBuilder));
+        return fieldOf(getter, (v, l) -> new ListCheck<>(v, l, elementCheckBuilder));
     }
 
-    default <E> LinkedCheck<SortedSet<E>, OrderedCollectionCheck<E, SortedSet<E>, ObjectCheck<E>>, ObjectCheck<T>>
+    default <E> LinkedCheck<SortedSet<E>, ListCheck<E, SortedSet<E>, ObjectCheck<E>>, ObjectCheck<T>>
             fieldOf(SortedSetGetter<T, E> getter) {
-        return fieldOf(getter, OrderedCollectionCheck::create);
+        return fieldOf(getter, ListCheck::create);
     }
 
-    default <E> LinkedCheck<Deque<E>, OrderedCollectionCheck<E, Deque<E>, ObjectCheck<E>>, ObjectCheck<T>> fieldOf(
+    default <E> LinkedCheck<Deque<E>, ListCheck<E, Deque<E>, ObjectCheck<E>>, ObjectCheck<T>> fieldOf(
             DequeGetter<T, E> getter) {
-        return fieldOf(getter, OrderedCollectionCheck::create);
+        return fieldOf(getter, ListCheck::create);
     }
 
     default <O> LinkedCheck<Optional<O>, OptionalCheck<O>, ObjectCheck<T>> fieldOf(OptionalGetter<T, O> getter) {

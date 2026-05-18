@@ -3,7 +3,7 @@ package software.plusminus.check;
 import java.util.List;
 import javax.annotation.Nullable;
 
-public class CharacterCheck extends PrimitiveCharacterCheck {
+public class CharacterCheck extends AbstractCheck<Character> {
 
     public CharacterCheck(@Nullable Character actual) {
         super(actual);
@@ -13,13 +13,12 @@ public class CharacterCheck extends PrimitiveCharacterCheck {
         super(actual, levels);
     }
 
-    @Override
-    public void isNull() {
-        super.isNull();
+    @SuppressWarnings("PMD.UselessOverridingMethod")
+    public void is(char expected) {
+        super.is(expected);
     }
 
-    @Override
-    public void isNotNull() {
-        super.isNotNull();
+    public void is(String expected) {
+        super.isString(expected);
     }
 }

@@ -51,76 +51,76 @@ import javax.annotation.CheckReturnValue;
 @CheckReturnValue
 public class CheckFactory {
 
-    public PrimitiveBooleanCheck build(boolean actual) {
-        return new PrimitiveBooleanCheck(actual);
-    }
-
-    public BooleanCheck build(Boolean actual) {
+    public BooleanCheck build(boolean actual) {
         return new BooleanCheck(actual);
     }
 
-    public PrimitiveCharacterCheck build(char actual) {
-        return new PrimitiveCharacterCheck(actual);
+    public NullableBooleanCheck build(Boolean actual) {
+        return new NullableBooleanCheck(actual);
     }
 
-    public CharacterCheck build(Character actual) {
+    public CharacterCheck build(char actual) {
         return new CharacterCheck(actual);
     }
 
-    public PrimitiveNumberCheck<Byte> build(byte actual) {
-        return new PrimitiveNumberCheck<>(actual);
+    public NullableCharacterCheck build(Character actual) {
+        return new NullableCharacterCheck(actual);
     }
 
-    public NumberCheck<Byte> build(Byte actual) {
+    public NumberCheck<Byte> build(byte actual) {
         return new NumberCheck<>(actual);
     }
 
-    public PrimitiveNumberCheck<Short> build(short actual) {
-        return new PrimitiveNumberCheck<>(actual);
+    public NullableNumberCheck<Byte> build(Byte actual) {
+        return new NullableNumberCheck<>(actual);
     }
 
-    public NumberCheck<Short> build(Short actual) {
+    public NumberCheck<Short> build(short actual) {
         return new NumberCheck<>(actual);
     }
 
-    public PrimitiveNumberCheck<Integer> build(int actual) {
-        return new PrimitiveNumberCheck<>(actual);
+    public NullableNumberCheck<Short> build(Short actual) {
+        return new NullableNumberCheck<>(actual);
     }
 
-    public NumberCheck<Integer> build(Integer actual) {
+    public NumberCheck<Integer> build(int actual) {
         return new NumberCheck<>(actual);
     }
 
-    public PrimitiveNumberCheck<Long> build(long actual) {
-        return new PrimitiveNumberCheck<>(actual);
+    public NullableNumberCheck<Integer> build(Integer actual) {
+        return new NullableNumberCheck<>(actual);
     }
 
-    public NumberCheck<Long> build(Long actual) {
+    public NumberCheck<Long> build(long actual) {
         return new NumberCheck<>(actual);
     }
 
-    public NumberCheck<BigInteger> build(BigInteger actual) {
-        return new NumberCheck<>(actual);
+    public NullableNumberCheck<Long> build(Long actual) {
+        return new NullableNumberCheck<>(actual);
     }
 
-    public PrimitiveDecimalCheck<Float> build(float actual) {
-        return new PrimitiveDecimalCheck<>(actual);
+    public NullableNumberCheck<BigInteger> build(BigInteger actual) {
+        return new NullableNumberCheck<>(actual);
     }
 
-    public DecimalCheck<Float> build(Float actual) {
+    public DecimalCheck<Float> build(float actual) {
         return new DecimalCheck<>(actual);
     }
 
-    public PrimitiveDecimalCheck<Double> build(double actual) {
-        return new PrimitiveDecimalCheck<>(actual);
+    public NullableDecimalCheck<Float> build(Float actual) {
+        return new NullableDecimalCheck<>(actual);
     }
 
-    public DecimalCheck<Double> build(Double actual) {
+    public DecimalCheck<Double> build(double actual) {
         return new DecimalCheck<>(actual);
     }
 
-    public DecimalCheck<BigDecimal> build(BigDecimal actual) {
-        return new DecimalCheck<>(actual);
+    public NullableDecimalCheck<Double> build(Double actual) {
+        return new NullableDecimalCheck<>(actual);
+    }
+
+    public NullableDecimalCheck<BigDecimal> build(BigDecimal actual) {
+        return new NullableDecimalCheck<>(actual);
     }
 
     public StringCheck build(String actual) {
@@ -165,91 +165,97 @@ public class CheckFactory {
 
     // --- Collection suppliers ---
 
-    public CollectionCheck<Boolean, Collection<Boolean>, BooleanCheck> build(BooleanCollectionSupplier supplier) {
-        return build(supplier.get(), BooleanCheck::new);
+    public CollectionCheck<Boolean, Collection<Boolean>, NullableBooleanCheck> build(
+            BooleanCollectionSupplier supplier) {
+        return build(supplier.get(), NullableBooleanCheck::new);
     }
 
-    public OrderedCollectionCheck<Boolean, List<Boolean>, BooleanCheck> build(BooleanListSupplier supplier) {
-        return build(supplier.get(), BooleanCheck::new);
+    public OrderedCollectionCheck<Boolean, List<Boolean>, NullableBooleanCheck> build(BooleanListSupplier supplier) {
+        return build(supplier.get(), NullableBooleanCheck::new);
     }
 
-    public CollectionCheck<Character, Collection<Character>, CharacterCheck> build(
+    public CollectionCheck<Character, Collection<Character>, NullableCharacterCheck> build(
             CharacterCollectionSupplier supplier) {
-        return build(supplier.get(), CharacterCheck::new);
+        return build(supplier.get(), NullableCharacterCheck::new);
     }
 
-    public OrderedCollectionCheck<Character, List<Character>, CharacterCheck> build(
+    public OrderedCollectionCheck<Character, List<Character>, NullableCharacterCheck> build(
             CharacterListSupplier supplier) {
-        return build(supplier.get(), CharacterCheck::new);
+        return build(supplier.get(), NullableCharacterCheck::new);
     }
 
-    public CollectionCheck<Byte, Collection<Byte>, NumberCheck<Byte>> build(ByteCollectionSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public CollectionCheck<Byte, Collection<Byte>, NullableNumberCheck<Byte>> build(ByteCollectionSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public OrderedCollectionCheck<Byte, List<Byte>, NumberCheck<Byte>> build(ByteListSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public OrderedCollectionCheck<Byte, List<Byte>, NullableNumberCheck<Byte>> build(ByteListSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public CollectionCheck<Short, Collection<Short>, NumberCheck<Short>> build(ShortCollectionSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public CollectionCheck<Short, Collection<Short>, NullableNumberCheck<Short>> build(
+            ShortCollectionSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public OrderedCollectionCheck<Short, List<Short>, NumberCheck<Short>> build(ShortListSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public OrderedCollectionCheck<Short, List<Short>, NullableNumberCheck<Short>> build(ShortListSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public CollectionCheck<Integer, Collection<Integer>, NumberCheck<Integer>> build(
+    public CollectionCheck<Integer, Collection<Integer>, NullableNumberCheck<Integer>> build(
             IntegerCollectionSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public OrderedCollectionCheck<Integer, List<Integer>, NumberCheck<Integer>> build(IntegerListSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public OrderedCollectionCheck<Integer, List<Integer>, NullableNumberCheck<Integer>> build(
+            IntegerListSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public CollectionCheck<Long, Collection<Long>, NumberCheck<Long>> build(LongCollectionSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public CollectionCheck<Long, Collection<Long>, NullableNumberCheck<Long>> build(LongCollectionSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public OrderedCollectionCheck<Long, List<Long>, NumberCheck<Long>> build(LongListSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+    public OrderedCollectionCheck<Long, List<Long>, NullableNumberCheck<Long>> build(LongListSupplier supplier) {
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public CollectionCheck<BigInteger, Collection<BigInteger>, NumberCheck<BigInteger>> build(
+    public CollectionCheck<BigInteger, Collection<BigInteger>, NullableNumberCheck<BigInteger>> build(
             BigIntegerCollectionSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public OrderedCollectionCheck<BigInteger, List<BigInteger>, NumberCheck<BigInteger>> build(
+    public OrderedCollectionCheck<BigInteger, List<BigInteger>, NullableNumberCheck<BigInteger>> build(
             BigIntegerListSupplier supplier) {
-        return build(supplier.get(), NumberCheck::new);
+        return build(supplier.get(), NullableNumberCheck::new);
     }
 
-    public CollectionCheck<Float, Collection<Float>, DecimalCheck<Float>> build(FloatCollectionSupplier supplier) {
-        return build(supplier.get(), DecimalCheck::new);
+    public CollectionCheck<Float, Collection<Float>, NullableDecimalCheck<Float>> build(
+            FloatCollectionSupplier supplier) {
+        return build(supplier.get(), NullableDecimalCheck::new);
     }
 
-    public OrderedCollectionCheck<Float, List<Float>, DecimalCheck<Float>> build(FloatListSupplier supplier) {
-        return build(supplier.get(), DecimalCheck::new);
+    public OrderedCollectionCheck<Float, List<Float>, NullableDecimalCheck<Float>> build(FloatListSupplier supplier) {
+        return build(supplier.get(), NullableDecimalCheck::new);
     }
 
-    public CollectionCheck<Double, Collection<Double>, DecimalCheck<Double>> build(DoubleCollectionSupplier supplier) {
-        return build(supplier.get(), DecimalCheck::new);
+    public CollectionCheck<Double, Collection<Double>, NullableDecimalCheck<Double>> build(
+            DoubleCollectionSupplier supplier) {
+        return build(supplier.get(), NullableDecimalCheck::new);
     }
 
-    public OrderedCollectionCheck<Double, List<Double>, DecimalCheck<Double>> build(DoubleListSupplier supplier) {
-        return build(supplier.get(), DecimalCheck::new);
+    public OrderedCollectionCheck<Double, List<Double>, NullableDecimalCheck<Double>> build(
+            DoubleListSupplier supplier) {
+        return build(supplier.get(), NullableDecimalCheck::new);
     }
 
-    public CollectionCheck<BigDecimal, Collection<BigDecimal>, DecimalCheck<BigDecimal>> build(
+    public CollectionCheck<BigDecimal, Collection<BigDecimal>, NullableDecimalCheck<BigDecimal>> build(
             BigDecimalCollectionSupplier supplier) {
-        return build(supplier.get(), DecimalCheck::new);
+        return build(supplier.get(), NullableDecimalCheck::new);
     }
 
-    public OrderedCollectionCheck<BigDecimal, List<BigDecimal>, DecimalCheck<BigDecimal>> build(
+    public OrderedCollectionCheck<BigDecimal, List<BigDecimal>, NullableDecimalCheck<BigDecimal>> build(
             BigDecimalListSupplier supplier) {
-        return build(supplier.get(), DecimalCheck::new);
+        return build(supplier.get(), NullableDecimalCheck::new);
     }
 
     public CollectionCheck<String, Collection<String>, StringCheck> build(StringCollectionSupplier supplier) {

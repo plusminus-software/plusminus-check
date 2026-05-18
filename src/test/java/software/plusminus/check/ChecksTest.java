@@ -264,14 +264,14 @@ public class ChecksTest {
     @Test
     public void booleanListReturnsOrderedCheck() {
         List<Boolean> list = Arrays.asList(true, false, true);
-        OrderedCollectionCheck<Boolean, List<Boolean>, BooleanCheck> check = checkOf(() -> list);
+        OrderedCollectionCheck<Boolean, List<Boolean>, NullableBooleanCheck> check = checkOf(() -> list);
         check.hasSize(3).contains(true);
     }
 
     @Test
     public void booleanListElementUsesBooleanCheck() {
         List<Boolean> list = Arrays.asList(true);
-        checkOf(() -> list).contains(BooleanCheck::isTrue);
+        checkOf(() -> list).contains(NullableBooleanCheck::isTrue);
     }
 
     @Test
@@ -283,69 +283,70 @@ public class ChecksTest {
     @Test
     public void booleanCollectionReturnsCollectionCheck() {
         Collection<Boolean> coll = new HashSet<>(Arrays.asList(true, false));
-        CollectionCheck<Boolean, Collection<Boolean>, BooleanCheck> check = checkOf(() -> coll);
+        CollectionCheck<Boolean, Collection<Boolean>, NullableBooleanCheck> check = checkOf(() -> coll);
         check.hasSize(2).contains(true);
     }
 
     @Test
     public void characterList() {
         List<Character> list = Arrays.asList('a', 'b');
-        OrderedCollectionCheck<Character, List<Character>, CharacterCheck> check = checkOf(() -> list);
+        OrderedCollectionCheck<Character, List<Character>, NullableCharacterCheck> check = checkOf(() -> list);
         check.hasSize(2).contains('a');
     }
 
     @Test
     public void byteList() {
         List<Byte> list = Arrays.asList((byte) 1, (byte) 2);
-        OrderedCollectionCheck<Byte, List<Byte>, NumberCheck<Byte>> check = checkOf(() -> list);
+        OrderedCollectionCheck<Byte, List<Byte>, NullableNumberCheck<Byte>> check = checkOf(() -> list);
         check.hasSize(2);
     }
 
     @Test
     public void shortList() {
         List<Short> list = Arrays.asList((short) 1, (short) 2);
-        OrderedCollectionCheck<Short, List<Short>, NumberCheck<Short>> check = checkOf(() -> list);
+        OrderedCollectionCheck<Short, List<Short>, NullableNumberCheck<Short>> check = checkOf(() -> list);
         check.hasSize(2);
     }
 
     @Test
     public void integerList() {
         List<Integer> list = Arrays.asList(1, 2, 3);
-        OrderedCollectionCheck<Integer, List<Integer>, NumberCheck<Integer>> check = checkOf(() -> list);
+        OrderedCollectionCheck<Integer, List<Integer>, NullableNumberCheck<Integer>> check = checkOf(() -> list);
         check.hasSize(3).contains(2);
     }
 
     @Test
     public void integerListElementUsesNumberCheck() {
         List<Integer> list = Arrays.asList(1);
-        checkOf(() -> list).contains(NumberCheck::isPositive);
+        checkOf(() -> list).contains(NullableNumberCheck::isPositive);
     }
 
     @Test
     public void longList() {
         List<Long> list = Arrays.asList(1L, 2L);
-        OrderedCollectionCheck<Long, List<Long>, NumberCheck<Long>> check = checkOf(() -> list);
+        OrderedCollectionCheck<Long, List<Long>, NullableNumberCheck<Long>> check = checkOf(() -> list);
         check.hasSize(2);
     }
 
     @Test
     public void bigIntegerList() {
         List<BigInteger> list = Arrays.asList(BigInteger.ONE, BigInteger.TEN);
-        OrderedCollectionCheck<BigInteger, List<BigInteger>, NumberCheck<BigInteger>> check = checkOf(() -> list);
+        OrderedCollectionCheck<BigInteger, List<BigInteger>, NullableNumberCheck<BigInteger>> check
+                = checkOf(() -> list);
         check.hasSize(2);
     }
 
     @Test
     public void floatList() {
         List<Float> list = Arrays.asList(1.0f, 2.0f);
-        OrderedCollectionCheck<Float, List<Float>, DecimalCheck<Float>> check = checkOf(() -> list);
+        OrderedCollectionCheck<Float, List<Float>, NullableDecimalCheck<Float>> check = checkOf(() -> list);
         check.hasSize(2);
     }
 
     @Test
     public void doubleList() {
         List<Double> list = Arrays.asList(1.0d, 2.0d);
-        OrderedCollectionCheck<Double, List<Double>, DecimalCheck<Double>> check = checkOf(() -> list);
+        OrderedCollectionCheck<Double, List<Double>, NullableDecimalCheck<Double>> check = checkOf(() -> list);
         check.hasSize(2);
     }
 
@@ -358,7 +359,8 @@ public class ChecksTest {
     @Test
     public void bigDecimalList() {
         List<BigDecimal> list = Arrays.asList(BigDecimal.ONE, BigDecimal.TEN);
-        OrderedCollectionCheck<BigDecimal, List<BigDecimal>, DecimalCheck<BigDecimal>> check = checkOf(() -> list);
+        OrderedCollectionCheck<BigDecimal, List<BigDecimal>, NullableDecimalCheck<BigDecimal>> check
+                = checkOf(() -> list);
         check.hasSize(2);
     }
 

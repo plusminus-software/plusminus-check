@@ -1,14 +1,14 @@
 package software.plusminus.check;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
-@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED",
-        justification = "super calls return this; narrowing override return type")
-public class DecimalCheck<T extends Number> extends PrimitiveDecimalCheck<T> {
+public class DecimalCheck<T extends Number> extends NumberCheck<T> {
+
+    private final Scale scale = new Scale();
 
     public DecimalCheck(@Nullable T actual) {
         super(actual);
@@ -18,27 +18,78 @@ public class DecimalCheck<T extends Number> extends PrimitiveDecimalCheck<T> {
         super(actual, levels);
     }
 
-    @Override
     @CheckReturnValue
     public DecimalCheck<T> limitScale() {
-        super.limitScale();
+        scale.limit();
         return this;
     }
 
-    @Override
     @CheckReturnValue
+    @SuppressWarnings("checkstyle:HiddenField")
     public DecimalCheck<T> limitScale(int scale) {
-        super.limitScale(scale);
+        this.scale.limit(scale);
         return this;
     }
 
     @Override
-    public void isNotNull() {
-        super.isNotNull();
+    public void is(T expected) {
+        isNumber(expected);
     }
 
     @Override
-    public void isNull() {
-        super.isNull();
+    public void is(int expected) {
+        isNumber(expected);
+    }
+
+    public void is(double expected) {
+        isNumber(expected);
+    }
+
+    public void is(String expected) {
+        isNumber(new BigDecimal(expected));
+    }
+
+    @Override
+    protected T actual() {
+        T actual = super.actual();
+        return scale.apply(actual);
+    }
+
+    static class Scale {
+
+        private static final int DEFAULT_SCALE = 4;
+
+        private boolean limited;
+        private int value;
+
+        void limit() {
+            limit(DEFAULT_SCALE);
+        }
+
+        void limit(int scale) {
+            this.limited = true;
+            this.value = scale;
+        }
+
+        @SuppressWarnings("unchecked")
+        <N extends Number> N apply(N number) {
+            if (!limited || number == null) {
+                return number;
+            }
+            if (number instanceof BigDecimal) {
+                return (N) ((BigDecimal) number).setScale(value, RoundingMode.HALF_UP);
+            }
+            if (number instanceof Float) {
+                BigDecimal scaled = new BigDecimal(Float.toString(number.floatValue()))
+                        .setScale(value, RoundingMode.HALF_UP);
+                return (N) Float.valueOf(scaled.floatValue());
+            }
+            if (number instanceof Double) {
+                BigDecimal scaled = new BigDecimal(Double.toString(number.doubleValue()))
+                        .setScale(value, RoundingMode.HALF_UP);
+                return (N) Double.valueOf(scaled.doubleValue());
+            }
+            throw new IllegalArgumentException("Unknown decimal type " + number.getClass());
+        }
     }
 }

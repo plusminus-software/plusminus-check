@@ -1,13 +1,13 @@
 package software.plusminus.check.object;
 
 import software.plusminus.check.AbstractCheck;
-import software.plusminus.check.BooleanCheck;
-import software.plusminus.check.CharacterCheck;
 import software.plusminus.check.CollectionCheck;
-import software.plusminus.check.DecimalCheck;
 import software.plusminus.check.EnumCheck;
 import software.plusminus.check.MapCheck;
-import software.plusminus.check.NumberCheck;
+import software.plusminus.check.NullableBooleanCheck;
+import software.plusminus.check.NullableCharacterCheck;
+import software.plusminus.check.NullableDecimalCheck;
+import software.plusminus.check.NullableNumberCheck;
 import software.plusminus.check.ObjectCheck;
 import software.plusminus.check.OptionalCheck;
 import software.plusminus.check.OrderedCollectionCheck;
@@ -27,12 +27,12 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unchecked")
 public interface ObjectCheckType {
 
-    default BooleanCheck isBoolean() {
-        return isType(Boolean.class, BooleanCheck::new);
+    default NullableBooleanCheck isBoolean() {
+        return isType(Boolean.class, NullableBooleanCheck::new);
     }
 
-    default CharacterCheck isCharacter() {
-        return isType(Character.class, CharacterCheck::new);
+    default NullableCharacterCheck isCharacter() {
+        return isType(Character.class, NullableCharacterCheck::new);
     }
 
     default <X> CollectionCheck<X, Collection<X>, ObjectCheck<X>> isCollection() {
@@ -60,21 +60,21 @@ public interface ObjectCheckType {
         return isType(type, EnumCheck::new);
     }
 
-    default <N extends Number> NumberCheck<N> isNumber() {
+    default <N extends Number> NullableNumberCheck<N> isNumber() {
         Class<N> type = (Class<N>) (Class<?>) Number.class;
-        return isType(type, NumberCheck::new);
+        return isType(type, NullableNumberCheck::new);
     }
 
-    default DecimalCheck<Float> isFloat() {
-        return isType(Float.class, DecimalCheck::new);
+    default NullableDecimalCheck<Float> isFloat() {
+        return isType(Float.class, NullableDecimalCheck::new);
     }
 
-    default DecimalCheck<Double> isDouble() {
-        return isType(Double.class, DecimalCheck::new);
+    default NullableDecimalCheck<Double> isDouble() {
+        return isType(Double.class, NullableDecimalCheck::new);
     }
 
-    default DecimalCheck<BigDecimal> isBigDecimal() {
-        return isType(BigDecimal.class, DecimalCheck::new);
+    default NullableDecimalCheck<BigDecimal> isBigDecimal() {
+        return isType(BigDecimal.class, NullableDecimalCheck::new);
     }
 
     default <K, V> MapCheck<K, V> isMap() {

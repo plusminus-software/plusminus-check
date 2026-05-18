@@ -16,24 +16,4 @@ public class CharacterCheckTest {
     public void isCharFail() {
         assertFail(() -> new CharacterCheck('a').is('b'), "a", "b");
     }
-
-    @Test
-    public void isNullSuccess() {
-        new CharacterCheck(null).isNull();
-    }
-
-    @Test
-    public void isNullFail() {
-        assertFail(() -> new CharacterCheck('a').isNull(), "a", "null");
-    }
-
-    @Test
-    public void isNotNullSuccess() {
-        new CharacterCheck('a').isNotNull();
-    }
-
-    @Test
-    public void isNotNullFail() {
-        assertFail(() -> new CharacterCheck(null).isNotNull(), "null", "not null");
-    }
 }

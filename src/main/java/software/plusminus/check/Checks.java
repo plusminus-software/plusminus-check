@@ -64,75 +64,75 @@ public class Checks {
         Checks.factory = checkFactory;
     }
 
-    public PrimitiveBooleanCheck check(boolean actual) {
+    public BooleanCheck check(boolean actual) {
         return factory.build(actual);
     }
 
-    public BooleanCheck check(Boolean actual) {
+    public NullableBooleanCheck check(Boolean actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveCharacterCheck check(char actual) {
+    public CharacterCheck check(char actual) {
         return factory.build(actual);
     }
 
-    public CharacterCheck check(Character actual) {
+    public NullableCharacterCheck check(Character actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveNumberCheck<Byte> check(byte actual) {
+    public NumberCheck<Byte> check(byte actual) {
         return factory.build(actual);
     }
 
-    public NumberCheck<Byte> check(Byte actual) {
+    public NullableNumberCheck<Byte> check(Byte actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveNumberCheck<Short> check(short actual) {
+    public NumberCheck<Short> check(short actual) {
         return factory.build(actual);
     }
 
-    public NumberCheck<Short> check(Short actual) {
+    public NullableNumberCheck<Short> check(Short actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveNumberCheck<Integer> check(int actual) {
+    public NumberCheck<Integer> check(int actual) {
         return factory.build(actual);
     }
 
-    public NumberCheck<Integer> check(Integer actual) {
+    public NullableNumberCheck<Integer> check(Integer actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveNumberCheck<Long> check(long actual) {
+    public NumberCheck<Long> check(long actual) {
         return factory.build(actual);
     }
 
-    public NumberCheck<Long> check(Long actual) {
+    public NullableNumberCheck<Long> check(Long actual) {
         return factory.build(actual);
     }
 
-    public NumberCheck<BigInteger> check(BigInteger actual) {
+    public NullableNumberCheck<BigInteger> check(BigInteger actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveDecimalCheck<Float> check(float actual) {
+    public DecimalCheck<Float> check(float actual) {
         return factory.build(actual);
     }
 
-    public DecimalCheck<Float> check(Float actual) {
+    public NullableDecimalCheck<Float> check(Float actual) {
         return factory.build(actual);
     }
 
-    public PrimitiveDecimalCheck<Double> check(double actual) {
+    public DecimalCheck<Double> check(double actual) {
         return factory.build(actual);
     }
 
-    public DecimalCheck<Double> check(Double actual) {
+    public NullableDecimalCheck<Double> check(Double actual) {
         return factory.build(actual);
     }
 
-    public DecimalCheck<BigDecimal> check(BigDecimal actual) {
+    public NullableDecimalCheck<BigDecimal> check(BigDecimal actual) {
         return factory.build(actual);
     }
 
@@ -178,91 +178,95 @@ public class Checks {
 
     // --- Collection suppliers ---
 
-    public CollectionCheck<Boolean, Collection<Boolean>, BooleanCheck> checkOf(BooleanCollectionSupplier supplier) {
+    public CollectionCheck<Boolean, Collection<Boolean>, NullableBooleanCheck> checkOf(
+            BooleanCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Boolean, List<Boolean>, BooleanCheck> checkOf(BooleanListSupplier supplier) {
+    public OrderedCollectionCheck<Boolean, List<Boolean>, NullableBooleanCheck> checkOf(BooleanListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Character, Collection<Character>, CharacterCheck> checkOf(
+    public CollectionCheck<Character, Collection<Character>, NullableCharacterCheck> checkOf(
             CharacterCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Character, List<Character>, CharacterCheck> checkOf(
+    public OrderedCollectionCheck<Character, List<Character>, NullableCharacterCheck> checkOf(
             CharacterListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Byte, Collection<Byte>, NumberCheck<Byte>> checkOf(ByteCollectionSupplier supplier) {
+    public CollectionCheck<Byte, Collection<Byte>, NullableNumberCheck<Byte>> checkOf(ByteCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Byte, List<Byte>, NumberCheck<Byte>> checkOf(ByteListSupplier supplier) {
+    public OrderedCollectionCheck<Byte, List<Byte>, NullableNumberCheck<Byte>> checkOf(ByteListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Short, Collection<Short>, NumberCheck<Short>> checkOf(ShortCollectionSupplier supplier) {
+    public CollectionCheck<Short, Collection<Short>, NullableNumberCheck<Short>> checkOf(
+            ShortCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Short, List<Short>, NumberCheck<Short>> checkOf(ShortListSupplier supplier) {
+    public OrderedCollectionCheck<Short, List<Short>, NullableNumberCheck<Short>> checkOf(ShortListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Integer, Collection<Integer>, NumberCheck<Integer>> checkOf(
+    public CollectionCheck<Integer, Collection<Integer>, NullableNumberCheck<Integer>> checkOf(
             IntegerCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Integer, List<Integer>, NumberCheck<Integer>> checkOf(
+    public OrderedCollectionCheck<Integer, List<Integer>, NullableNumberCheck<Integer>> checkOf(
             IntegerListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Long, Collection<Long>, NumberCheck<Long>> checkOf(LongCollectionSupplier supplier) {
+    public CollectionCheck<Long, Collection<Long>, NullableNumberCheck<Long>> checkOf(LongCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Long, List<Long>, NumberCheck<Long>> checkOf(LongListSupplier supplier) {
+    public OrderedCollectionCheck<Long, List<Long>, NullableNumberCheck<Long>> checkOf(LongListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<BigInteger, Collection<BigInteger>, NumberCheck<BigInteger>> checkOf(
+    public CollectionCheck<BigInteger, Collection<BigInteger>, NullableNumberCheck<BigInteger>> checkOf(
             BigIntegerCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<BigInteger, List<BigInteger>, NumberCheck<BigInteger>> checkOf(
+    public OrderedCollectionCheck<BigInteger, List<BigInteger>, NullableNumberCheck<BigInteger>> checkOf(
             BigIntegerListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Float, Collection<Float>, DecimalCheck<Float>> checkOf(FloatCollectionSupplier supplier) {
+    public CollectionCheck<Float, Collection<Float>, NullableDecimalCheck<Float>> checkOf(
+            FloatCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Float, List<Float>, DecimalCheck<Float>> checkOf(FloatListSupplier supplier) {
+    public OrderedCollectionCheck<Float, List<Float>, NullableDecimalCheck<Float>> checkOf(FloatListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<Double, Collection<Double>, DecimalCheck<Double>> checkOf(
+    public CollectionCheck<Double, Collection<Double>, NullableDecimalCheck<Double>> checkOf(
             DoubleCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<Double, List<Double>, DecimalCheck<Double>> checkOf(DoubleListSupplier supplier) {
+    public OrderedCollectionCheck<Double, List<Double>, NullableDecimalCheck<Double>> checkOf(
+            DoubleListSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public CollectionCheck<BigDecimal, Collection<BigDecimal>, DecimalCheck<BigDecimal>> checkOf(
+    public CollectionCheck<BigDecimal, Collection<BigDecimal>, NullableDecimalCheck<BigDecimal>> checkOf(
             BigDecimalCollectionSupplier supplier) {
         return factory.build(supplier);
     }
 
-    public OrderedCollectionCheck<BigDecimal, List<BigDecimal>, DecimalCheck<BigDecimal>> checkOf(
+    public OrderedCollectionCheck<BigDecimal, List<BigDecimal>, NullableDecimalCheck<BigDecimal>> checkOf(
             BigDecimalListSupplier supplier) {
         return factory.build(supplier);
     }

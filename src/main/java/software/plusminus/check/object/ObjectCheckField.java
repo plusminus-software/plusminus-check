@@ -7,14 +7,14 @@ import software.plusminus.check.CollectionCheck;
 import software.plusminus.check.DecimalCheck;
 import software.plusminus.check.LinkedCheck;
 import software.plusminus.check.MapCheck;
+import software.plusminus.check.NullableBooleanCheck;
+import software.plusminus.check.NullableCharacterCheck;
+import software.plusminus.check.NullableDecimalCheck;
+import software.plusminus.check.NullableNumberCheck;
 import software.plusminus.check.NumberCheck;
 import software.plusminus.check.ObjectCheck;
 import software.plusminus.check.OptionalCheck;
 import software.plusminus.check.OrderedCollectionCheck;
-import software.plusminus.check.PrimitiveBooleanCheck;
-import software.plusminus.check.PrimitiveCharacterCheck;
-import software.plusminus.check.PrimitiveDecimalCheck;
-import software.plusminus.check.PrimitiveNumberCheck;
 import software.plusminus.check.StringCheck;
 import software.plusminus.check.getter.AbstractGetter;
 import software.plusminus.check.getter.BigDecimalGetter;
@@ -74,79 +74,81 @@ public interface ObjectCheckField<T> {
 
     <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(String fieldName);
 
-    default LinkedCheck<Boolean, PrimitiveBooleanCheck, ObjectCheck<T>> fieldOf(PrimitiveBooleanGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveBooleanCheck::new);
+    default LinkedCheck<Boolean, BooleanCheck, ObjectCheck<T>> fieldOf(PrimitiveBooleanGetter<T> getter) {
+        return fieldOf(getter, getter::apply, BooleanCheck::new);
     }
 
-    default LinkedCheck<Boolean, BooleanCheck, ObjectCheck<T>> fieldOf(BooleanGetter<T> getter) {
-        return fieldOf(getter, BooleanCheck::new);
+    default LinkedCheck<Boolean, NullableBooleanCheck, ObjectCheck<T>> fieldOf(BooleanGetter<T> getter) {
+        return fieldOf(getter, NullableBooleanCheck::new);
     }
 
-    default LinkedCheck<Character, PrimitiveCharacterCheck, ObjectCheck<T>> fieldOf(
+    default LinkedCheck<Character, CharacterCheck, ObjectCheck<T>> fieldOf(
             PrimitiveCharacterGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveCharacterCheck::new);
+        return fieldOf(getter, getter::apply, CharacterCheck::new);
     }
 
-    default LinkedCheck<Character, CharacterCheck, ObjectCheck<T>> fieldOf(CharacterGetter<T> getter) {
-        return fieldOf(getter, CharacterCheck::new);
+    default LinkedCheck<Character, NullableCharacterCheck, ObjectCheck<T>> fieldOf(CharacterGetter<T> getter) {
+        return fieldOf(getter, NullableCharacterCheck::new);
     }
 
-    default LinkedCheck<Byte, PrimitiveNumberCheck<Byte>, ObjectCheck<T>> fieldOf(PrimitiveByteGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveNumberCheck::new);
+    default LinkedCheck<Byte, NumberCheck<Byte>, ObjectCheck<T>> fieldOf(PrimitiveByteGetter<T> getter) {
+        return fieldOf(getter, getter::apply, NumberCheck::new);
     }
 
-    default LinkedCheck<Byte, NumberCheck<Byte>, ObjectCheck<T>> fieldOf(ByteGetter<T> getter) {
-        return fieldOf(getter, NumberCheck::new);
+    default LinkedCheck<Byte, NullableNumberCheck<Byte>, ObjectCheck<T>> fieldOf(ByteGetter<T> getter) {
+        return fieldOf(getter, NullableNumberCheck::new);
     }
 
-    default LinkedCheck<Short, PrimitiveNumberCheck<Short>, ObjectCheck<T>> fieldOf(PrimitiveShortGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveNumberCheck::new);
+    default LinkedCheck<Short, NumberCheck<Short>, ObjectCheck<T>> fieldOf(PrimitiveShortGetter<T> getter) {
+        return fieldOf(getter, getter::apply, NumberCheck::new);
     }
 
-    default LinkedCheck<Short, NumberCheck<Short>, ObjectCheck<T>> fieldOf(ShortGetter<T> getter) {
-        return fieldOf(getter, NumberCheck::new);
+    default LinkedCheck<Short, NullableNumberCheck<Short>, ObjectCheck<T>> fieldOf(ShortGetter<T> getter) {
+        return fieldOf(getter, NullableNumberCheck::new);
     }
 
-    default LinkedCheck<Integer, PrimitiveNumberCheck<Integer>, ObjectCheck<T>> fieldOf(
+    default LinkedCheck<Integer, NumberCheck<Integer>, ObjectCheck<T>> fieldOf(
             PrimitiveIntegerGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveNumberCheck::new);
+        return fieldOf(getter, getter::apply, NumberCheck::new);
     }
 
-    default LinkedCheck<Integer, NumberCheck<Integer>, ObjectCheck<T>> fieldOf(IntegerGetter<T> getter) {
-        return fieldOf(getter, NumberCheck::new);
+    default LinkedCheck<Integer, NullableNumberCheck<Integer>, ObjectCheck<T>> fieldOf(IntegerGetter<T> getter) {
+        return fieldOf(getter, NullableNumberCheck::new);
     }
 
-    default LinkedCheck<Long, PrimitiveNumberCheck<Long>, ObjectCheck<T>> fieldOf(PrimitiveLongGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveNumberCheck::new);
+    default LinkedCheck<Long, NumberCheck<Long>, ObjectCheck<T>> fieldOf(PrimitiveLongGetter<T> getter) {
+        return fieldOf(getter, getter::apply, NumberCheck::new);
     }
 
-    default LinkedCheck<Long, NumberCheck<Long>, ObjectCheck<T>> fieldOf(LongGetter<T> getter) {
-        return fieldOf(getter, NumberCheck::new);
+    default LinkedCheck<Long, NullableNumberCheck<Long>, ObjectCheck<T>> fieldOf(LongGetter<T> getter) {
+        return fieldOf(getter, NullableNumberCheck::new);
     }
 
-    default LinkedCheck<BigInteger, NumberCheck<BigInteger>, ObjectCheck<T>> fieldOf(BigIntegerGetter<T> getter) {
-        return fieldOf(getter, NumberCheck::new);
+    default LinkedCheck<BigInteger, NullableNumberCheck<BigInteger>, ObjectCheck<T>> fieldOf(
+            BigIntegerGetter<T> getter) {
+        return fieldOf(getter, NullableNumberCheck::new);
     }
 
-    default LinkedCheck<Float, PrimitiveDecimalCheck<Float>, ObjectCheck<T>> fieldOf(PrimitiveFloatGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveDecimalCheck::new);
+    default LinkedCheck<Float, DecimalCheck<Float>, ObjectCheck<T>> fieldOf(PrimitiveFloatGetter<T> getter) {
+        return fieldOf(getter, getter::apply, DecimalCheck::new);
     }
 
-    default LinkedCheck<Float, DecimalCheck<Float>, ObjectCheck<T>> fieldOf(FloatGetter<T> getter) {
-        return fieldOf(getter, DecimalCheck::new);
+    default LinkedCheck<Float, NullableDecimalCheck<Float>, ObjectCheck<T>> fieldOf(FloatGetter<T> getter) {
+        return fieldOf(getter, NullableDecimalCheck::new);
     }
 
-    default LinkedCheck<Double, PrimitiveDecimalCheck<Double>, ObjectCheck<T>> fieldOf(
+    default LinkedCheck<Double, DecimalCheck<Double>, ObjectCheck<T>> fieldOf(
             PrimitiveDoubleGetter<T> getter) {
-        return fieldOf(getter, getter::apply, PrimitiveDecimalCheck::new);
+        return fieldOf(getter, getter::apply, DecimalCheck::new);
     }
 
-    default LinkedCheck<Double, DecimalCheck<Double>, ObjectCheck<T>> fieldOf(DoubleGetter<T> getter) {
-        return fieldOf(getter, DecimalCheck::new);
+    default LinkedCheck<Double, NullableDecimalCheck<Double>, ObjectCheck<T>> fieldOf(DoubleGetter<T> getter) {
+        return fieldOf(getter, NullableDecimalCheck::new);
     }
 
-    default LinkedCheck<BigDecimal, DecimalCheck<BigDecimal>, ObjectCheck<T>> fieldOf(BigDecimalGetter<T> getter) {
-        return fieldOf(getter, DecimalCheck::new);
+    default LinkedCheck<BigDecimal, NullableDecimalCheck<BigDecimal>, ObjectCheck<T>> fieldOf(
+            BigDecimalGetter<T> getter) {
+        return fieldOf(getter, NullableDecimalCheck::new);
     }
 
     default LinkedCheck<String, StringCheck, ObjectCheck<T>> fieldOf(StringGetter<T> getter) {

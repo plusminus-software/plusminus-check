@@ -6,12 +6,14 @@ Fluent assertions based on JSON / string comparison instead of `equals()`, with
 first-class support for loading expected values from `src/test/resources`.
 
 ```java
+import static software.plusminus.check.Checks.check;
+
 @Test
 public void testProduct() {
     Product product = new Product("testName");
 
-    check(product).is("{\"name\":\"testName\"}");
-    check(product).is("some-file-in-resources-folder.json");
+    check(product).is("{\"name\":\"testName\"}"); // ok
+    check(product).is("some-file-in-resources-folder.json"); // ok
     check(product).is(new Product("otherName")); // fails, prints a JSON diff
 }
 ```
@@ -27,8 +29,9 @@ and diffs that.
 void createsUser() {
     // class User does not have properly overriden equals() and hashCode()
     // but the test still checks everything correctly
+
     User actual = userService.create("Alice", 30);
-    check(actual).is(new User("Alice", 30)); // OK
+    check(actual).is(new User("Alice", 30)); // ok
 }
 ```
 
@@ -54,7 +57,7 @@ void persistsUser() {
     User saved = repository.save(new User("Alice", 30));
 
     check(toJson(saved)).isJson()
-        .hasField("id",        id -> id.isNumber())
+        .hasField("id", id -> id.isNumber())
         .hasField("createdAt", t  -> t.isLike(LocalDate.now()))
         .is("user.json");
 }
@@ -83,10 +86,24 @@ items[0].price expected:<9.99> but was:<5.00>
 ```
 
 **One `check(x)` for every common type.**
-Primitives, `BigDecimal`, `Temporal`, `Optional`, `Map`, arrays, collections,
-enums, POJOs — overloads dispatch on the argument and give you the matching
-checker (sign checks for numbers, `isEmpty()` for collections, `hasField()`
-for JSON, …).
+Just `import static software.plusminus.check.Checks.check`. Primitives, `BigDecimal`, `Temporal`, `Optional`, `Map`,
+arrays, collections, enums, POJOs — overloads dispatch on the argument and give you the matching
+checker.
+
+**Typed check of Collection/List? Yes.**
+Java erases element types — `check(list)` gives you `ObjectCheck` elements.
+`checkOf(supplier)` reads the element type from the supplier interface, so
+`.at(i)` returns the narrow checker that fits.
+```java
+@Test
+void hasPositiveAmounts() {
+    List<Integer> amounts = invoice.getAmounts();
+
+    checkOf(() -> amounts)            // typed as IntegerListSupplier
+        .at(0).is(c -> c.isPositive()) // c is NumberCheck<Integer>, not ObjectCheck
+        .hasSize(3);
+}
+```
 
 ## Supported types
 1. `boolean` / `Boolean`

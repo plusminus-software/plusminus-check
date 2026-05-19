@@ -40,29 +40,29 @@ public class ObjectCheckTest {
     }
 
     @Test
-    public void fieldOfGetter() {
+    public void fieldByGetter() {
         check(new TestObject("a", 1))
-                .fieldOf(TestObject::getName).is("a");
+                .field(TestObject::getName).is("a");
     }
 
     @Test
-    public void fieldOfGetterFail() {
+    public void fieldByGetterFail() {
         assertFail(() -> check(new TestObject("a", 1))
-                .fieldOf(TestObject::getName).is("b"), "name ", "a", "b");
+                .field(TestObject::getName).is("b"), "name ", "a", "b");
     }
 
     @Test
     public void allFieldsCheckedOk() {
         ObjectCheck<TestObject> objectCheck = check(new TestObject("a", 1));
-        objectCheck.fieldOf(TestObject::getName).is("a");
-        objectCheck.fieldOf(TestObject::getCount).is(1);
+        objectCheck.field(TestObject::getName).is("a");
+        objectCheck.field(TestObject::getCount).is(1);
         objectCheck.allFieldsChecked();
     }
 
     @Test
     public void allFieldsCheckedFail() {
         ObjectCheck<TestObject> objectCheck = check(new TestObject("a", 1));
-        objectCheck.fieldOf(TestObject::getName).is("a");
+        objectCheck.field(TestObject::getName).is("a");
         assertFail(objectCheck::allFieldsChecked,
                 "there are not checked fields: [count]",
                 "all fields were checked");

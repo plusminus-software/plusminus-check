@@ -1,19 +1,4 @@
-package software.plusminus.check.object;
-
-import software.plusminus.check.types.AbstractCheck;
-import software.plusminus.check.types.ArrayCheck;
-import software.plusminus.check.types.CollectionCheck;
-import software.plusminus.check.types.EnumCheck;
-import software.plusminus.check.types.ListCheck;
-import software.plusminus.check.types.MapCheck;
-import software.plusminus.check.types.NullableBooleanCheck;
-import software.plusminus.check.types.NullableCharacterCheck;
-import software.plusminus.check.types.NullableDecimalCheck;
-import software.plusminus.check.types.NullableNumberCheck;
-import software.plusminus.check.types.ObjectCheck;
-import software.plusminus.check.types.OptionalCheck;
-import software.plusminus.check.types.StringCheck;
-import software.plusminus.check.types.TemporalCheck;
+package software.plusminus.check.types;
 
 import java.math.BigDecimal;
 import java.time.temporal.Temporal;
@@ -26,7 +11,7 @@ import java.util.SortedSet;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("unchecked")
-public interface ObjectCheckType {
+public interface TypeCheck {
 
     default NullableBooleanCheck isBoolean() {
         return isType(Boolean.class, NullableBooleanCheck::new);

@@ -69,8 +69,8 @@ void calculatesOrderTotals() {
     Order order = orderService.place(cart);
 
     check(order)
-        .fieldOf(Order::getCustomer).fieldOf(Customer::getName).is("Alice")
-        .fieldOf(Order::getItems).at(0).fieldOf(Item::getPrice).is("9.99");
+        .field(Order::getCustomer).field(Customer::getName).is("Alice")
+        .field(Order::getItems).at(0).field(Item::getPrice).is("9.99");
 }
 ```
 
@@ -126,9 +126,9 @@ Checks.factory(new MyCheckFactory());
 | method                                            | meaning                                                        |
 |:--------------------------------------------------|:---------------------------------------------------------------|
 | `isInstanceOf(Class<X>)`                          | returns a typed `ObjectCheck<X>` for further chaining          |
-| `isBoolean()` / `isString()` / `isNumber()` / ... | narrows to a typed checker (see `ObjectCheckType`)             |
-| `field("name")`                                   | descends into a field by name, returns a `LinkedCheck`         |
-| `fieldOf(User::getName, ...)`                     | descends via a method reference, with full check builder       |
+| `isBoolean()` / `isString()` / `isNumber()` / ... | narrows to a typed checker (see `TypeCheck`)             |
+| `field(User::getName)`                            | descends via a typed method reference (returns narrowed checker) |
+| `field("fieldName")`                              | descends by string name (reflective fallback)                  |
 | `allFieldsChecked(coverage)`                      | asserts every field of the object has been checked             |
 
 ## Collection / Map checks

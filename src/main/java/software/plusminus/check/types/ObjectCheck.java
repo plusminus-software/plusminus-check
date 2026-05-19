@@ -1,8 +1,6 @@
 package software.plusminus.check.types;
 
 import software.plusminus.check.getter.AbstractGetter;
-import software.plusminus.check.object.ObjectCheckField;
-import software.plusminus.check.object.ObjectCheckType;
 import software.plusminus.check.util.FieldCoverage;
 import software.plusminus.check.util.ObjectUtils;
 
@@ -17,7 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @SuppressWarnings({"unchecked", "java:S2160"})
-public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectCheckType, ObjectCheckField<T> {
+public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck, FieldCheck<T> {
 
     private Set<String> checkedFields;
 
@@ -71,7 +69,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
     }
 
     @Override
-    public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> fieldOf(
+    public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
             AbstractGetter<T, V> getter,
             BiFunction<V, List<String>, C> checkBuilder) {
         isNotNull();
@@ -81,7 +79,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
     }
 
     @Override
-    public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> fieldOf(
+    public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
             Serializable getter,
             Function<T, V> valueProvider,
             BiFunction<V, List<String>, C> checkBuilder) {

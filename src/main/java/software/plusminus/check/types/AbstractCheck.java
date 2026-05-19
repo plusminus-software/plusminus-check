@@ -178,8 +178,12 @@ public abstract class AbstractCheck<T> implements Check<T> {
 
     @SuppressWarnings("checkstyle:HiddenField")
     protected void fail(@Nullable Object actual, @Nullable Object expected) {
+        String path = String.join("", levels);
+        if (path.startsWith(".")) {
+            path = path.substring(1);
+        }
         String message = String.format(MESSAGE_PATTERN,
-                String.join(" -> ", levels) + (levels.isEmpty() ? "" : " "),
+                path + (path.isEmpty() ? "" : " "),
                 StringUtil.toString(expected, true),
                 StringUtil.toString(actual));
         throw new AssertionError(message);

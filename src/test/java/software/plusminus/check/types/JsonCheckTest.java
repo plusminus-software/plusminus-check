@@ -42,7 +42,7 @@ public class JsonCheckTest {
         assertFail(() -> check("{\"id\":42,\"name\":\"a\"}")
                         .isJson()
                         .hasField("id", id -> id.isLike(7)),
-                ".id ", 42, 7);
+                "id ", 42, 7);
     }
 
     @Test

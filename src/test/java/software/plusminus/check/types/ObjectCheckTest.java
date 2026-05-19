@@ -36,7 +36,7 @@ public class ObjectCheckTest {
     @Test
     public void fieldByNameFail() {
         assertFail(() -> check(new TestObject("a", 1)).field("name").is(o -> o.is("b")),
-                ".name ", "a", "b");
+                "name ", "a", "b");
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ObjectCheckTest {
     @Test
     public void fieldOfGetterFail() {
         assertFail(() -> check(new TestObject("a", 1))
-                .fieldOf(TestObject::getName).is("b"), ".name ", "a", "b");
+                .fieldOf(TestObject::getName).is("b"), "name ", "a", "b");
     }
 
     @Test

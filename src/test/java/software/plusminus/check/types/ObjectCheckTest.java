@@ -35,8 +35,8 @@ public class ObjectCheckTest {
 
     @Test
     public void fieldByNameFail() {
-        assertFail(() -> check(new TestObject("a", 1))
-                .field("name").is(o -> o.is("b")), "a", "b");
+        assertFail(() -> check(new TestObject("a", 1)).field("name").is(o -> o.is("b")),
+                ".name ", "a", "b");
     }
 
     @Test

@@ -65,7 +65,9 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements ObjectChec
         T actual = actual();
         Object value = ObjectUtils.readField(actual, fieldName);
         checkedFields.add(fieldName);
-        return new LinkedCheck<>(new ObjectCheck<>((X) value, levels()), this);
+        List<String> fieldLevels = new ArrayList<>(levels());
+        fieldLevels.add("." + fieldName);
+        return new LinkedCheck<>(new ObjectCheck<>((X) value, fieldLevels), this);
     }
 
     @Override

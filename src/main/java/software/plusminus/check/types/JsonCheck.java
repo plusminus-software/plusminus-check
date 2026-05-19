@@ -18,6 +18,7 @@ package software.plusminus.check.types;
 import software.plusminus.check.util.JsonUtil;
 import software.plusminus.util.ResourceUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,9 @@ public class JsonCheck extends AbstractCheck<String> {
             fail("Field " + fieldName + " is present", "Field " + fieldName + " is missed");
         }
         Object value = actualMap.get(fieldName);
-        ObjectCheck<?> objectCheck = new ObjectCheck<>(value);
+        List<String> fieldLevels = new ArrayList<>(levels());
+        fieldLevels.add("." + fieldName);
+        ObjectCheck<?> objectCheck = new ObjectCheck<>(value, fieldLevels);
         fieldValueChecker.accept(objectCheck);
         return this;
     }

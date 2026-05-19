@@ -1,7 +1,7 @@
 # plusminus-check
 Rich test assertions for Java
 
-## Why?
+## What is it?
 Fluent assertions based on JSON / string comparison instead of `equals()`, with
 first-class support for loading expected values from `src/test/resources`.
 
@@ -15,6 +15,78 @@ public void testProduct() {
     check(product).is(new Product("otherName")); // fails, prints a JSON diff
 }
 ```
+
+## Why?
+
+**Compare any object by structure — no `equals()` needed.**
+You stop writing throwaway `equals()`/`hashCode()` just so a test can compare
+DTOs, entities, or response bodies. The library serialises both sides to JSON
+and diffs that.
+```java
+@Test
+void createsUser() {
+    // class User does not have properly overriden equals() and hashCode()
+    // but the test still checks everything correctly
+    User actual = userService.create("Alice", 30);
+    check(actual).is(new User("Alice", 30)); // OK
+}
+```
+
+**Pin the expected output to a resource file. Edit JSON, not Java.**
+When the expected payload is large or nested (API responses, persisted
+entities), keeping it inline drowns the test. Move it to
+`src/test/resources/` and reference it by name.
+```java
+@Test
+void rendersUserJson() {
+    String body = controller.getUser(42).getBody();
+    check(body).is("user.json");   // src/test/resources/user.json
+}
+```
+
+**Ignore volatile fields without touching the expected JSON.**
+IDs and timestamps make snapshot tests flaky. Pre-check them with `hasField`,
+then compare the rest against a stable resource — no placeholders, no
+post-processing.
+```java
+@Test
+void persistsUser() {
+    User saved = repository.save(new User("Alice", 30));
+
+    check(toJson(saved)).isJson()
+        .hasField("id",        id -> id.isNumber())
+        .hasField("createdAt", t  -> t.isLike(LocalDate.now()))
+        .is("user.json");
+}
+```
+
+**Navigate fields and collections with type-safe getters.**
+No string field names, no reflection: refactors carry through. Use it when you
+care about a few specific values inside a big aggregate.
+```java
+@Test
+void calculatesOrderTotals() {
+    Order order = orderService.place(cart);
+
+    check(order)
+        .fieldOf(Order::getCustomer).fieldOf(Customer::getName).is("Alice")
+        .fieldOf(Order::getItems).at(0).fieldOf(Item::getPrice).is("9.99");
+}
+```
+
+**Failure messages read like the call chain.**
+You can find the broken field by skimming, without expanding multi-line JSON
+diffs.
+```text
+customer.name expected:<Bob> but was:<Alice>
+items[0].price expected:<9.99> but was:<5.00>
+```
+
+**One `check(x)` for every common type.**
+Primitives, `BigDecimal`, `Temporal`, `Optional`, `Map`, arrays, collections,
+enums, POJOs — overloads dispatch on the argument and give you the matching
+checker (sign checks for numbers, `isEmpty()` for collections, `hasField()`
+for JSON, …).
 
 ## Supported types
 1. `boolean` / `Boolean`

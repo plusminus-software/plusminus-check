@@ -41,6 +41,7 @@ import software.plusminus.check.types.CharacterCheck;
 import software.plusminus.check.types.CollectionCheck;
 import software.plusminus.check.types.DecimalCheck;
 import software.plusminus.check.types.EnumCheck;
+import software.plusminus.check.types.InputStreamCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
 import software.plusminus.check.types.NullableBooleanCheck;
@@ -53,6 +54,7 @@ import software.plusminus.check.types.OptionalCheck;
 import software.plusminus.check.types.StringCheck;
 import software.plusminus.check.types.TemporalCheck;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.Temporal;
@@ -150,6 +152,10 @@ public interface Checks {
     }
 
     static StringCheck check(String actual) {
+        return FACTORY.get().build(actual);
+    }
+
+    static InputStreamCheck check(InputStream actual) {
         return FACTORY.get().build(actual);
     }
 

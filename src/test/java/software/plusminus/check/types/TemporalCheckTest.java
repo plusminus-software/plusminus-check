@@ -1,5 +1,6 @@
 package software.plusminus.check.types;
 
+import lombok.Data;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -58,5 +59,34 @@ public class TemporalCheckTest {
     @Test
     public void recentYearMonthWithinRange() {
         check(YearMonth.now()).isRecent(Duration.ofDays(40));
+    }
+
+    @Test
+    public void fieldWithGetterOk() {
+        TestEvent event = new TestEvent(Instant.now());
+        check(event).field(TestEvent::getCreatedAt).is(c -> c.isRecent());
+    }
+
+    @Test
+    public void fieldWithGetterFail() {
+        TestEvent event = new TestEvent(Instant.now().minusSeconds(10));
+        assertFail(() -> check(event).field(TestEvent::getCreatedAt).is(c -> c.isRecent()));
+    }
+
+    @Test
+    public void fieldWithGetterIsOk() {
+        Instant now = Instant.now();
+        TestEvent event = new TestEvent(now);
+        check(event).field(TestEvent::getCreatedAt).is(now);
+    }
+
+    @Data
+    private static class TestEvent {
+
+        private Instant createdAt;
+
+        TestEvent(Instant createdAt) {
+            this.createdAt = createdAt;
+        }
     }
 }

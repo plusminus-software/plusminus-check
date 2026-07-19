@@ -177,7 +177,7 @@ public class PathCheckTest {
         private String name;
         private Path path;
 
-        public TestFile(String name, Path path) {
+        TestFile(String name, Path path) {
             this.name = name;
             this.path = path;
         }

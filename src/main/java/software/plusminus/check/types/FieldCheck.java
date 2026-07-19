@@ -10,6 +10,7 @@ import software.plusminus.check.getter.CharacterGetter;
 import software.plusminus.check.getter.CollectionGetter;
 import software.plusminus.check.getter.DequeGetter;
 import software.plusminus.check.getter.DoubleGetter;
+import software.plusminus.check.getter.EnumGetter;
 import software.plusminus.check.getter.FloatGetter;
 import software.plusminus.check.getter.IntegerGetter;
 import software.plusminus.check.getter.ListGetter;
@@ -28,12 +29,14 @@ import software.plusminus.check.getter.PrimitiveShortGetter;
 import software.plusminus.check.getter.ShortGetter;
 import software.plusminus.check.getter.SortedSetGetter;
 import software.plusminus.check.getter.StringGetter;
+import software.plusminus.check.getter.TemporalGetter;
 import software.plusminus.check.util.FieldCoverage;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
@@ -144,6 +147,15 @@ public interface FieldCheck<T> {
 
     default LinkedCheck<Path, PathCheck, ObjectCheck<T>> field(PathGetter<T> getter) {
         return field(getter, PathCheck::new);
+    }
+
+    default <X extends Temporal> LinkedCheck<X, TemporalCheck<X>, ObjectCheck<T>> field(
+            TemporalGetter<T, X> getter) {
+        return field(getter, TemporalCheck::new);
+    }
+
+    default <E extends Enum<E>> LinkedCheck<E, EnumCheck<E>, ObjectCheck<T>> field(EnumGetter<T, E> getter) {
+        return field(getter, EnumCheck::new);
     }
 
     default <E> LinkedCheck<Collection<E>, CollectionCheck<E, Collection<E>, ObjectCheck<E>>, ObjectCheck<T>> field(

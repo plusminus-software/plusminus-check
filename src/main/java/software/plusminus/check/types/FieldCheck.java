@@ -16,6 +16,7 @@ import software.plusminus.check.getter.ListGetter;
 import software.plusminus.check.getter.LongGetter;
 import software.plusminus.check.getter.MapGetter;
 import software.plusminus.check.getter.OptionalGetter;
+import software.plusminus.check.getter.PathGetter;
 import software.plusminus.check.getter.PrimitiveBooleanGetter;
 import software.plusminus.check.getter.PrimitiveByteGetter;
 import software.plusminus.check.getter.PrimitiveCharacterGetter;
@@ -32,6 +33,7 @@ import software.plusminus.check.util.FieldCoverage;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
@@ -138,6 +140,10 @@ public interface FieldCheck<T> {
 
     default LinkedCheck<String, StringCheck, ObjectCheck<T>> field(StringGetter<T> getter) {
         return field(getter, StringCheck::new);
+    }
+
+    default LinkedCheck<Path, PathCheck, ObjectCheck<T>> field(PathGetter<T> getter) {
+        return field(getter, PathCheck::new);
     }
 
     default <E> LinkedCheck<Collection<E>, CollectionCheck<E, Collection<E>, ObjectCheck<E>>, ObjectCheck<T>> field(

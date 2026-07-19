@@ -46,6 +46,8 @@ import software.plusminus.check.supplier.MapCollectionSupplier;
 import software.plusminus.check.supplier.MapListSupplier;
 import software.plusminus.check.supplier.OptionalCollectionSupplier;
 import software.plusminus.check.supplier.OptionalListSupplier;
+import software.plusminus.check.supplier.PathCollectionSupplier;
+import software.plusminus.check.supplier.PathListSupplier;
 import software.plusminus.check.supplier.ShortCollectionSupplier;
 import software.plusminus.check.supplier.ShortListSupplier;
 import software.plusminus.check.supplier.StringCollectionSupplier;
@@ -68,11 +70,14 @@ import software.plusminus.check.types.NullableNumberCheck;
 import software.plusminus.check.types.NumberCheck;
 import software.plusminus.check.types.ObjectCheck;
 import software.plusminus.check.types.OptionalCheck;
+import software.plusminus.check.types.PathCheck;
 import software.plusminus.check.types.StringCheck;
 import software.plusminus.check.types.TemporalCheck;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -217,6 +222,12 @@ public class ChecksTest {
     public void stringCheck() {
         String actual = "a";
         verify(() -> check(actual), StringCheck.class);
+    }
+
+    @Test
+    public void pathCheck() {
+        Path actual = Paths.get("src/main");
+        verify(() -> check(actual), PathCheck.class);
     }
 
     @Test
@@ -390,6 +401,12 @@ public class ChecksTest {
     }
 
     @Test
+    public void pathArrayCheck() {
+        Path[] actual = {Paths.get("src/main")};
+        verify(() -> check(actual), ArrayCheck.class);
+    }
+
+    @Test
     public void temporalArrayCheck() {
         LocalDate[] actual = {LocalDate.now()};
         verify(() -> check(actual), ArrayCheck.class);
@@ -551,6 +568,18 @@ public class ChecksTest {
     @Test
     public void stringListSupplier() {
         StringListSupplier supplier = () -> Collections.singletonList("a");
+        verify(() -> checkOf(supplier), ListCheck.class);
+    }
+
+    @Test
+    public void pathCollectionSupplier() {
+        PathCollectionSupplier supplier = () -> Collections.singleton(Paths.get("src/main"));
+        verify(() -> checkOf(supplier), CollectionCheck.class);
+    }
+
+    @Test
+    public void pathListSupplier() {
+        PathListSupplier supplier = () -> Collections.singletonList(Paths.get("src/main"));
         verify(() -> checkOf(supplier), ListCheck.class);
     }
 

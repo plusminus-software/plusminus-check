@@ -29,6 +29,8 @@ import software.plusminus.check.supplier.MapCollectionSupplier;
 import software.plusminus.check.supplier.MapListSupplier;
 import software.plusminus.check.supplier.OptionalCollectionSupplier;
 import software.plusminus.check.supplier.OptionalListSupplier;
+import software.plusminus.check.supplier.PathCollectionSupplier;
+import software.plusminus.check.supplier.PathListSupplier;
 import software.plusminus.check.supplier.ShortCollectionSupplier;
 import software.plusminus.check.supplier.ShortListSupplier;
 import software.plusminus.check.supplier.StringCollectionSupplier;
@@ -280,6 +282,10 @@ public interface Checks {
         return FACTORY.get().build(actual);
     }
 
+    static ArrayCheck<Path, PathCheck> check(Path[] actual) {
+        return FACTORY.get().build(actual);
+    }
+
     static <T extends Temporal> ArrayCheck<T, TemporalCheck<T>> check(T[] actual) {
         return FACTORY.get().build(actual);
     }
@@ -400,6 +406,14 @@ public interface Checks {
     }
 
     static ListCheck<String, List<String>, StringCheck> checkOf(StringListSupplier supplier) {
+        return FACTORY.get().build(supplier);
+    }
+
+    static CollectionCheck<Path, Collection<Path>, PathCheck> checkOf(PathCollectionSupplier supplier) {
+        return FACTORY.get().build(supplier);
+    }
+
+    static ListCheck<Path, List<Path>, PathCheck> checkOf(PathListSupplier supplier) {
         return FACTORY.get().build(supplier);
     }
 

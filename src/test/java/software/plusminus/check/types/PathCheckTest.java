@@ -15,13 +15,17 @@
  */
 package software.plusminus.check.types;
 
+import lombok.Data;
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 
 import static software.plusminus.check.Checks.check;
+import static software.plusminus.check.Checks.checkOf;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
@@ -118,7 +122,64 @@ public class PathCheckTest {
                 absolute.toString(), "relative path");
     }
 
+    @Test
+    public void fieldWithGetterOk() {
+        TestFile file = new TestFile("test", Paths.get("src/main"));
+        check(file).field(TestFile::getPath).is(c -> c.is("src/main"));
+    }
+
+    @Test
+    public void fieldWithGetterFail() {
+        TestFile file = new TestFile("test", Paths.get("src/main"));
+        assertFail(() -> check(file).field(TestFile::getPath).is(c -> c.is("src/test")),
+                "path ", path("src/main"), "src/test");
+    }
+
+    @Test
+    public void fieldWithNameNarrowedToPathOk() {
+        TestFile file = new TestFile("test", Paths.get("src/main"));
+        check(file).field("path").is(c -> c.isPath().is("src/main"));
+    }
+
+    @Test
+    public void isPathFail() {
+        assertFail(() -> check((Object) "not a path").isPath());
+    }
+
+    @Test
+    public void pathListSupplierElementOk() {
+        List<Path> paths = Collections.singletonList(Paths.get("src/main"));
+        checkOf(() -> paths)
+                .at(0).is(c -> c.is("src/main"))
+                .hasSize(1);
+    }
+
+    @Test
+    public void pathListSupplierElementFail() {
+        List<Path> paths = Collections.singletonList(Paths.get("src/main"));
+        assertFail(() -> checkOf(() -> paths).at(0).is(c -> c.is("src/test")),
+                "[0] ", path("src/main"), "src/test");
+    }
+
+    @Test
+    public void pathArrayElementOk() {
+        Path[] paths = {Paths.get("src/main")};
+        check(paths).at(0).is(c -> c.is("src/main"));
+    }
+
     private String path(String path) {
         return path.replace('/', File.separatorChar);
+    }
+
+    @Data
+    private static class TestFile {
+
+        private String name;
+        private Path path;
+
+        public TestFile(String name, Path path) {
+            this.name = name;
+            this.path = path;
+        }
     }
 }

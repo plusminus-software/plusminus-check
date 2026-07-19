@@ -29,6 +29,8 @@ import software.plusminus.check.supplier.MapCollectionSupplier;
 import software.plusminus.check.supplier.MapListSupplier;
 import software.plusminus.check.supplier.OptionalCollectionSupplier;
 import software.plusminus.check.supplier.OptionalListSupplier;
+import software.plusminus.check.supplier.PathCollectionSupplier;
+import software.plusminus.check.supplier.PathListSupplier;
 import software.plusminus.check.supplier.ShortCollectionSupplier;
 import software.plusminus.check.supplier.ShortListSupplier;
 import software.plusminus.check.supplier.StringCollectionSupplier;
@@ -290,6 +292,10 @@ public class CheckFactory {
         return new ArrayCheck<>(actual, StringCheck::new);
     }
 
+    public ArrayCheck<Path, PathCheck> build(Path[] actual) {
+        return new ArrayCheck<>(actual, PathCheck::new);
+    }
+
     public <T extends Temporal> ArrayCheck<T, TemporalCheck<T>> build(T[] actual) {
         return new ArrayCheck<>(actual, TemporalCheck::new);
     }
@@ -411,6 +417,14 @@ public class CheckFactory {
 
     public ListCheck<String, List<String>, StringCheck> build(StringListSupplier supplier) {
         return build(supplier.get(), StringCheck::new);
+    }
+
+    public CollectionCheck<Path, Collection<Path>, PathCheck> build(PathCollectionSupplier supplier) {
+        return build(supplier.get(), PathCheck::new);
+    }
+
+    public ListCheck<Path, List<Path>, PathCheck> build(PathListSupplier supplier) {
+        return build(supplier.get(), PathCheck::new);
     }
 
     public <E extends Enum<E>> CollectionCheck<E, Collection<E>, EnumCheck<E>> build(

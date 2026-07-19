@@ -201,6 +201,15 @@ void targetPath() {
 | `is(String)`                    | compares path string, `/` and `\` treated as equal       |
 | `isAbsolute()` / `isRelative()` | asserts the path kind                                    |
 
+`Path` is also supported everywhere other scalar types are:
+
+```java
+check(javaClass).field(JavaClass::getPath).is(c -> c.is("src/main/Test.java")); // field navigation
+check(object).field("path").is(c -> c.isPath().is("src/main"));                 // isPath() narrowing
+checkOf(() -> paths).at(0).is(c -> c.is("src/main"));                           // typed List<Path> / Collection<Path>
+check(pathArray).at(0).is(c -> c.isRelative());                                 // Path[]
+```
+
 ## Exception checks
 
 `checkException(lambda)` runs the lambda, captures anything it throws (checked

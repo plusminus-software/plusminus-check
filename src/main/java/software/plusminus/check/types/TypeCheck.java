@@ -1,6 +1,7 @@
 package software.plusminus.check.types;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Deque;
@@ -47,12 +48,12 @@ public interface TypeCheck {
     }
 
     default <X extends Enum<X>> EnumCheck<X> isEnum() {
-        Class<X> type = (Class<X>) (Class<?>) Enum.class;
+        Class<X> type = (Class<X>) Enum.class;
         return isType(type, EnumCheck::new);
     }
 
     default <N extends Number> NullableNumberCheck<N> isNumber() {
-        Class<N> type = (Class<N>) (Class<?>) Number.class;
+        Class<N> type = (Class<N>) Number.class;
         return isType(type, NullableNumberCheck::new);
     }
 
@@ -82,8 +83,12 @@ public interface TypeCheck {
         return isType(String.class, StringCheck::new);
     }
 
+    default PathCheck isPath() {
+        return isType(Path.class, PathCheck::new);
+    }
+
     default <X extends Temporal> TemporalCheck<X> isTemporal() {
-        Class<X> type = (Class<X>) (Class<?>) Temporal.class;
+        Class<X> type = (Class<X>) Temporal.class;
         return isType(type, TemporalCheck::new);
     }
 

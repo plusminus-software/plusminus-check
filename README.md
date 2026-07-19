@@ -113,8 +113,9 @@ void hasPositiveAmounts() {
 5. `String`
 6. `Temporal` (any `java.time` type)
 7. `Enum`
-8. Containers: `Optional`, `Collection`, `List`, `SortedSet`, `Deque`, `Map`
-9. Arbitrary objects (compared via JSON / JSOG)
+8. `java.nio.file.Path`
+9. Containers: `Optional`, `Collection`, `List`, `SortedSet`, `Deque`, `Map`
+10. Arbitrary objects (compared via JSON / JSOG)
 
 ## Entry point
 Static import `software.plusminus.check.Checks.check` in your tests. Overloads of
@@ -178,6 +179,27 @@ check(jsonString)
     .hasField("id", id -> id.isNumber())
     .is("expected.json");
 ```
+
+## Path checks
+
+`check(path)` of a `java.nio.file.Path` returns a `PathCheck`. `is(String)` is
+separator-agnostic: both sides are compared with `/` and `\` treated as equal,
+so the expected value may use either style and the test passes on both Windows
+and Unix:
+
+```java
+@Test
+void targetPath() {
+    Path path = generator.targetPath(TestModel.class, javaClass);
+    check(path).is("src/main/java/software/plusminus/test/TestGenerated.java");
+}
+```
+
+| method                          | meaning                                                  |
+|:--------------------------------|:----------------------------------------------------------|
+| `is(Path)`                      | path equality                                            |
+| `is(String)`                    | compares path string, `/` and `\` treated as equal       |
+| `isAbsolute()` / `isRelative()` | asserts the path kind                                    |
 
 ## Exception checks
 

@@ -53,12 +53,14 @@ import software.plusminus.check.types.NullableNumberCheck;
 import software.plusminus.check.types.NumberCheck;
 import software.plusminus.check.types.ObjectCheck;
 import software.plusminus.check.types.OptionalCheck;
+import software.plusminus.check.types.PathCheck;
 import software.plusminus.check.types.StringCheck;
 import software.plusminus.check.types.TemporalCheck;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Deque;
@@ -158,6 +160,10 @@ public class CheckFactory {
 
     public InputStreamCheck build(InputStream actual) {
         return new InputStreamCheck(actual);
+    }
+
+    public PathCheck build(Path actual) {
+        return new PathCheck(actual);
     }
 
     @SuppressWarnings({"PMD.AvoidCatchingThrowable", "java:S1181"})

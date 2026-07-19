@@ -178,3 +178,27 @@ check(jsonString)
     .hasField("id", id -> id.isNumber())
     .is("expected.json");
 ```
+
+## Exception checks
+
+`checkException(lambda)` runs the lambda, captures anything it throws (checked
+exceptions included) and returns an `ExceptionCheck` — a fluent analogue of
+JUnit's `assertThrows`:
+
+```java
+import static software.plusminus.check.Checks.checkException;
+
+@Test
+void rejectsNegativeAmount() {
+    checkException(() -> invoice.setAmount(-1))
+        .is(IllegalArgumentException.class)
+        .hasMessage("Amount must be positive");
+}
+```
+
+| method                     | meaning                                                     |
+|:---------------------------|:-------------------------------------------------------------|
+| `is(Class)`                | exact exception class match                                  |
+| `isInstanceOf(Class)`      | exception class or any subclass (like `assertThrows`)        |
+| `hasMessage(String)`       | exception message equality (`null`-safe)                     |
+| `isNotThrown()`            | asserts the lambda completed without throwing                |

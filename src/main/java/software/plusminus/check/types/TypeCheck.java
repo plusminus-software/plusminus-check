@@ -1,5 +1,6 @@
 package software.plusminus.check.types;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.time.temporal.Temporal;
@@ -48,7 +49,7 @@ public interface TypeCheck {
     }
 
     default <X extends Enum<X>> EnumCheck<X> isEnum() {
-        Class<X> type = (Class<X>) Enum.class;
+        Class<X> type = (Class<X>) (Class<?>) Enum.class;
         return isType(type, EnumCheck::new);
     }
 
@@ -85,6 +86,10 @@ public interface TypeCheck {
 
     default PathCheck isPath() {
         return isType(Path.class, PathCheck::new);
+    }
+
+    default InputStreamCheck isInputStream() {
+        return isType(InputStream.class, InputStreamCheck::new);
     }
 
     default <X extends Temporal> TemporalCheck<X> isTemporal() {

@@ -12,6 +12,7 @@ import software.plusminus.check.getter.DequeGetter;
 import software.plusminus.check.getter.DoubleGetter;
 import software.plusminus.check.getter.EnumGetter;
 import software.plusminus.check.getter.FloatGetter;
+import software.plusminus.check.getter.InputStreamGetter;
 import software.plusminus.check.getter.IntegerGetter;
 import software.plusminus.check.getter.ListGetter;
 import software.plusminus.check.getter.LongGetter;
@@ -32,6 +33,7 @@ import software.plusminus.check.getter.StringGetter;
 import software.plusminus.check.getter.TemporalGetter;
 import software.plusminus.check.util.FieldCoverage;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -152,6 +154,16 @@ public interface FieldCheck<T> {
     default <X extends Temporal> LinkedCheck<X, TemporalCheck<X>, ObjectCheck<T>> field(
             TemporalGetter<T, X> getter) {
         return field(getter, TemporalCheck::new);
+    }
+
+    /**
+     * Descends into an {@link InputStream} field.
+     * Note: the stream is consumed by the assertion — it is read to the end
+     * and cannot be checked again or used by the code under test afterwards.
+     */
+    default <X extends InputStream> LinkedCheck<InputStream, InputStreamCheck, ObjectCheck<T>> field(
+            InputStreamGetter<T, X> getter) {
+        return field(getter, getter::apply, InputStreamCheck::new);
     }
 
     default <E extends Enum<E>> LinkedCheck<E, EnumCheck<E>, ObjectCheck<T>> field(EnumGetter<T, E> getter) {

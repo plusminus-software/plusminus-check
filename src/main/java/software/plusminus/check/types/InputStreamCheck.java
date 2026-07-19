@@ -12,6 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 
+/**
+ * Checks an {@link InputStream} by content.
+ * Note: streams are one-shot — every assertion that compares content reads
+ * the actual stream (and an expected stream, if given) to the end, so a
+ * stream can be checked only once and is unusable afterwards.
+ */
 public class InputStreamCheck extends AbstractCheck<InputStream> {
 
     private static final int BUFFER_SIZE = 8192;

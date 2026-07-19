@@ -114,8 +114,9 @@ void hasPositiveAmounts() {
 6. `Temporal` (any `java.time` type)
 7. `Enum`
 8. `java.nio.file.Path`
-9. Containers: `Optional`, `Collection`, `List`, `SortedSet`, `Deque`, `Map`
-10. Arbitrary objects (compared via JSON / JSOG)
+9. `InputStream` (compared by content)
+10. Containers: `Optional`, `Collection`, `List`, `SortedSet`, `Deque`, `Map`
+11. Arbitrary objects (compared via JSON / JSOG)
 
 ## Entry point
 Static import `software.plusminus.check.Checks.check` in your tests. Overloads of

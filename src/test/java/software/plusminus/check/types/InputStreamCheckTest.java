@@ -15,6 +15,7 @@
  */
 package software.plusminus.check.types;
 
+import lombok.Data;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -105,11 +106,51 @@ public class InputStreamCheckTest {
         assertFail(() -> check(stream("hello")).isSame(stream("hello")));
     }
 
+    @Test
+    public void fieldWithGetterOk() {
+        TestResponse response = new TestResponse("test", byteStream("hello"));
+        check(response).field(TestResponse::getBody).is(c -> c.is("hello"));
+    }
+
+    @Test
+    public void fieldWithGetterFail() {
+        TestResponse response = new TestResponse("test", byteStream("hello"));
+        assertFail(() -> check(response).field(TestResponse::getBody).is(c -> c.is("world")),
+                "body ", "hello", "world");
+    }
+
+    @Test
+    public void fieldWithNameNarrowedToInputStreamOk() {
+        TestResponse response = new TestResponse("test", byteStream("hello"));
+        check(response).field("body").is(c -> c.isInputStream().is("hello"));
+    }
+
+    @Test
+    public void isInputStreamFail() {
+        assertFail(() -> check((Object) "not a stream").isInputStream());
+    }
+
     private InputStream stream(String content) {
+        return new ByteArrayInputStream(bytes(content));
+    }
+
+    private ByteArrayInputStream byteStream(String content) {
         return new ByteArrayInputStream(bytes(content));
     }
 
     private byte[] bytes(String content) {
         return content.getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Data
+    private static class TestResponse {
+
+        private String name;
+        private ByteArrayInputStream body;
+
+        TestResponse(String name, ByteArrayInputStream body) {
+            this.name = name;
+            this.body = body;
+        }
     }
 }

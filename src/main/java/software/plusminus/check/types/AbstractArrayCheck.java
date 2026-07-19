@@ -181,6 +181,7 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
                 if (matches(actualElement, expectedElement)) {
                     actualIterator.remove();
                     expectedIterator.remove();
+                    break;
                 }
             }
         }

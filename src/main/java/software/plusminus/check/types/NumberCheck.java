@@ -10,6 +10,7 @@ public class NumberCheck<T extends Number> extends AbstractCheck<T> {
     public static final String NEGATIVE = "negative";
     public static final String POSITIVE = "positive";
     public static final String ZERO = "zero";
+    public static final String NAN = "NaN";
 
     public NumberCheck(@Nullable T actual) {
         super(actual);
@@ -25,32 +26,53 @@ public class NumberCheck<T extends Number> extends AbstractCheck<T> {
 
     public void isPositive() {
         isNotNull();
-        if (actual().doubleValue() < 0) {
+        Integer sign = signOrNull();
+        if (sign == null) {
+            fail(NAN, POSITIVE);
+        } else if (sign < 0) {
             fail(NEGATIVE, POSITIVE);
-        }
-        if (actual().doubleValue() == 0) {
+        } else if (sign == 0) {
             fail(ZERO, POSITIVE);
         }
     }
 
     public void isNegative() {
         isNotNull();
-        if (actual().doubleValue() > 0) {
+        Integer sign = signOrNull();
+        if (sign == null) {
+            fail(NAN, NEGATIVE);
+        } else if (sign > 0) {
             fail(POSITIVE, NEGATIVE);
-        }
-        if (actual().doubleValue() == 0) {
+        } else if (sign == 0) {
             fail(ZERO, NEGATIVE);
         }
     }
 
     public void isZero() {
         isNotNull();
-        if (actual().doubleValue() > 0) {
+        Integer sign = signOrNull();
+        if (sign == null) {
+            fail(NAN, ZERO);
+        } else if (sign > 0) {
             fail(POSITIVE, ZERO);
-        }
-        if (actual().doubleValue() < 0) {
+        } else if (sign < 0) {
             fail(NEGATIVE, ZERO);
         }
+    }
+
+    @Nullable
+    private Integer signOrNull() {
+        T value = actual();
+        if (value instanceof Double || value instanceof Float) {
+            double d = value.doubleValue();
+            if (Double.isNaN(d)) {
+                return null;
+            }
+            if (Double.isInfinite(d)) {
+                return d > 0 ? 1 : -1;
+            }
+        }
+        return toBigDecimal(value).signum();
     }
 
     protected void isNumber(Number expected) {

@@ -17,4 +17,19 @@ public class CharacterCheckTest {
     public void isCharFail() {
         assertFail(() -> check('a').is('b'), "a", "b");
     }
+
+    @Test
+    public void isStringOk() {
+        check('a').is("a");
+    }
+
+    @Test
+    public void isStringFail() {
+        assertFail(() -> check('a').is("ab"), "a", "ab");
+    }
+
+    @Test
+    public void isStringDifferentCharFail() {
+        assertFail(() -> check('a').is("b"), "a", "b");
+    }
 }

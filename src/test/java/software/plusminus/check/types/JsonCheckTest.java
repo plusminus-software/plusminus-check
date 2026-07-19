@@ -48,7 +48,7 @@ public class JsonCheckTest {
     @Test
     public void hasFieldMissing() {
         assertFail(() -> check("{\"name\":\"a\"}").isJson().hasField("id", id -> id.isLike(42)),
-                "Field id is present", "Field id is missed");
+                "Field id is missed", "Field id is present");
     }
 
     @Test

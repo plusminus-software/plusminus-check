@@ -4,6 +4,10 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 
 import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
@@ -34,5 +38,25 @@ public class TemporalCheckTest {
     @Test
     public void recentWithDurationFail() {
         assertFail(() -> check(Instant.now().minusSeconds(10)).isRecent(Duration.ofSeconds(5)));
+    }
+
+    @Test
+    public void recentLocalDateTime() {
+        check(LocalDateTime.now()).isRecent();
+    }
+
+    @Test
+    public void recentLocalTime() {
+        check(LocalTime.now()).isRecent();
+    }
+
+    @Test
+    public void recentLocalDateWithinDay() {
+        check(LocalDate.now()).isRecent(Duration.ofDays(2));
+    }
+
+    @Test
+    public void recentYearMonthWithinRange() {
+        check(YearMonth.now()).isRecent(Duration.ofDays(40));
     }
 }

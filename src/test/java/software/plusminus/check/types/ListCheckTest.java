@@ -24,6 +24,28 @@ public class ListCheckTest {
     }
 
     @Test
+    public void containsExactlyWithDuplicatesOk() {
+        check(Arrays.asList("a", "a")).containsExactly("a", "a");
+    }
+
+    @Test
+    public void containsWithDuplicatesOk() {
+        check(Arrays.asList("a", "a", "b")).contains("a", "a");
+    }
+
+    @Test
+    public void containsMoreDuplicatesThanActualFail() {
+        assertFail(() -> check(Arrays.asList("a")).contains("a", "a"),
+                "does not contain [\n  \"a\"\n]", "contains all elements");
+    }
+
+    @Test
+    public void containsExactlyMoreDuplicatesThanActualFail() {
+        assertFail(() -> check(Arrays.asList("a")).containsExactly("a", "a"),
+                "does not contain: [\n  \"a\"\n]", "contains exactly elements");
+    }
+
+    @Test
     public void at() {
         List<Integer> list = Arrays.asList(0, 1, -2);
         checkOf(() -> list)

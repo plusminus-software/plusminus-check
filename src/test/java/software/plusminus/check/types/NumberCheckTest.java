@@ -2,6 +2,8 @@ package software.plusminus.check.types;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
+
 import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
@@ -46,5 +48,35 @@ public class NumberCheckTest {
     @Test
     public void zeroFail() {
         assertFail(() -> check(1).isZero(), "positive", "zero");
+    }
+
+    @Test
+    public void nanIsNotPositive() {
+        assertFail(() -> check(Double.NaN).isPositive(), "NaN", "positive");
+    }
+
+    @Test
+    public void nanIsNotNegative() {
+        assertFail(() -> check(Double.NaN).isNegative(), "NaN", "negative");
+    }
+
+    @Test
+    public void nanIsNotZero() {
+        assertFail(() -> check(Double.NaN).isZero(), "NaN", "zero");
+    }
+
+    @Test
+    public void tinyBigDecimalIsNotZero() {
+        assertFail(() -> check(new BigDecimal("1E-30")).isZero(), "positive", "zero");
+    }
+
+    @Test
+    public void tinyBigDecimalIsPositive() {
+        check(new BigDecimal("1E-30")).isPositive();
+    }
+
+    @Test
+    public void tinyNegativeBigDecimalIsNegative() {
+        check(new BigDecimal("-1E-30")).isNegative();
     }
 }

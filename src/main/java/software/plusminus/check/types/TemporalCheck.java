@@ -17,7 +17,13 @@ package software.plusminus.check.types;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalQueries;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -39,7 +45,7 @@ public class TemporalCheck<T extends Temporal> extends AbstractObjectCheck<T> {
         isNotNull();
         Instant now = Instant.now();
         Temporal actual = actual();
-        Instant actualInstant = Instant.from(actual);
+        Instant actualInstant = toInstant(actual);
         if (actualInstant.isAfter(now)) {
             fail(actual + " is after now", actual + " is recent");
         }
@@ -47,5 +53,34 @@ public class TemporalCheck<T extends Temporal> extends AbstractObjectCheck<T> {
             fail(actual + " is more than " + duration + " before now",
                     actual + " is recent");
         }
+    }
+
+    /**
+     * Converts a {@link Temporal} to an {@link Instant}, handling zoneless types
+     * (LocalDateTime/LocalDate/LocalTime/YearMonth) by resolving them against the
+     * system default time-zone. Zoned/offset temporals are converted directly.
+     */
+    private Instant toInstant(Temporal actual) {
+        if (actual instanceof Instant) {
+            return (Instant) actual;
+        }
+        ZoneId zone = ZoneId.systemDefault();
+        if (actual instanceof LocalDateTime) {
+            return ((LocalDateTime) actual).atZone(zone).toInstant();
+        }
+        if (actual instanceof LocalDate) {
+            return ((LocalDate) actual).atStartOfDay(zone).toInstant();
+        }
+        if (actual instanceof LocalTime) {
+            return ((LocalTime) actual).atDate(LocalDate.now(zone)).atZone(zone).toInstant();
+        }
+        if (actual instanceof YearMonth) {
+            return ((YearMonth) actual).atDay(1).atStartOfDay(zone).toInstant();
+        }
+        if (actual.query(TemporalQueries.zone()) == null
+                && actual.query(TemporalQueries.offset()) == null) {
+            return LocalDateTime.from(actual).atZone(zone).toInstant();
+        }
+        return Instant.from(actual);
     }
 }

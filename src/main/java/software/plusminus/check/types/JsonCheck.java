@@ -58,7 +58,7 @@ public class JsonCheck extends AbstractCheck<String> {
             expected = ResourceUtils.toString(expected);
         }
         if (!JsonUtil.isJson(expected)) {
-            fail("is json", "is not json");
+            fail("is not json", "is json");
         }
         String actual = actual();
         if (!separatelyCheckedFields.isEmpty()) {
@@ -76,7 +76,7 @@ public class JsonCheck extends AbstractCheck<String> {
         separatelyCheckedFields.add(fieldName);
         Map<Object, Object> actualMap = JsonUtil.fromJson(actual(), Map.class);
         if (!actualMap.containsKey(fieldName)) {
-            fail("Field " + fieldName + " is present", "Field " + fieldName + " is missed");
+            fail("Field " + fieldName + " is missed", "Field " + fieldName + " is present");
         }
         Object value = actualMap.get(fieldName);
         List<String> fieldLevels = new ArrayList<>(levels());

@@ -19,6 +19,10 @@ public class CharacterCheck extends AbstractCheck<Character> {
     }
 
     public void is(String expected) {
-        super.isString(expected);
+        isNotNull();
+        Character actual = actual();
+        if (expected == null || expected.length() != 1 || expected.charAt(0) != actual) {
+            fail(String.valueOf(actual), expected);
+        }
     }
 }

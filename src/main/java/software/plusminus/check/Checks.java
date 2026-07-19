@@ -41,6 +41,7 @@ import software.plusminus.check.types.CharacterCheck;
 import software.plusminus.check.types.CollectionCheck;
 import software.plusminus.check.types.DecimalCheck;
 import software.plusminus.check.types.EnumCheck;
+import software.plusminus.check.types.ExceptionCheck;
 import software.plusminus.check.types.InputStreamCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
@@ -454,5 +455,16 @@ public interface Checks {
     static <E> ListCheck<Optional<E>, List<Optional<E>>, OptionalCheck<E>> checkOf(
             OptionalListSupplier<E> supplier) {
         return FACTORY.get().build(supplier);
+    }
+
+    /* Exceptions */
+
+    /**
+     * Checks an exception thrown by the passed lambda.
+     * Named differently from other check() methods as a lambda argument
+     * is ambiguous with the generic check(T) overload.
+     */
+    static ExceptionCheck checkException(ThrowingRunnable actual) {
+        return FACTORY.get().build(actual);
     }
 }

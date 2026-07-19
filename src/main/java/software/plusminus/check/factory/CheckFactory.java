@@ -1,5 +1,6 @@
 package software.plusminus.check.factory;
 
+import software.plusminus.check.ThrowingRunnable;
 import software.plusminus.check.supplier.BigDecimalCollectionSupplier;
 import software.plusminus.check.supplier.BigDecimalListSupplier;
 import software.plusminus.check.supplier.BigIntegerCollectionSupplier;
@@ -41,6 +42,7 @@ import software.plusminus.check.types.CharacterCheck;
 import software.plusminus.check.types.CollectionCheck;
 import software.plusminus.check.types.DecimalCheck;
 import software.plusminus.check.types.EnumCheck;
+import software.plusminus.check.types.ExceptionCheck;
 import software.plusminus.check.types.InputStreamCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
@@ -156,6 +158,16 @@ public class CheckFactory {
 
     public InputStreamCheck build(InputStream actual) {
         return new InputStreamCheck(actual);
+    }
+
+    @SuppressWarnings({"PMD.AvoidCatchingThrowable", "java:S1181"})
+    public ExceptionCheck build(ThrowingRunnable actual) {
+        try {
+            actual.run();
+        } catch (Throwable throwable) {
+            return new ExceptionCheck(throwable);
+        }
+        return new ExceptionCheck(null);
     }
 
     public <T extends Temporal> TemporalCheck<T> build(T actual) {

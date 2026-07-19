@@ -196,11 +196,27 @@ void targetPath() {
 }
 ```
 
-| method                          | meaning                                                  |
-|:--------------------------------|:----------------------------------------------------------|
-| `is(Path)`                      | path equality                                            |
-| `is(String)`                    | compares path string, `/` and `\` treated as equal       |
-| `isAbsolute()` / `isRelative()` | asserts the path kind                                    |
+| method                              | meaning                                                    |
+|:------------------------------------|:-----------------------------------------------------------|
+| `is(Path)`                          | path equality                                              |
+| `is(String)`                        | compares path string, `/` and `\` treated as equal         |
+| `isAbsolute()` / `isRelative()`     | asserts the path kind                                      |
+| `exists()` / `doesNotExist()`       | asserts presence on the file system                        |
+| `isFile()` / `isDirectory()`        | asserts the path exists and is a regular file / directory  |
+| `startsWith(Path)` / `startsWith(String)` | asserts the leading path elements, separator-agnostic |
+| `endsWith(Path)` / `endsWith(String)`     | asserts the trailing path elements, separator-agnostic |
+| `hasContent(String)`                | checks file content; the expected value may be the content itself or a classpath resource reference |
+
+`hasContent` makes file-generation tests one-liners — the expected value can be
+a resource file next to the test:
+
+```java
+@Test
+void generatesFile() {
+    Path generated = generator.generate(TestModel.class);
+    check(generated).hasContent("/TestModelController.java"); // classpath resource
+}
+```
 
 `Path` is also supported everywhere other scalar types are:
 

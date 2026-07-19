@@ -16,9 +16,15 @@
 package software.plusminus.check.types;
 
 import lombok.Data;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -30,6 +36,9 @@ import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
 public class PathCheckTest {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void isOk() {
@@ -123,6 +132,125 @@ public class PathCheckTest {
     }
 
     @Test
+    public void existsOk() {
+        check(file("existing.txt", "One").getParent()).exists();
+    }
+
+    @Test
+    public void existsFail() {
+        Path missing = temporaryFolder.getRoot().toPath().resolve("missing.txt");
+        assertFail(() -> check(missing).exists(),
+                missing.toString(), "existing path");
+    }
+
+    @Test
+    public void doesNotExistOk() {
+        check(temporaryFolder.getRoot().toPath().resolve("missing.txt")).doesNotExist();
+    }
+
+    @Test
+    public void doesNotExistFail() {
+        Path existing = file("existing.txt", "One");
+        assertFail(() -> check(existing).doesNotExist(),
+                existing.toString(), "non-existing path");
+    }
+
+    @Test
+    public void isFileOk() {
+        check(file("file.txt", "One")).isFile();
+    }
+
+    @Test
+    public void isFileFail() {
+        Path directory = temporaryFolder.getRoot().toPath();
+        assertFail(() -> check(directory).isFile(),
+                directory.toString(), "regular file");
+    }
+
+    @Test
+    public void isDirectoryOk() {
+        check(temporaryFolder.getRoot().toPath()).isDirectory();
+    }
+
+    @Test
+    public void isDirectoryFail() {
+        Path file = file("file.txt", "One");
+        assertFail(() -> check(file).isDirectory(),
+                file.toString(), "directory");
+    }
+
+    @Test
+    public void startsWithPathOk() {
+        check(Paths.get("src/main/java")).startsWith(Paths.get("src/main"));
+    }
+
+    @Test
+    public void startsWithPathFail() {
+        assertFail(() -> check(Paths.get("src/main/java")).startsWith(Paths.get("src/test")),
+                path("src/main/java"), "starts with " + path("src/test"));
+    }
+
+    @Test
+    public void startsWithStringOk() {
+        check(Paths.get("src/main/java")).startsWith("src/main");
+    }
+
+    @Test
+    public void startsWithStringWithBackslashesOk() {
+        check(Paths.get("src/main/java")).startsWith("src\\main");
+    }
+
+    @Test
+    public void endsWithPathOk() {
+        check(Paths.get("src/main/java")).endsWith(Paths.get("main/java"));
+    }
+
+    @Test
+    public void endsWithPathFail() {
+        assertFail(() -> check(Paths.get("src/main/java")).endsWith(Paths.get("src/test")),
+                path("src/main/java"), "ends with " + path("src/test"));
+    }
+
+    @Test
+    public void endsWithStringOk() {
+        check(Paths.get("src/main/java")).endsWith("main/java");
+    }
+
+    @Test
+    public void endsWithStringWithBackslashesOk() {
+        check(Paths.get("src/main/java")).endsWith("main\\java");
+    }
+
+    @Test
+    public void endsWithStringFail() {
+        assertFail(() -> check(Paths.get("src/main/java")).endsWith("src/test"),
+                path("src/main/java"), "ends with src/test");
+    }
+
+    @Test
+    public void hasContentOk() {
+        check(file("content.txt", "One")).hasContent("One");
+    }
+
+    @Test
+    public void hasContentResourceOk() {
+        check(file("content.txt", "One")).hasContent("one.txt");
+    }
+
+    @Test
+    public void hasContentFail() {
+        assertFail(() -> check(file("content.txt", "One")).hasContent("Two"),
+                "One", "Two");
+    }
+
+    @Test
+    public void hasContentFailOnMissingFile() {
+        Path missing = temporaryFolder.getRoot().toPath().resolve("missing.txt");
+        assertFail(() -> check(missing).hasContent("One"),
+                missing.toString(), "existing path");
+    }
+
+    @Test
     public void fieldWithGetterOk() {
         TestFile file = new TestFile("test", Paths.get("src/main"));
         check(file).field(TestFile::getPath).is(c -> c.is("src/main"));
@@ -169,6 +297,16 @@ public class PathCheckTest {
 
     private String path(String path) {
         return path.replace('/', File.separatorChar);
+    }
+
+    private Path file(String name, String content) {
+        try {
+            Path file = temporaryFolder.getRoot().toPath().resolve(name);
+            Files.write(file, content.getBytes(StandardCharsets.UTF_8));
+            return file;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Data

@@ -40,7 +40,7 @@ public class StringCheckTest {
 
     @Test
     public void containsOk() {
-        check("hello world").contains("hello", "world");
+        check("hello world").contains("hello");
     }
 
     @Test
@@ -50,7 +50,8 @@ public class StringCheckTest {
 
     @Test
     public void containsFail() {
-        assertFail(() -> check("hello world").contains("hello", "planet"));
+        assertFail(() -> check("hello world").contains("planet"),
+                "does not contain planet", "contains planet");
     }
 
     @Test

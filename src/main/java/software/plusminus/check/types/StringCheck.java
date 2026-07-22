@@ -1,11 +1,8 @@
 package software.plusminus.check.types;
 
 import software.plusminus.check.util.JsonUtil;
-import software.plusminus.check.util.StringUtil;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 public class StringCheck extends AbstractCheck<String> {
@@ -39,13 +36,10 @@ public class StringCheck extends AbstractCheck<String> {
         super.isSame(expected);
     }
 
-    public StringCheck contains(String... expectedSubstrings) {
+    public StringCheck contains(String expectedSubstring) {
         isNotNull();
-        List<String> missing = Stream.of(expectedSubstrings)
-                .filter(substring -> !actual().contains(substring))
-                .collect(Collectors.toList());
-        if (!missing.isEmpty()) {
-            fail("does not contain " + StringUtil.toString(missing), "contains all substrings");
+        if (!actual().contains(expectedSubstring)) {
+            fail("does not contain " + expectedSubstring, "contains " + expectedSubstring);
         }
         return this;
     }

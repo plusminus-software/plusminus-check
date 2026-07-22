@@ -39,6 +39,26 @@ public class StringCheckTest {
     }
 
     @Test
+    public void containsOk() {
+        check("hello world").contains("hello", "world");
+    }
+
+    @Test
+    public void containsChainOk() {
+        check("hello world").contains("hello").contains("world");
+    }
+
+    @Test
+    public void containsFail() {
+        assertFail(() -> check("hello world").contains("hello", "planet"));
+    }
+
+    @Test
+    public void containsFailOnNull() {
+        assertFail(() -> check((String) null).contains("hello"));
+    }
+
+    @Test
     public void isJsonOk() {
         check("{\"a\":1}").isJson().is("{\"a\":1}");
     }

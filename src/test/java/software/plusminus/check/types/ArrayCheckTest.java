@@ -17,8 +17,7 @@ public class ArrayCheckTest {
     @Test
     public void isFail() {
         Integer[] array = {1, 2, 3};
-        assertFail(() -> check(array).is(1, 2, 4),
-                "[\n  1,\n  2,\n  3\n]", "[\n  1,\n  2,\n  4\n]");
+        assertFail(() -> check(array).is(1, 2, 4), "[2] ", 3, 4);
     }
 
     @Test

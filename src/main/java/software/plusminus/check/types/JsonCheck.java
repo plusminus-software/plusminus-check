@@ -73,6 +73,9 @@ public class JsonCheck extends AbstractCheck<String> {
     }
     
     public JsonCheck hasField(String fieldName, Consumer<ObjectCheck<?>> fieldValueChecker) {
+        if (actual().startsWith("[")) {
+            fail("is not a json object", "is a json object");
+        }
         separatelyCheckedFields.add(fieldName);
         Map<Object, Object> actualMap = JsonUtil.fromJson(actual(), Map.class);
         if (!actualMap.containsKey(fieldName)) {
@@ -94,7 +97,11 @@ public class JsonCheck extends AbstractCheck<String> {
     
     private String replaceSeparatelyCheckedFields(String json) {
         Map<Object, Object> jsonMap = JsonUtil.fromJson(json, Map.class);
-        separatelyCheckedFields.forEach(field -> jsonMap.put(field, "SEPARATELY CHECKED"));
+        separatelyCheckedFields.forEach(field -> {
+            if (jsonMap.containsKey(field)) {
+                jsonMap.put(field, "SEPARATELY CHECKED");
+            }
+        });
         return JsonUtil.toJson(jsonMap);
     }
 

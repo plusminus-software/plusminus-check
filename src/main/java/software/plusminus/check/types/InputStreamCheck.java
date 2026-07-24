@@ -83,11 +83,11 @@ public class InputStreamCheck extends AbstractCheck<InputStream> {
     private byte[] read(InputStream stream) {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[BUFFER_SIZE];
-        try {
-            int length = stream.read(buffer);
+        try (InputStream in = stream) {
+            int length = in.read(buffer);
             while (length != -1) {
                 result.write(buffer, 0, length);
-                length = stream.read(buffer);
+                length = in.read(buffer);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);

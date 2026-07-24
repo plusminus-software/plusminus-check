@@ -57,6 +57,6 @@ public class DecimalCheckTest {
 
     @Test
     public void limitScaleFail() {
-        assertFail(() -> check(1.234567d).limitScale(2).is(1.25d), 1.234567d, 1.25d);
+        assertFail(() -> check(1.234567d).limitScale(2).is(1.25d), 1.23d, 1.25d);
     }
 }

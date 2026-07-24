@@ -52,6 +52,21 @@ public class JsonCheckTest {
     }
 
     @Test
+    public void hasFieldOnArrayFail() {
+        assertFail(() -> check("[1,2,3]").isJson().hasField("id", id -> id.isLike(1)),
+                "is not a json object", "is a json object");
+    }
+
+    @Test
+    public void separatelyCheckedFieldMissingInExpectedFail() {
+        assertFail(() -> check("{\"id\":42,\"name\":\"a\"}")
+                .isJson()
+                .ignoringFieldsOrder()
+                .hasField("id", id -> id.isLike(42))
+                .is("{\"name\":\"a\"}"));
+    }
+
+    @Test
     public void isResourceOk() {
         check("{\"name\":\"a\"}").isJson().is("json-object.json");
     }

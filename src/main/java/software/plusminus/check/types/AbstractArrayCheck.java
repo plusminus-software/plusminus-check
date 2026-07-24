@@ -54,19 +54,15 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
     }
 
     protected void is(Object... expectedElements) {
-        try {
-            isNotNull();
-            hasSize(expectedElements.length);
-            for (int i = 0; i < expectedElements.length; i++) {
-                int index = i;
-                if (expectedElements[i] instanceof String) {
-                    at(i).is(check -> check.isString((String) expectedElements[index]));
-                } else {
-                    at(i).is(check -> check.isLike(expectedElements[index]));
-                }
+        isNotNull();
+        hasSize(expectedElements.length);
+        for (int i = 0; i < expectedElements.length; i++) {
+            int index = i;
+            if (expectedElements[i] instanceof String) {
+                at(i).is(check -> check.isString((String) expectedElements[index]));
+            } else {
+                at(i).is(check -> check.isLike(expectedElements[index]));
             }
-        } catch (AssertionError fail) {
-            fail(StringUtil.toString(expectedElements));
         }
     }
 

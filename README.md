@@ -124,7 +124,7 @@ Static import `software.plusminus.check.Checks.check` in your tests. Overloads o
 plug in a custom factory, set it once during test bootstrap:
 
 ```java
-Checks.factory(new MyCheckFactory());
+Checks.FACTORY.set(new MyCheckFactory());
 ```
 
 ## Common methods

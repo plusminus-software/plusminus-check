@@ -28,6 +28,18 @@ public class ObjectCheckTest {
     }
 
     @Test
+    public void isCompactInlineJsonOk() {
+        check(new TestObject("x", 1)).is("{\"name\":\"x\",\"count\":1}");
+    }
+
+    @Test
+    public void isCompactInlineJsonFail() {
+        assertFail(() -> check(new TestObject("x", 1)).is("{\"name\":\"y\",\"count\":1}"),
+                "{\n  \"name\": \"x\",\n  \"count\": 1\n}",
+                "{\"name\":\"y\",\"count\":1}");
+    }
+
+    @Test
     public void fieldByName() {
         check(new TestObject("a", 1))
                 .field("name").is(o -> o.is("a"));

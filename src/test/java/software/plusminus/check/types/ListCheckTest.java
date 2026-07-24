@@ -19,8 +19,7 @@ public class ListCheckTest {
 
     @Test
     public void isFail() {
-        assertFail(() -> check(Arrays.asList(1, 2, 3)).is(1, 2, 4),
-                "[\n  1,\n  2,\n  3\n]", "[\n  1,\n  2,\n  4\n]");
+        assertFail(() -> check(Arrays.asList(1, 2, 3)).is(1, 2, 4), "[2] ", 3, 4);
     }
 
     @Test

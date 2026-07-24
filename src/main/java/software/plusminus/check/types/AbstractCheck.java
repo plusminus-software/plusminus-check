@@ -154,8 +154,8 @@ public abstract class AbstractCheck<T> implements Check<T> {
     }
 
     protected boolean checkJson(Object expected) {
-        String actualJson = StringUtil.toString(actual);
-        String expectedJson = StringUtil.toString(expected);
+        String actualJson = JsonUtil.pretty(StringUtil.toString(actual));
+        String expectedJson = JsonUtil.pretty(StringUtil.toString(expected));
         return actualJson.equals(expectedJson);
     }
 
@@ -173,7 +173,7 @@ public abstract class AbstractCheck<T> implements Check<T> {
     }
 
     protected void fail(@Nullable Object expected) {
-        fail(actual, expected);
+        fail(actual(), expected);
     }
 
     @SuppressWarnings("checkstyle:HiddenField")

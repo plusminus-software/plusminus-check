@@ -42,6 +42,16 @@ public class DecimalCheck<T extends Number> extends NumberCheck<T> {
     }
 
     public void is(String expected) {
+        T actual = actual();
+        if (actual instanceof BigDecimal) {
+            if (checkNull(expected)) {
+                return;
+            }
+            if (!actual.toString().equals(expected)) {
+                fail(expected);
+            }
+            return;
+        }
         isNumber(new BigDecimal(expected));
     }
 

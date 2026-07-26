@@ -41,6 +41,24 @@ public class DecimalCheckTest {
     }
 
     @Test
+    public void isStringKeepsBigDecimalScale() {
+        assertFail(() -> check(new BigDecimal("1.5")).is("1.50"), "1.5", "1.50");
+        assertFail(() -> check(new BigDecimal("1.50")).is("1.5"), "1.50", "1.5");
+        check(new BigDecimal("1.50")).is("1.50");
+    }
+
+    @Test
+    public void isStringIgnoresScaleOfScalelessTypes() {
+        check(1.5d).is("1.50");
+        check(1.5f).is("1.50");
+    }
+
+    @Test
+    public void isStringAfterLimitScale() {
+        check(new BigDecimal("1.234567")).limitScale(2).is("1.23");
+    }
+
+    @Test
     public void isBigDecimalScaleAgnostic() {
         check(new BigDecimal("1.50")).is(new BigDecimal("1.5"));
     }

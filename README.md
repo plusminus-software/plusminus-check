@@ -169,6 +169,17 @@ Checks.FACTORY.set(new MyCheckFactory());
 | `isPositive()` / `isNegative()` / `isZero()` | sign assertions                        |
 | `limitScale()` / `limitScale(int)`           | round decimals before comparison (default scale 4) |
 
+Numbers compare numerically, so `check(new BigDecimal("1.50")).is(new BigDecimal("1.5"))` passes.
+A `BigDecimal` carries its scale, though, so `is(String)` compares it as a string instead — that is
+the way to pin down the exact rendering:
+
+```java
+check(new BigDecimal("1.50")).is("1.50");   // ok
+check(new BigDecimal("1.5")).is("1.50");    // fails: expected:<1.50> but was:<1.5>
+```
+
+`float` / `double` have no scale of their own and keep comparing numerically against a string.
+
 ## JSON checks
 
 `check(jsonString)` of a well-formed JSON `String` returns a `JsonCheck` for

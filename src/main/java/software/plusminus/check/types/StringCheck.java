@@ -44,6 +44,22 @@ public class StringCheck extends AbstractCheck<String> {
         return this;
     }
 
+    public StringCheck startsWith(String expectedPrefix) {
+        isNotNull();
+        if (!actual().startsWith(expectedPrefix)) {
+            fail("does not start with " + expectedPrefix, "starts with " + expectedPrefix);
+        }
+        return this;
+    }
+
+    public StringCheck endsWith(String expectedSuffix) {
+        isNotNull();
+        if (!actual().endsWith(expectedSuffix)) {
+            fail("does not end with " + expectedSuffix, "ends with " + expectedSuffix);
+        }
+        return this;
+    }
+
     public JsonCheck isJson() {
         isNotNull();
         String actual = actual();

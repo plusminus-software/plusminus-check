@@ -60,6 +60,43 @@ public class StringCheckTest {
     }
 
     @Test
+    public void startsWithOk() {
+        check("hello world").startsWith("hello");
+    }
+
+    @Test
+    public void startsWithChainOk() {
+        check("hello world").startsWith("hello").endsWith("world");
+    }
+
+    @Test
+    public void startsWithFail() {
+        assertFail(() -> check("hello world").startsWith("world"),
+                "does not start with world", "starts with world");
+    }
+
+    @Test
+    public void startsWithFailOnNull() {
+        assertFail(() -> check((String) null).startsWith("hello"));
+    }
+
+    @Test
+    public void endsWithOk() {
+        check("hello world").endsWith("world");
+    }
+
+    @Test
+    public void endsWithFail() {
+        assertFail(() -> check("hello world").endsWith("hello"),
+                "does not end with hello", "ends with hello");
+    }
+
+    @Test
+    public void endsWithFailOnNull() {
+        assertFail(() -> check((String) null).endsWith("world"));
+    }
+
+    @Test
     public void isJsonOk() {
         check("{\"a\":1}").isJson().is("{\"a\":1}");
     }

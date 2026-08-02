@@ -163,7 +163,11 @@ Checks.FACTORY.set(new MyCheckFactory());
 | `map(Function<T, R>, elementCheck)` | same, with an explicit element checker                             |
 | `mapTo(getter)`                 | same, with the element checker chosen from the getter's return type    |
 | `filter(Predicate<T>)`          | keeps the matching elements, along with the current element checker    |
+| `flatMap(getter)`               | concatenates every element's collection into one check                 |
+| `distinct()`                    | drops duplicates, keeping first occurrences in order                   |
 | `sorted()` / `sorted(Comparator)` | reorders the elements, as on `Stream`                               |
+| `allMatch(Predicate<T>)` / `noneMatch(...)` | asserts a condition over every / no element            |
+| `hasNoDuplicates()`             | asserts no two elements are equal                                      |
 | `isStringList()` / `isNumberList()` / ... | asserts the element type and narrows the element checker     |
 
 `map` and `mapTo` keep element order and the current path, so failures still report
@@ -220,6 +224,31 @@ not the first element of the original. `sorted()` uses natural ordering and repo
 `sorted` always returns a `ListCheck`, including when called on a `CollectionCheck` —
 ordering is exactly what an unordered collection lacks, so the ordered check is the
 useful result.
+
+`flatMap` concatenates each element's collection, and `distinct` drops repeats:
+
+```java
+check(orders).flatMap(Order::getLines).hasSize(7);
+check(names).distinct().is("Alice", "Bob");
+```
+
+A null collection fails — `element at index 1 has no collection` — rather than
+contributing nothing, so a missing field is not left to surface later as a confusing
+size mismatch. Empty collections are fine. This is the one place `Stream.flatMap`
+differs: it treats a null mapped stream as empty. If null really means "no items"
+in your model, filter first: `check(orders).filter(o -> o.getLines() != null)`.
+
+`allMatch`, `noneMatch` and `hasNoDuplicates` assert but return the check itself, so
+they chain like `hasSize`:
+
+```java
+check(users).allMatch(User::isActive).hasNoDuplicates().hasSize(3);
+```
+
+Duplicates — for both `distinct()` and `hasNoDuplicates()` — are decided structurally,
+the same way `contains` and `containsExactly` compare elements, so they work on types
+that do not implement `equals`. That differs from `Stream.distinct()`, which uses
+`equals`.
 
 ### Narrowing an untyped collection
 

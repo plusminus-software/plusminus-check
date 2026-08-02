@@ -35,12 +35,23 @@ public class ListCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
     @CheckReturnValue
     public <R, M extends AbstractCheck<R>> ListCheck<R, List<R>, M> map(
             Function<T, R> mapper, BiFunction<R, List<String>, M> elementCheck) {
-        return new ListCheck<>(mapToList(mapper), levels(), elementCheck);
+        return new ListCheck<>(operations().map(mapper), levels(), elementCheck);
     }
 
     @CheckReturnValue
     public ListCheck<T, List<T>, E> filter(Predicate<T> predicate) {
-        return new ListCheck<>(filterToList(predicate), levels(), elementCheck);
+        return new ListCheck<>(operations().filter(predicate), levels(), elementCheck);
+    }
+
+    @CheckReturnValue
+    public <R> ListCheck<R, List<R>, ObjectCheck<R>> flatMap(Function<T, ? extends Collection<R>> mapper) {
+        BiFunction<R, List<String>, ObjectCheck<R>> elementCheck = ObjectCheck::new;
+        return new ListCheck<>(operations().flatMap(mapper), levels(), elementCheck);
+    }
+
+    @CheckReturnValue
+    public ListCheck<T, List<T>, E> distinct() {
+        return new ListCheck<>(operations().distinct(), levels(), elementCheck);
     }
 
     @Override

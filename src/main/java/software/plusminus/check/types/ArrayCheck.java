@@ -3,6 +3,7 @@ package software.plusminus.check.types;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -54,23 +55,37 @@ public class ArrayCheck<T, E extends AbstractCheck<T>>
     @SuppressWarnings("unchecked")
     public <R, M extends AbstractCheck<R>> ArrayCheck<R, M> map(
             Function<T, R> mapper, BiFunction<R, List<String>, M> elementCheck) {
-        R[] mapped = (R[]) mapToList(mapper).toArray();
+        R[] mapped = (R[]) operations().map(mapper).toArray();
         return new ArrayCheck<>(mapped, levels(), elementCheck);
     }
 
     @CheckReturnValue
     public ArrayCheck<T, E> filter(Predicate<T> predicate) {
-        return create(filterToList(predicate));
+        return create(operations().filter(predicate));
+    }
+
+    @CheckReturnValue
+    @SuppressWarnings("unchecked")
+    public <R> ArrayCheck<R, ObjectCheck<R>> flatMap(Function<T, ? extends Collection<R>> mapper) {
+        BiFunction<R, List<String>, ObjectCheck<R>> elementCheck = ObjectCheck::new;
+        R[] flattened = (R[]) operations().flatMap(mapper).toArray();
+        return new ArrayCheck<>(flattened, levels(), elementCheck);
+
+    }
+
+    @CheckReturnValue
+    public ArrayCheck<T, E> distinct() {
+        return create(operations().distinct());
     }
 
     @CheckReturnValue
     public ArrayCheck<T, E> sorted() {
-        return create(sortToList(null));
+        return create(operations().sort(null));
     }
 
     @CheckReturnValue
     public ArrayCheck<T, E> sorted(Comparator<? super T> comparator) {
-        return create(sortToList(comparator));
+        return create(operations().sort(comparator));
     }
 
     @Override
@@ -79,7 +94,7 @@ public class ArrayCheck<T, E extends AbstractCheck<T>>
     public <X, M extends AbstractCheck<X>> ArrayCheck<X, M> isArrayOf(
             Class<X> type, BiFunction<X, List<String>, M> checkBuilder) {
         checkElementsType(type);
-        List<X> mapped = mapToList(type::cast);
+        List<X> mapped = operations().map(type::cast);
         X[] typed = mapped.toArray((X[]) Array.newInstance(type, mapped.size()));
         return new ArrayCheck<>(typed, levels(), checkBuilder);
     }

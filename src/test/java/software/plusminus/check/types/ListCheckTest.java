@@ -7,6 +7,7 @@ import software.plusminus.check.fixtures.TestObject;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -242,6 +243,101 @@ public class ListCheckTest {
     public void sortedAllowsNullsWithComparator() {
         check(Arrays.asList("b", null)).sorted(Comparator.nullsFirst(Comparator.naturalOrder()))
                 .is(null, "b");
+    }
+
+    @Test
+    public void flatMap() {
+        check(objects()).flatMap(TestObject::getListField)
+                .is("One", "Two");
+    }
+
+    @Test
+    public void flatMapWithElementCheck() {
+        check(objects()).flatMap(TestObject::getListField)
+                .isStringList()
+                .at(0).is(c -> c.startsWith("On"));
+    }
+
+    @Test
+    public void flatMapFailsOnNullCollection() {
+        List<TestObject> list = objects();
+        list.get(1).setListField(null);
+
+        assertFail(() -> check(list).flatMap(TestObject::getListField),
+                "element at index 1 has no collection", "all elements have a collection");
+    }
+
+    @Test
+    public void flatMapAllowsEmptyCollection() {
+        List<TestObject> list = objects();
+        list.get(1).setListField(Collections.emptyList());
+
+        check(list).flatMap(TestObject::getListField)
+                .is("One");
+    }
+
+    @Test
+    public void flatMapKeepsNullInsideCollection() {
+        List<TestObject> list = objects();
+        list.get(0).setListField(Arrays.asList("One", null));
+
+        check(list).flatMap(TestObject::getListField)
+                .is("One", null, "Two");
+    }
+
+    @Test
+    public void flatMapFailsOnNullElement() {
+        List<TestObject> list = Arrays.asList(TestObject.of("One", 1), null);
+        assertFail(() -> check(list).flatMap(TestObject::getListField),
+                "element at index 1 is null", "all elements are non-null");
+    }
+
+    @Test
+    public void distinct() {
+        check(Arrays.asList("a", "b", "a")).distinct()
+                .is("a", "b");
+    }
+
+    @Test
+    public void distinctComparesStructurally() {
+        check(Arrays.asList(new TestObject("a", 1), new TestObject("a", 1))).distinct()
+                .hasSize(1);
+    }
+
+    @Test
+    public void hasNoDuplicates() {
+        check(Arrays.asList("a", "b")).hasNoDuplicates()
+                .hasSize(2);
+    }
+
+    @Test
+    public void hasNoDuplicatesFail() {
+        assertFail(() -> check(Arrays.asList("a", "b", "a")).hasNoDuplicates(),
+                "element at index 2 duplicates index 0", "all elements are unique");
+    }
+
+    @Test
+    public void allMatch() {
+        check(objects()).allMatch(o -> o.getCount() > 0)
+                .hasSize(2);
+    }
+
+    @Test
+    public void allMatchFail() {
+        assertFail(() -> check(objects()).allMatch(o -> o.getCount() > 1),
+                "element at index 0 does not match", "all elements match");
+    }
+
+    @Test
+    public void noneMatch() {
+        check(objects()).noneMatch(o -> o.getCount() > 9)
+                .hasSize(2);
+    }
+
+    @Test
+    public void noneMatchFail() {
+        assertFail(() -> check(objects()).noneMatch(o -> o.getCount() > 1),
+                "element at index 1 matches", "no elements match");
     }
 
     @Test

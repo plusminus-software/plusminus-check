@@ -4,12 +4,10 @@ import software.plusminus.check.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -19,6 +17,7 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         Self extends AbstractArrayCheck<T, A, E, Self>> extends AbstractObjectCheck<A> {
 
     private static final String SIZE_IS = "size is ";
+    public static final String ELEMENT_AT_INDEX = "element at index ";
 
     protected BiFunction<T, List<String>, E> elementCheck;
 
@@ -128,6 +127,31 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         return self();
     }
 
+    public Self allMatch(Predicate<T> predicate) {
+        int index = operations().firstNotMatching(predicate);
+        if (index >= 0) {
+            fail(ELEMENT_AT_INDEX + index + " does not match", "all elements match");
+        }
+        return self();
+    }
+
+    public Self noneMatch(Predicate<T> predicate) {
+        int index = operations().firstMatching(predicate);
+        if (index >= 0) {
+            fail(ELEMENT_AT_INDEX + index + " matches", "no elements match");
+        }
+        return self();
+    }
+
+    public Self hasNoDuplicates() {
+        int[] duplicate = operations().firstDuplicate();
+        if (duplicate != null) {
+            fail(ELEMENT_AT_INDEX + duplicate[0] + " duplicates index " + duplicate[1],
+                    "all elements are unique");
+        }
+        return self();
+    }
+
     public void containsExactly(Object... expectedElements) {
         isNotNull();
         List<T> remaining = new ArrayList<>(actualList());
@@ -143,7 +167,7 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
             String actualMessage;
             if (missedElements != null && unexpectedElements == null) {
                 actualMessage = missedElements;
-            } else if (missedElements == null && unexpectedElements != null) {
+            } else if (missedElements == null) {
                 actualMessage = unexpectedElements;
             } else {
                 actualMessage = missedElements + "\nbut " + unexpectedElements;
@@ -165,74 +189,17 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         return new LinkedCheck<>(check, self());
     }
 
-    protected <R> List<R> mapToList(Function<T, R> mapper) {
+    protected ElementOperations<T> operations() {
         isNotNull();
-        List<T> elements = actualList();
-        List<R> mapped = new ArrayList<>(elements.size());
-        for (int i = 0; i < elements.size(); i++) {
-            T element = elements.get(i);
-            mapped.add(applyToElement(mapper, element, i));
-        }
-        return mapped;
-    }
-
-    protected List<T> filterToList(Predicate<T> predicate) {
-        isNotNull();
-        List<T> elements = actualList();
-        List<T> filtered = new ArrayList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            T element = elements.get(i);
-            if (applyToElement(predicate::test, element, i)) {
-                filtered.add(element);
-            }
-        }
-        return filtered;
-    }
-
-    protected List<T> sortToList(@Nullable Comparator<? super T> comparator) {
-        isNotNull();
-        List<T> sorted = new ArrayList<>(actualList());
-        if (comparator == null) {
-            checkNoNullElements(sorted);
-        }
-        try {
-            sorted.sort(comparator);
-        } catch (ClassCastException e) {
-            fail("elements are not mutually comparable", "all elements are comparable");
-        }
-        return sorted;
+        return new ElementOperations<>(actualList(), levels(), this::fail);
     }
 
     protected void checkElementsType(Class<?> type) {
-        isNotNull();
-        List<T> elements = actualList();
-        for (int i = 0; i < elements.size(); i++) {
-            T element = elements.get(i);
-            if (element != null && !type.isInstance(element)) {
-                fail("element at index " + i + " is " + element.getClass().getName(),
-                        "all elements are " + type.getName());
-            }
-        }
-    }
-
-    private void checkNoNullElements(List<T> elements) {
-        for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i) == null) {
-                fail("element at index " + i + " is null", "all elements are non-null");
-            }
-        }
-    }
-
-    @SuppressWarnings({"PMD.AvoidCatchingNPE", "java:S1696"})
-    private <R> R applyToElement(Function<T, R> function, @Nullable T element, int index) {
-        try {
-            return function.apply(element);
-        } catch (NullPointerException e) {
-            if (element != null) {
-                throw e;
-            }
-            fail("element at index " + index + " is null", "all elements are non-null");
-            return null;
+        ElementOperations<T> operations = operations();
+        int index = operations.firstNotInstanceOf(type);
+        if (index >= 0) {
+            fail(ELEMENT_AT_INDEX + index + " is " + operations.get(index).getClass().getName(),
+                    "all elements are " + type.getName());
         }
     }
 

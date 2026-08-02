@@ -31,12 +31,12 @@ abstract class AbstractCollectionCheck<T, C extends Collection<T>, E extends Abs
 
     @CheckReturnValue
     public ListCheck<T, List<T>, E> sorted() {
-        return new ListCheck<>(sortToList(null), levels(), elementCheck);
+        return new ListCheck<>(operations().sort(null), levels(), elementCheck);
     }
 
     @CheckReturnValue
     public ListCheck<T, List<T>, E> sorted(Comparator<? super T> comparator) {
-        return new ListCheck<>(sortToList(comparator), levels(), elementCheck);
+        return new ListCheck<>(operations().sort(comparator), levels(), elementCheck);
     }
 
     @Override

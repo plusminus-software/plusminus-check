@@ -143,7 +143,7 @@ Checks.FACTORY.set(new MyCheckFactory());
 
 Assertions return the check so they chain, except the ones that end a chain by nature:
 `is(...)`, `isNull`, `isSame`, `isEqual`, `isLike`, `isZero`, `isTrue` / `isFalse`,
-`isEmpty`, `containsExactly` and `allFieldsChecked`.
+`isEmpty`, `containsExactly` and `allChecked`.
 
 `isNot` is available on every checker and negates whatever `is` means for it, so it
 compares structurally rather than by `equals`:
@@ -165,7 +165,7 @@ check(amount).isNot(0);
 | `isBoolean()` / `isString()` / `isNumber()` / ... | narrows to a typed checker (see `TypeCheck`)             |
 | `field(User::getName)`                            | descends via a typed method reference (returns narrowed checker) |
 | `field("fieldName")`                              | descends by string name (reflective fallback)                  |
-| `allFieldsChecked(coverage)`                      | asserts every field of the object has been checked             |
+| `allChecked()` / `allChecked(coverage)`           | asserts every field of the object has been checked             |
 
 ## Collection / Map checks
 
@@ -188,6 +188,7 @@ check(amount).isNot(0);
 | `isSorted()` / `isSortedBy(Comparator)` | asserts the elements are already in order                      |
 | `first()` / `last()`            | descends into the first / last element (ordered checks only)           |
 | `isStringList()` / `isNumberList()` / ... | asserts the element type and narrows the element checker     |
+| `allChecked()`                  | asserts every element / entry has been checked                         |
 
 `map` and `mapTo` keep element order and the current path, so failures still report
 the index the mismatching element came from. Both are available on `ListCheck`,
@@ -378,6 +379,39 @@ second path convention to learn:
 ```java
 check(headers.keySet()).contains("Content-Type", "Location");
 check(headers.values()).hasSize(2);
+```
+
+## Coverage checks
+
+`allChecked()` asserts that nothing was left unasserted — every field of an object, every
+entry of a map, every element of a collection or array. It is the same method on all of
+them, so a field, entry or element added later fails the test until it is checked too:
+
+```java
+ObjectCheck<User> user = check(actualUser);
+user.field(User::getName).is("Bob");
+user.field(User::getAge).is(30);
+user.allChecked();          // fails once User grows an `email` field
+
+MapCheck<String, String> headers = check(actualHeaders);
+headers.valueAt("Content-Type").is("application/json");
+headers.allChecked();       // there are not checked keys: [Location]
+
+ListCheck<String, List<String>, ObjectCheck<String>> lines = check(actualLines);
+lines.first().is("header");
+lines.allChecked();         // there are not checked indexes: [1, 2]
+```
+
+A part counts as checked when the check descended into it by name, key or position
+(`field`, `valueAt`, `containsKey`, `containsEntry`, `at`, `first`, `last`), when
+`contains` matched it, or when an assertion compared the value as a whole (`is`,
+`isLike`, `containsExactly`).
+
+`ObjectCheck` also takes a `FieldCoverage`, for classes whose internal fields are not
+meant to be asserted:
+
+```java
+user.allChecked(FieldCoverage.WITH_GETTERS_ONLY);
 ```
 
 ## Number checks

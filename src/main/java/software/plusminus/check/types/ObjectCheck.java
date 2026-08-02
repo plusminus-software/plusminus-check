@@ -7,7 +7,6 @@ import software.plusminus.check.util.ObjectUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -17,16 +16,14 @@ import java.util.function.Function;
 @SuppressWarnings({"unchecked", "java:S2160"})
 public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck, FieldCheck<T> {
 
-    private Set<String> checkedFields;
+    private final CheckedParts checkedParts = new CheckedParts("fields");
 
     public ObjectCheck(T actual) {
         super(actual);
-        this.checkedFields = new HashSet<>();
     }
 
     public ObjectCheck(T actual, List<String> levels) {
         super(actual, levels);
-        this.checkedFields = new HashSet<>();
     }
 
     @Override
@@ -66,7 +63,19 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
     }
 
     @Override
-    public void allFieldsChecked(FieldCoverage coverage) {
+    public void is(String expected) {
+        checkedParts.markAll();
+        super.is(expected);
+    }
+
+    @Override
+    public void isLike(Object expected) {
+        checkedParts.markAll();
+        super.isLike(expected);
+    }
+
+    @Override
+    public void allChecked(FieldCoverage coverage) {
         if (actual() == null) {
             throw new AssertionError("Cannot verify checked fields: actual is null");
         }
@@ -75,10 +84,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
         if (coverage == FieldCoverage.WITH_GETTERS_ONLY) {
             required.removeIf(name -> !ObjectUtils.hasGetter(clazz, name));
         }
-        required.removeAll(checkedFields);
-        if (!required.isEmpty()) {
-            fail("there are not checked fields: " + required, "all fields were checked");
-        }
+        checkedParts.verify(required, this::fail);
     }
 
     @Override
@@ -86,7 +92,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
         isNotNull();
         T actual = actual();
         Object value = ObjectUtils.readField(actual, fieldName);
-        checkedFields.add(fieldName);
+        checkedParts.mark(fieldName);
         List<String> fieldLevels = new ArrayList<>(levels());
         fieldLevels.add("." + fieldName);
         return new LinkedCheck<>(new ObjectCheck<>((X) value, fieldLevels), this);
@@ -115,7 +121,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
 
     private List<String> levels(Serializable getter) {
         Field field = ObjectUtils.toField(getter);
-        checkedFields.add(field.getName());
+        checkedParts.mark(field.getName());
         List<String> levels = new ArrayList<>(levels());
         levels.add("." + field.getName());
         return levels;

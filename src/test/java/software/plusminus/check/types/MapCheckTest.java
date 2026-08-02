@@ -179,6 +179,30 @@ public class MapCheckTest {
                 "keys are [\n  \"a\"\n]", "contains key b");
     }
 
+    @Test
+    public void allCheckedByValueAtOk() {
+        check(map("a", "1", "b", "2"))
+                .valueAt("a").is("1")
+                .valueAt("b").is("2")
+                .allChecked();
+    }
+
+    @Test
+    public void allCheckedByContainsEntryOk() {
+        check(map("a", "1"))
+                .containsEntry("a", "1")
+                .allChecked();
+    }
+
+    @Test
+    public void allCheckedFail() {
+        MapCheck<String, String> mapCheck = check(map("a", "1", "b", "2"));
+        mapCheck.valueAt("a").is("1");
+        assertFail(mapCheck::allChecked,
+                "there are not checked keys: [b]",
+                "all keys were checked");
+    }
+
     private static String json(String... pairs) {
         StringBuilder json = new StringBuilder("{");
         for (int i = 0; i < pairs.length; i += 2) {

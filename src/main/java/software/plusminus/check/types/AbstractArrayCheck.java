@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -15,12 +17,15 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings({"checkstyle:ClassTypeParameterName", "java:S2160", "java:S119"})
 public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
-        Self extends AbstractArrayCheck<T, A, E, Self>> extends AbstractObjectCheck<A> {
+        Self extends AbstractArrayCheck<T, A, E, Self>> extends AbstractObjectCheck<A>
+        implements CoverageCheck {
 
     private static final String SIZE_IS = "size is ";
     public static final String ELEMENT_AT_INDEX = "element at index ";
 
     protected BiFunction<T, List<String>, E> elementCheck;
+
+    private final CheckedParts checkedParts = new CheckedParts("indexes");
 
     protected AbstractArrayCheck(@Nullable A actual, BiFunction<T, List<String>, E> elementCheck) {
         super(actual);
@@ -38,6 +43,20 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
     protected abstract List<T> actualList();
 
     protected abstract T get(int index);
+
+    /**
+     * Asserts every element was checked, by {@code at}, {@code first}, {@code last},
+     * by a {@code contains} that matched it.
+     */
+    @Override
+    public void allChecked() {
+        isNotNull();
+        Set<String> required = new LinkedHashSet<>();
+        for (int i = 0; i < size(); i++) {
+            required.add(String.valueOf(i));
+        }
+        checkedParts.verify(required, this::fail);
+    }
 
     @Override
     public void is(String expected) {
@@ -124,6 +143,7 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         if (!expected.isEmpty()) {
             fail("does not contain " + StringUtil.toString(expected), "contains all elements");
         }
+        markMatched(remaining);
         return self();
     }
 
@@ -149,6 +169,7 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
             fail("does not contain " + remainingChecks.size() + " matching element(s)",
                     "contains elements matching all checks");
         }
+        markMatched(remaining);
         return self();
     }
 
@@ -224,6 +245,7 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
             fail(SIZE_IS + size(), "has element at index " + index);
         }
         T element = get(index);
+        checkedParts.mark(index);
         List<String> elementLevels = new ArrayList<>(levels());
         elementLevels.add("[" + index + "]");
         E check = elementCheck.apply(element, elementLevels);
@@ -267,6 +289,27 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
     @SuppressWarnings("unchecked")
     private Self self() {
         return (Self) this;
+    }
+
+    private void markMatched(List<T> unmatched) {
+        List<T> leftovers = new ArrayList<>(unmatched);
+        List<T> elements = actualList();
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            if (!removeSame(leftovers, elements.get(i))) {
+                checkedParts.mark(i);
+            }
+        }
+    }
+
+    private boolean removeSame(List<T> elements, @Nullable T element) {
+        Iterator<T> iterator = elements.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next() == element) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     private void removeIntersections(List<T> actualElements, List<Object> expectedElements) {

@@ -65,18 +65,18 @@ public class ObjectCheckTest {
     }
 
     @Test
-    public void allFieldsCheckedOk() {
-        ObjectCheck<TestObject> objectCheck = check(new TestObject("a", 1));
-        objectCheck.field(TestObject::getName).is("a");
-        objectCheck.field(TestObject::getCount).is(1);
-        objectCheck.allFieldsChecked();
+    public void allCheckedOk() {
+        check(new TestObject("a", 1))
+                .field(TestObject::getName).is("a")
+                .field(TestObject::getCount).is(1)
+                .allChecked();
     }
 
     @Test
-    public void allFieldsCheckedFail() {
+    public void allCheckedFail() {
         ObjectCheck<TestObject> objectCheck = check(new TestObject("a", 1));
         objectCheck.field(TestObject::getName).is("a");
-        assertFail(objectCheck::allFieldsChecked,
+        assertFail(objectCheck::allChecked,
                 "there are not checked fields: [count]",
                 "all fields were checked");
     }

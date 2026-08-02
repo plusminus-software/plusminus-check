@@ -20,8 +20,10 @@ import software.plusminus.util.ResourceUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -35,8 +37,10 @@ import javax.annotation.Nullable;
  *
  * @author Taras Shpek
  */
-@SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
-public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
+@SuppressWarnings({"checkstyle:ParameterNumber", "java:S107", "java:S2160"})
+public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> implements CoverageCheck {
+
+    private final CheckedParts checkedParts = new CheckedParts("keys");
 
     public MapCheck(@Nullable Map<K, V> actual) {
         super(actual);
@@ -44,6 +48,18 @@ public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
 
     public MapCheck(@Nullable Map<K, V> actual, List<String> levels) {
         super(actual, levels);
+    }
+
+    /**
+     * Asserts every key of the map was checked, by {@code valueAt}, {@code containsKey},
+     * {@code containsEntry}.
+     */
+    @Override
+    public void allChecked() {
+        isNotNull();
+        Set<String> required = new LinkedHashSet<>();
+        actual().keySet().forEach(key -> required.add(StringUtil.toString(key)));
+        checkedParts.verify(required, this::fail);
     }
 
     @Override
@@ -171,6 +187,7 @@ public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
         if (!actual().containsKey(key)) {
             fail(keysDescription(), "contains key " + StringUtil.toString(key));
         }
+        checkedParts.mark(StringUtil.toString(key));
         return this;
     }
 

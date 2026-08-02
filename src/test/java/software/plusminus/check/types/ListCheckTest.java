@@ -487,6 +487,53 @@ public class ListCheckTest {
         assertFail(() -> check(nullList).isStringList());
     }
 
+    @Test
+    public void allCheckedByAtOk() {
+        check(Arrays.asList("a", "b"))
+                .at(0).is("a")
+                .at(1).is("b")
+                .allChecked();
+    }
+
+    @Test
+    public void allCheckedByContainsOk() {
+        check(Arrays.asList("a", "b"))
+                .contains("b", "a")
+                .allChecked();
+    }
+
+    @Test
+    public void allCheckedByContainsWithDuplicatesOk() {
+        check(Arrays.asList("a", "a"))
+                .contains("a", "a")
+                .allChecked();
+    }
+
+    @Test
+    public void allCheckedByPartialContainsFail() {
+        ListCheck<String, List<String>, ObjectCheck<String>> listCheck = check(Arrays.asList("a", "a", "b"));
+        listCheck.contains("a");
+        assertFail(listCheck::allChecked,
+                "there are not checked indexes: [1, 2]",
+                "all indexes were checked");
+    }
+
+    @Test
+    public void allCheckedByContainsConsumerOk() {
+        check(Arrays.asList("a", "b"))
+                .contains(c -> c.isEqual("a"), c -> c.isEqual("b"))
+                .allChecked();
+    }
+
+    @Test
+    public void allCheckedFail() {
+        ListCheck<String, List<String>, ObjectCheck<String>> listCheck = check(Arrays.asList("a", "b", "c"));
+        listCheck.at(1).is("b");
+        assertFail(listCheck::allChecked,
+                "there are not checked indexes: [0, 2]",
+                "all indexes were checked");
+    }
+
     private List<TestObject> objects() {
         return Arrays.asList(TestObject.of("One", 1), TestObject.of("Two", 2));
     }

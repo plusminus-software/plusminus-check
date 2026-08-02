@@ -56,13 +56,14 @@ import javax.annotation.CheckReturnValue;
 
 @SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @CheckReturnValue
-public interface FieldCheck<T> {
+public interface FieldCheck<T> extends CoverageCheck {
 
-    default void allFieldsChecked() {
-        allFieldsChecked(FieldCoverage.ALL);
+    @Override
+    default void allChecked() {
+        allChecked(FieldCoverage.ALL);
     }
 
-    void allFieldsChecked(FieldCoverage coverage);
+    void allChecked(FieldCoverage coverage);
 
     <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(String fieldName);
 

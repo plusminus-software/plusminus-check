@@ -34,7 +34,14 @@ public class EnumCheck<E extends Enum<E>> extends AbstractCheck<E> {
     }
 
     @Override
-    public void isNotNull() {
+    public EnumCheck<E> isNotNull() {
         super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public EnumCheck<E> isNot(E unexpected) {
+        super.isNot(unexpected);
+        return this;
     }
 }

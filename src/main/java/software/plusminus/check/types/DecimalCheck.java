@@ -33,6 +33,12 @@ public class DecimalCheck<T extends Number> extends NumberCheck<T> {
     }
 
     @Override
+    public DecimalCheck<T> isNot(T unexpected) {
+        super.isNot(unexpected);
+        return this;
+    }
+
+    @Override
     public void is(T expected) {
         isNumber(expected);
     }

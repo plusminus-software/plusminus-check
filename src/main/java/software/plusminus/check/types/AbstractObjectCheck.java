@@ -30,8 +30,15 @@ public class AbstractObjectCheck<T> extends AbstractCheck<T> {
     }
 
     @Override
-    public void isNotNull() {
+    public AbstractObjectCheck<T> isNotNull() {
         super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public AbstractObjectCheck<T> isNot(T unexpected) {
+        super.isNot(unexpected);
+        return this;
     }
 
     public void isEqual(T expected) {
@@ -43,12 +50,14 @@ public class AbstractObjectCheck<T> extends AbstractCheck<T> {
         super.isSame(expected);
     }
 
-    public void isType(T expected) {
+    public AbstractObjectCheck<T> isSameTypeAs(T expected) {
         checkType(expected);
+        return this;
     }
 
-    public void isType(Class<?> expectedType) {
+    public AbstractObjectCheck<T> isType(Class<?> expectedType) {
         checkType(expectedType);
+        return this;
     }
 
     protected <O, C extends AbstractCheck<O>> boolean predicate(O object,
@@ -62,14 +71,5 @@ public class AbstractObjectCheck<T> extends AbstractCheck<T> {
         } catch (AssertionError e) {
             return false;
         }
-    }
-
-    protected void not(Runnable runnable, String expected) {
-        try {
-            runnable.run();
-        } catch (AssertionError e) {
-            return;
-        }
-        fail("not " + expected, expected);
     }
 }

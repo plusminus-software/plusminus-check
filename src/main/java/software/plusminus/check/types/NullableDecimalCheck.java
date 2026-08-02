@@ -33,8 +33,15 @@ public class NullableDecimalCheck<T extends Number> extends DecimalCheck<T> {
     }
 
     @Override
-    public void isNotNull() {
+    public NullableDecimalCheck<T> isNotNull() {
         super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public NullableDecimalCheck<T> isNot(T unexpected) {
+        super.isNot(unexpected);
+        return this;
     }
 
     @Override

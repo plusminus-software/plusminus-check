@@ -57,7 +57,7 @@ public class CollectionCheckTest {
         check(objects()).mapTo(TestObject::getListField)
                 .contains(c -> c.hasSize(1));
         check(objects()).mapTo(TestObject::getOptionalField)
-                .contains(c -> c.isNotEmpty().isEqual("One"));
+                .contains(c -> c.isPresent().isEqual("One"));
         check(objects()).mapTo(TestObject::getPrimitiveIntegerField)
                 .contains(NumberCheck::isPositive);
         check(objects()).mapTo(TestObject::getCount)

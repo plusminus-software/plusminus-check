@@ -36,6 +36,30 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
         return checkBuilder.apply(type.cast(actual()), levels());
     }
 
+    @Override
+    public ObjectCheck<T> isType(Class<?> expectedType) {
+        super.isType(expectedType);
+        return this;
+    }
+
+    @Override
+    public ObjectCheck<T> isNotNull() {
+        super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public ObjectCheck<T> isNot(T unexpected) {
+        super.isNot(unexpected);
+        return this;
+    }
+
+    @Override
+    public ObjectCheck<T> isSameTypeAs(T expected) {
+        super.isSameTypeAs(expected);
+        return this;
+    }
+
     public <X> ObjectCheck<X> isInstanceOf(Class<X> expectedType) {
         checkInstanceOf(expectedType);
         return new ObjectCheck<>(expectedType.cast(actual()), levels());

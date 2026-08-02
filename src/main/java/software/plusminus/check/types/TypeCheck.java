@@ -3,6 +3,8 @@ package software.plusminus.check.types;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Period;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Deque;
@@ -98,5 +100,17 @@ public interface TypeCheck {
     default <X extends Temporal> TemporalCheck<X> isTemporal() {
         Class<X> type = (Class<X>) Temporal.class;
         return isType(type, TemporalCheck::new);
+    }
+
+    default BytesCheck isBytes() {
+        return isType(byte[].class, BytesCheck::new);
+    }
+
+    default DurationCheck isDuration() {
+        return isType(Duration.class, DurationCheck::new);
+    }
+
+    default PeriodCheck isPeriod() {
+        return isType(Period.class, PeriodCheck::new);
     }
 }

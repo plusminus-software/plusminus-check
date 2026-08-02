@@ -17,6 +17,7 @@ package software.plusminus.check.types;
 
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("java:S2789")
@@ -30,6 +31,28 @@ public class OptionalCheck<T> extends AbstractObjectCheck<Optional<T>> {
         super(actual, levels);
     }
 
+    @Override
+    public OptionalCheck<T> isNotNull() {
+        super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public OptionalCheck<T> isNot(Optional<T> unexpected) {
+        super.isNot(unexpected);
+        return this;
+    }
+
+    @Override
+    public void is(String expected) {
+        isPresent().is(expected);
+    }
+
+    @Override
+    public void isLike(Object expected) {
+        isPresent().isLike(expected);
+    }
+
     public void isEmpty() {
         isNotNull();
         if (actual().isPresent()) {
@@ -37,8 +60,8 @@ public class OptionalCheck<T> extends AbstractObjectCheck<Optional<T>> {
         }
     }
 
-    @SuppressWarnings("java:S3655")
-    public ObjectCheck<T> isNotEmpty() {
+    @CheckReturnValue
+    public ObjectCheck<T> isPresent() {
         isNotNull();
         Optional<T> actual = actual();
         if (!actual.isPresent()) {

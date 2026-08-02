@@ -86,6 +86,26 @@ public class AbstractCheckTest {
         assertFail(() -> check.isSame("other"), "hello", "same as other");
     }
 
+    @Test
+    public void isNotOk() {
+        check.isNot("other");
+    }
+
+    @Test
+    public void isNotFail() {
+        assertFail(() -> check.isNot(actual), "hello", "not hello");
+    }
+
+    @Test
+    public void isNotNullValueOk() {
+        nullCheck.isNot(actual);
+    }
+
+    @Test
+    public void isNotNullValueFail() {
+        assertFail(() -> nullCheck.isNot(null), "null", "not null");
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void equalsThrowsException() {
         AbstractCheck<String> abstractCheck = new AbstractCheck<String>(actual) {};

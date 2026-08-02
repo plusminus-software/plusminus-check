@@ -19,6 +19,7 @@ import software.plusminus.check.util.JsonUtil;
 import software.plusminus.util.ResourceUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +31,20 @@ import javax.annotation.Nullable;
 /**
  * Json checker.
  *
+ * <p>Field names are dot-separated paths into nested objects, for instance
+ * {@code "user.address.city"}. Fields checked with {@code hasField} or listed in
+ * {@code ignoringFields} are masked on both sides before {@code is} compares
+ * the documents, so volatile values do not have to appear in the expected json.
+ *
  * @author Taras Shpek
  */
-@SuppressWarnings("java:S2160")
+@SuppressWarnings({"java:S2160", "unchecked"})
 public class JsonCheck extends AbstractCheck<String> {
 
-    private Set<String> separatelyCheckedFields = new HashSet<>();
+    private static final String MASK = "SEPARATELY CHECKED";
+    private static final String FIELD = "Field ";
+
+    private Set<String> maskedFields = new HashSet<>();
     private boolean ignoreFieldsOrder;
 
     protected JsonCheck(@Nullable String actual) {
@@ -61,9 +70,9 @@ public class JsonCheck extends AbstractCheck<String> {
             fail("is not json", "is json");
         }
         String actual = actual();
-        if (!separatelyCheckedFields.isEmpty()) {
-            actual = replaceSeparatelyCheckedFields(actual);
-            expected = replaceSeparatelyCheckedFields(expected);
+        if (!maskedFields.isEmpty()) {
+            actual = maskFields(actual);
+            expected = maskFields(expected);
         }
         actual = JsonUtil.pretty(actual);
         expected = ignoreFieldsOrder ? JsonUtil.prettyOrdered(expected, actual) : JsonUtil.pretty(expected);
@@ -71,21 +80,44 @@ public class JsonCheck extends AbstractCheck<String> {
             fail(actual, expected);
         }
     }
-    
+
+    public JsonCheck hasField(String fieldName) {
+        return hasField(fieldName, check -> { });
+    }
+
     public JsonCheck hasField(String fieldName, Consumer<ObjectCheck<?>> fieldValueChecker) {
-        if (actual().startsWith("[")) {
-            fail("is not a json object", "is a json object");
+        assertJsonObject();
+        Map<Object, Object> jsonMap = JsonUtil.fromJson(actual(), Map.class);
+        String[] segments = segments(fieldName);
+        Map<Object, Object> parent = parent(jsonMap, segments);
+        String field = segments[segments.length - 1];
+        if (parent == null || !parent.containsKey(field)) {
+            fail(FIELD + fieldName + " is missed", FIELD + fieldName + " is present");
         }
-        separatelyCheckedFields.add(fieldName);
-        Map<Object, Object> actualMap = JsonUtil.fromJson(actual(), Map.class);
-        if (!actualMap.containsKey(fieldName)) {
-            fail("Field " + fieldName + " is missed", "Field " + fieldName + " is present");
-        }
-        Object value = actualMap.get(fieldName);
+        maskedFields.add(fieldName);
         List<String> fieldLevels = new ArrayList<>(levels());
-        fieldLevels.add("." + fieldName);
-        ObjectCheck<?> objectCheck = new ObjectCheck<>(value, fieldLevels);
-        fieldValueChecker.accept(objectCheck);
+        for (String segment : segments) {
+            fieldLevels.add("." + segment);
+        }
+        fieldValueChecker.accept(new ObjectCheck<>(parent.get(field), fieldLevels));
+        return this;
+    }
+
+    public JsonCheck doesNotHaveField(String fieldName) {
+        assertJsonObject();
+        Map<Object, Object> jsonMap = JsonUtil.fromJson(actual(), Map.class);
+        String[] segments = segments(fieldName);
+        Map<Object, Object> parent = parent(jsonMap, segments);
+        if (parent != null && parent.containsKey(segments[segments.length - 1])) {
+            fail(FIELD + fieldName + " is present", FIELD + fieldName + " is absent");
+        }
+        return this;
+    }
+
+    @CheckReturnValue
+    public JsonCheck ignoringFields(String... fieldNames) {
+        assertJsonObject();
+        maskedFields.addAll(Arrays.asList(fieldNames));
         return this;
     }
 
@@ -94,15 +126,41 @@ public class JsonCheck extends AbstractCheck<String> {
         this.ignoreFieldsOrder = true;
         return this;
     }
-    
-    private String replaceSeparatelyCheckedFields(String json) {
+
+    private String maskFields(String json) {
         Map<Object, Object> jsonMap = JsonUtil.fromJson(json, Map.class);
-        separatelyCheckedFields.forEach(field -> {
-            if (jsonMap.containsKey(field)) {
-                jsonMap.put(field, "SEPARATELY CHECKED");
+        maskedFields.forEach(fieldName -> {
+            String[] segments = segments(fieldName);
+            Map<Object, Object> parent = parent(jsonMap, segments);
+            String field = segments[segments.length - 1];
+            if (parent != null && parent.containsKey(field)) {
+                parent.put(field, MASK);
             }
         });
         return JsonUtil.toJson(jsonMap);
+    }
+
+    @Nullable
+    private Map<Object, Object> parent(Map<Object, Object> jsonMap, String[] segments) {
+        Map<Object, Object> current = jsonMap;
+        for (int i = 0; i < segments.length - 1; i++) {
+            Object value = current.get(segments[i]);
+            if (!(value instanceof Map)) {
+                return null;
+            }
+            current = (Map<Object, Object>) value;
+        }
+        return current;
+    }
+
+    private String[] segments(String fieldName) {
+        return fieldName.split("\\.");
+    }
+
+    private void assertJsonObject() {
+        if (actual().startsWith("[")) {
+            fail("is not a json object", "is a json object");
+        }
     }
 
     private void assertJson(String actual) {

@@ -14,8 +14,15 @@ public class NullableNumberCheck<T extends Number> extends NumberCheck<T> {
     }
 
     @Override
-    public void isNotNull() {
+    public NullableNumberCheck<T> isNotNull() {
         super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public NullableNumberCheck<T> isNot(T unexpected) {
+        super.isNot(unexpected);
+        return this;
     }
 
     @Override

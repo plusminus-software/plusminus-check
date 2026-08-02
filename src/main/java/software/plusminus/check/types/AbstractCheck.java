@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("java:S1133")
-public abstract class AbstractCheck<T> implements Check<T> {
+public abstract class AbstractCheck<T> {
 
     private static final String MESSAGE_PATTERN = "%sexpected:<%s> but was:<%s>";
     public static final String EMPTY = "empty";
@@ -77,16 +77,22 @@ public abstract class AbstractCheck<T> implements Check<T> {
         check(expected, this::checkNull, this::checkEmpty, this::checkEquals, this::checkJson);
     }
 
+    public AbstractCheck<T> isNot(T unexpected) {
+        not(() -> is(unexpected), StringUtil.toString(unexpected));
+        return this;
+    }
+
     protected void isNull() {
         if (actual != null) {
             fail(actual, null);
         }
     }
 
-    protected void isNotNull() {
+    protected AbstractCheck<T> isNotNull() {
         if (actual == null) {
             fail(actual, "not null");
         }
+        return this;
     }
 
     protected void isSame(T expected) {
@@ -170,6 +176,15 @@ public abstract class AbstractCheck<T> implements Check<T> {
         String actualString = JsonUtil.pretty(StringUtil.toString(actual));
         expectedString = JsonUtil.pretty(ResourceUtils.toString(expectedString));
         return actualString.equals(expectedString);
+    }
+
+    protected void not(Runnable assertion, String expected) {
+        try {
+            assertion.run();
+        } catch (AssertionError e) {
+            return;
+        }
+        fail(expected, "not " + expected);
     }
 
     protected void fail(@Nullable Object expected) {

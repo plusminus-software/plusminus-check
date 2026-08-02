@@ -15,20 +15,27 @@
  */
 package software.plusminus.check.types;
 
+import software.plusminus.check.util.StringUtil;
 import software.plusminus.util.ResourceUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
  * Map (including HashMap, TreeMap etc) checker.
  * Converts Map to string (in Json or Jsog formats) before comparing.
  *
+ * <p>The {@code is} overloads take alternating keys and values, up to ten pairs,
+ * the way {@link Map#of} does. Past that, or when the pairs are built elsewhere,
+ * use the entry overload with {@code Checks.entry(key, value)}.
+ *
  * @author Taras Shpek
  */
-@SuppressWarnings("checkstyle:ParameterNumber")
+@SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
 public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
 
     public MapCheck(@Nullable Map<K, V> actual) {
@@ -37,6 +44,30 @@ public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
 
     public MapCheck(@Nullable Map<K, V> actual, List<String> levels) {
         super(actual, levels);
+    }
+
+    @Override
+    public MapCheck<K, V> isNotNull() {
+        super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public MapCheck<K, V> isNot(Map<K, V> unexpected) {
+        super.isNot(unexpected);
+        return this;
+    }
+
+    @Override
+    public MapCheck<K, V> isSameTypeAs(Map<K, V> expected) {
+        super.isSameTypeAs(expected);
+        return this;
+    }
+
+    @Override
+    public MapCheck<K, V> isType(Class<?> expectedType) {
+        super.isType(expectedType);
+        return this;
     }
 
     public void isEmpty() {
@@ -74,15 +105,153 @@ public class MapCheck<K, V> extends AbstractObjectCheck<Map<K, V>> {
         checkMap(key1, value1, key2, value2, key3, value3);
     }
 
-    @SuppressWarnings("java:S107")
     public void is(K key1, V value1, K key2, V value2, K key3, V value3,
                    K key4, V value4) {
         checkMap(key1, value1, key2, value2, key3, value3, key4, value4);
     }
 
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4, K key5, V value5) {
+        checkMap(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5);
+    }
+
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4, K key5, V value5, K key6, V value6) {
+        checkMap(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5,
+                key6, value6);
+    }
+
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4, K key5, V value5, K key6, V value6,
+                   K key7, V value7) {
+        checkMap(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5,
+                key6, value6, key7, value7);
+    }
+
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4, K key5, V value5, K key6, V value6,
+                   K key7, V value7, K key8, V value8) {
+        checkMap(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5,
+                key6, value6, key7, value7, key8, value8);
+    }
+
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4, K key5, V value5, K key6, V value6,
+                   K key7, V value7, K key8, V value8, K key9, V value9) {
+        checkMap(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5,
+                key6, value6, key7, value7, key8, value8, key9, value9);
+    }
+
+    public void is(K key1, V value1, K key2, V value2, K key3, V value3,
+                   K key4, V value4, K key5, V value5, K key6, V value6,
+                   K key7, V value7, K key8, V value8, K key9, V value9,
+                   K key10, V value10) {
+        checkMap(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5,
+                key6, value6, key7, value7, key8, value8, key9, value9, key10, value10);
+    }
+
+    /**
+     * Compares the map against the expected entries, for any number of them.
+     * Build the entries with {@code Checks.entry(key, value)}.
+     *
+     * @param entries expected entries
+     */
+    @SafeVarargs
+    public final void is(Map.Entry<K, V>... entries) {
+        Object[] keyValues = new Object[entries.length * 2];
+        for (int i = 0; i < entries.length; i++) {
+            keyValues[i * 2] = entries[i].getKey();
+            keyValues[i * 2 + 1] = entries[i].getValue();
+        }
+        checkMap(keyValues);
+    }
+
+    public MapCheck<K, V> containsKey(K key) {
+        isNotNull();
+        if (!actual().containsKey(key)) {
+            fail(keysDescription(), "contains key " + StringUtil.toString(key));
+        }
+        return this;
+    }
+
+    public MapCheck<K, V> doesNotContainKey(K key) {
+        isNotNull();
+        if (actual().containsKey(key)) {
+            fail(keysDescription(), "does not contain key " + StringUtil.toString(key));
+        }
+        return this;
+    }
+
+    /**
+     * Asserts the map contains the entry. Values are compared structurally, the same way
+     * {@code is} compares them, so this works on types that do not implement {@code equals}.
+     *
+     * @param key expected key
+     * @param value expected value
+     * @return this check, for chaining
+     */
+    public MapCheck<K, V> containsEntry(K key, V value) {
+        containsKey(key);
+        if (!sameValue(actual().get(key), value)) {
+            fail(StringUtil.toString(actual().get(key)),
+                    "value " + StringUtil.toString(value) + " for key " + StringUtil.toString(key));
+        }
+        return this;
+    }
+
+    /**
+     * Asserts at least one value matches. Values are compared structurally,
+     * as in {@link #containsEntry}.
+     *
+     * @param value expected value
+     * @return this check, for chaining
+     */
+    public MapCheck<K, V> containsValue(V value) {
+        isNotNull();
+        for (V actualValue : actual().values()) {
+            if (sameValue(actualValue, value)) {
+                return this;
+            }
+        }
+        fail("does not contain " + StringUtil.toString(value),
+                "contains value " + StringUtil.toString(value));
+        return this;
+    }
+
+    /**
+     * Descends into the value of an entry. Fails if the key is absent.
+     *
+     * @param key key of the entry to check
+     * @return a check of the value, linked back to this check
+     */
+    @CheckReturnValue
+    public LinkedCheck<V, ObjectCheck<V>, MapCheck<K, V>> valueAt(K key) {
+        containsKey(key);
+        List<String> valueLevels = new ArrayList<>(levels());
+        valueLevels.add(level(key));
+        return new LinkedCheck<>(new ObjectCheck<>(actual().get(key), valueLevels), this);
+    }
+
+    private boolean sameValue(@Nullable V actualValue, @Nullable V expectedValue) {
+        if (actualValue == null || expectedValue == null) {
+            return actualValue == expectedValue;
+        }
+        return predicate(actualValue, levels(), ObjectCheck::new, c -> c.isLike(expectedValue));
+    }
+
+    private String keysDescription() {
+        return "keys are " + StringUtil.toString(new ArrayList<>(actual().keySet()));
+    }
+
+    private String level(K key) {
+        if (key instanceof CharSequence) {
+            return "." + key;
+        }
+        return "[" + StringUtil.toString(key) + "]";
+    }
+
     private void checkMap(Object... expectedKeyValues) {
-        Map<Object, Object> expected = toMap(expectedKeyValues);
-        expected = prepareExpectedMap(expected);
+        Map<Object, Object> expected = prepareExpectedMap(toMap(expectedKeyValues));
         isLike(expected);
     }
 

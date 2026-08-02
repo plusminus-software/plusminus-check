@@ -86,4 +86,89 @@ public class JsonCheckTest {
     public void nullFail() {
         assertFail(() -> check((String) null).isJson(), "null", "not null");
     }
+
+    @Test
+    public void hasFieldPresenceOnlyOk() {
+        check("{\"id\":7,\"name\":\"a\"}").isJson()
+                .hasField("id")
+                .is("{\"id\":123,\"name\":\"a\"}");
+    }
+
+    @Test
+    public void hasFieldPresenceOnlyFail() {
+        assertFail(() -> check("{\"name\":\"a\"}").isJson().hasField("id"),
+                "Field id is missed", "Field id is present");
+    }
+
+    @Test
+    public void hasNestedFieldOk() {
+        check("{\"user\":{\"id\":7,\"name\":\"a\"}}").isJson()
+                .hasField("user.id", id -> id.isNumber().is(7))
+                .is("{\"user\":{\"id\":999,\"name\":\"a\"}}");
+    }
+
+    @Test
+    public void hasNestedFieldMissedFail() {
+        assertFail(() -> check("{\"user\":{\"name\":\"a\"}}").isJson().hasField("user.id"),
+                "Field user.id is missed", "Field user.id is present");
+    }
+
+    @Test
+    public void hasNestedFieldWrongValueFail() {
+        assertFail(() -> check("{\"user\":{\"id\":7}}").isJson()
+                        .hasField("user.id", id -> id.isNumber().is(8)),
+                "user.id ", "7", "8");
+    }
+
+    @Test
+    public void doesNotHaveFieldOk() {
+        check("{\"name\":\"a\"}").isJson().doesNotHaveField("id");
+    }
+
+    @Test
+    public void doesNotHaveFieldFail() {
+        assertFail(() -> check("{\"id\":7}").isJson().doesNotHaveField("id"),
+                "Field id is present", "Field id is absent");
+    }
+
+    @Test
+    public void doesNotHaveNestedFieldOk() {
+        check("{\"user\":{\"name\":\"a\"}}").isJson().doesNotHaveField("user.id");
+    }
+
+    @Test
+    public void ignoringFieldsOk() {
+        check("{\"id\":7,\"createdAt\":\"2020-01-01\",\"name\":\"a\"}").isJson()
+                .ignoringFields("id", "createdAt")
+                .is("{\"id\":1,\"createdAt\":\"1999-12-31\",\"name\":\"a\"}");
+    }
+
+    @Test
+    public void ignoringFieldsStillComparesTheRestFail() {
+        assertFail(() -> check("{\"id\":7,\"name\":\"a\"}").isJson()
+                        .ignoringFields("id")
+                        .is("{\"id\":1,\"name\":\"b\"}"),
+                "{\n  \"id\": \"SEPARATELY CHECKED\",\n  \"name\": \"a\"\n}",
+                "{\n  \"id\": \"SEPARATELY CHECKED\",\n  \"name\": \"b\"\n}");
+    }
+
+    @Test
+    public void ignoringAbsentFieldOk() {
+        check("{\"name\":\"a\"}").isJson()
+                .ignoringFields("id")
+                .is("{\"name\":\"a\"}");
+    }
+
+    @Test
+    public void ignoringNestedFieldOk() {
+        check("{\"user\":{\"id\":7,\"name\":\"a\"}}").isJson()
+                .ignoringFields("user.id")
+                .is("{\"user\":{\"id\":1,\"name\":\"a\"}}");
+    }
+
+    @Test
+    public void ignoringFieldsOnArrayFail() {
+        assertFail(() -> check("[1,2]").isJson().ignoringFields("id"),
+                "is not a json object", "is a json object");
+    }
 }

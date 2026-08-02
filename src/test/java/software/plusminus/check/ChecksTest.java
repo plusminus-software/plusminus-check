@@ -18,48 +18,14 @@ package software.plusminus.check;
 import org.junit.Test;
 import software.plusminus.check.fixtures.TestEnum;
 import software.plusminus.check.fixtures.TestObject;
-import software.plusminus.check.supplier.BigDecimalCollectionSupplier;
-import software.plusminus.check.supplier.BigDecimalListSupplier;
-import software.plusminus.check.supplier.BigIntegerCollectionSupplier;
-import software.plusminus.check.supplier.BigIntegerListSupplier;
-import software.plusminus.check.supplier.BooleanCollectionSupplier;
-import software.plusminus.check.supplier.BooleanListSupplier;
-import software.plusminus.check.supplier.ByteCollectionSupplier;
-import software.plusminus.check.supplier.ByteListSupplier;
-import software.plusminus.check.supplier.CharacterCollectionSupplier;
-import software.plusminus.check.supplier.CharacterListSupplier;
-import software.plusminus.check.supplier.CollectionCollectionSupplier;
-import software.plusminus.check.supplier.CollectionListSupplier;
-import software.plusminus.check.supplier.DoubleCollectionSupplier;
-import software.plusminus.check.supplier.DoubleListSupplier;
-import software.plusminus.check.supplier.EnumCollectionSupplier;
-import software.plusminus.check.supplier.EnumListSupplier;
-import software.plusminus.check.supplier.FloatCollectionSupplier;
-import software.plusminus.check.supplier.FloatListSupplier;
-import software.plusminus.check.supplier.IntegerCollectionSupplier;
-import software.plusminus.check.supplier.IntegerListSupplier;
-import software.plusminus.check.supplier.ListCollectionSupplier;
-import software.plusminus.check.supplier.ListListSupplier;
-import software.plusminus.check.supplier.LongCollectionSupplier;
-import software.plusminus.check.supplier.LongListSupplier;
-import software.plusminus.check.supplier.MapCollectionSupplier;
-import software.plusminus.check.supplier.MapListSupplier;
-import software.plusminus.check.supplier.OptionalCollectionSupplier;
-import software.plusminus.check.supplier.OptionalListSupplier;
-import software.plusminus.check.supplier.PathCollectionSupplier;
-import software.plusminus.check.supplier.PathListSupplier;
-import software.plusminus.check.supplier.ShortCollectionSupplier;
-import software.plusminus.check.supplier.ShortListSupplier;
-import software.plusminus.check.supplier.StringCollectionSupplier;
-import software.plusminus.check.supplier.StringListSupplier;
-import software.plusminus.check.supplier.TemporalCollectionSupplier;
-import software.plusminus.check.supplier.TemporalListSupplier;
 import software.plusminus.check.types.AbstractCheck;
 import software.plusminus.check.types.ArrayCheck;
 import software.plusminus.check.types.BooleanCheck;
+import software.plusminus.check.types.BytesCheck;
 import software.plusminus.check.types.CharacterCheck;
 import software.plusminus.check.types.CollectionCheck;
 import software.plusminus.check.types.DecimalCheck;
+import software.plusminus.check.types.DurationCheck;
 import software.plusminus.check.types.EnumCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
@@ -71,6 +37,7 @@ import software.plusminus.check.types.NumberCheck;
 import software.plusminus.check.types.ObjectCheck;
 import software.plusminus.check.types.OptionalCheck;
 import software.plusminus.check.types.PathCheck;
+import software.plusminus.check.types.PeriodCheck;
 import software.plusminus.check.types.StringCheck;
 import software.plusminus.check.types.TemporalCheck;
 
@@ -78,21 +45,24 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static software.plusminus.check.Checks.check;
-import static software.plusminus.check.Checks.checkOf;
 
 /**
  * Main entry point tests.
@@ -231,6 +201,18 @@ public class ChecksTest {
     }
 
     @Test
+    public void durationCheck() {
+        Duration actual = Duration.ofSeconds(1);
+        verify(() -> check(actual), DurationCheck.class);
+    }
+
+    @Test
+    public void periodCheck() {
+        Period actual = Period.ofDays(1);
+        verify(() -> check(actual), PeriodCheck.class);
+    }
+
+    @Test
     public void temporalCheck() {
         LocalDate actual = LocalDate.now();
         verify(() -> check(actual), TemporalCheck.class);
@@ -264,6 +246,37 @@ public class ChecksTest {
     public void dequeCheck() {
         Deque<String> actual = new ArrayDeque<>(Collections.singletonList("a"));
         verify(() -> check(actual), ListCheck.class);
+    }
+
+    @Test
+    public void iterableCheck() {
+        Iterable<String> actual = () -> Collections.singletonList("a").iterator();
+        verify(() -> check(actual), CollectionCheck.class);
+    }
+
+    @Test
+    public void streamCheck() {
+        verify(() -> check(Stream.of("a")), ListCheck.class);
+    }
+
+    @Test
+    public void nullStreamCheck() {
+        verify(() -> check((Stream<String>) null), ListCheck.class);
+    }
+
+    @Test
+    public void iteratorCheck() {
+        verify(() -> check(Collections.singletonList("a").iterator()), ListCheck.class);
+    }
+
+    @Test
+    public void nullIteratorCheck() {
+        verify(() -> check((Iterator<String>) null), ListCheck.class);
+    }
+
+    @Test
+    public void nullIterableCheck() {
+        verify(() -> check((Iterable<String>) null), CollectionCheck.class);
     }
 
     @Test
@@ -311,9 +324,9 @@ public class ChecksTest {
     }
 
     @Test
-    public void byteArrayCheck() {
+    public void bytesCheck() {
         byte[] actual = {1};
-        verify(() -> check(actual), ArrayCheck.class);
+        verify(() -> check(actual), BytesCheck.class);
     }
 
     @Test
@@ -435,230 +448,6 @@ public class ChecksTest {
     public void objectArrayCheck() {
         TestObject[] actual = {new TestObject("a", 1)};
         verify(() -> check(actual), ArrayCheck.class);
-    }
-
-    // --- Collection suppliers ---
-
-    @Test
-    public void booleanCollectionSupplier() {
-        BooleanCollectionSupplier supplier = () -> Collections.singleton(true);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void booleanListSupplier() {
-        BooleanListSupplier supplier = () -> Collections.singletonList(true);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void characterCollectionSupplier() {
-        CharacterCollectionSupplier supplier = () -> Collections.singleton('a');
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void characterListSupplier() {
-        CharacterListSupplier supplier = () -> Collections.singletonList('a');
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void byteCollectionSupplier() {
-        ByteCollectionSupplier supplier = () -> Collections.singleton((byte) 1);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void byteListSupplier() {
-        ByteListSupplier supplier = () -> Collections.singletonList((byte) 1);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void shortCollectionSupplier() {
-        ShortCollectionSupplier supplier = () -> Collections.singleton((short) 1);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void shortListSupplier() {
-        ShortListSupplier supplier = () -> Collections.singletonList((short) 1);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void integerCollectionSupplier() {
-        IntegerCollectionSupplier supplier = () -> Collections.singleton(1);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void integerListSupplier() {
-        IntegerListSupplier supplier = () -> Collections.singletonList(1);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void longCollectionSupplier() {
-        LongCollectionSupplier supplier = () -> Collections.singleton(1L);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void longListSupplier() {
-        LongListSupplier supplier = () -> Collections.singletonList(1L);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void bigIntegerCollectionSupplier() {
-        BigIntegerCollectionSupplier supplier = () -> Collections.singleton(BigInteger.ONE);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void bigIntegerListSupplier() {
-        BigIntegerListSupplier supplier = () -> Collections.singletonList(BigInteger.ONE);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void floatCollectionSupplier() {
-        FloatCollectionSupplier supplier = () -> Collections.singleton(1.0f);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void floatListSupplier() {
-        FloatListSupplier supplier = () -> Collections.singletonList(1.0f);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void doubleCollectionSupplier() {
-        DoubleCollectionSupplier supplier = () -> Collections.singleton(1.0d);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void doubleListSupplier() {
-        DoubleListSupplier supplier = () -> Collections.singletonList(1.0d);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void bigDecimalCollectionSupplier() {
-        BigDecimalCollectionSupplier supplier = () -> Collections.singleton(BigDecimal.ONE);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void bigDecimalListSupplier() {
-        BigDecimalListSupplier supplier = () -> Collections.singletonList(BigDecimal.ONE);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void stringCollectionSupplier() {
-        StringCollectionSupplier supplier = () -> Collections.singleton("a");
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void stringListSupplier() {
-        StringListSupplier supplier = () -> Collections.singletonList("a");
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void pathCollectionSupplier() {
-        PathCollectionSupplier supplier = () -> Collections.singleton(Paths.get("src/main"));
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void pathListSupplier() {
-        PathListSupplier supplier = () -> Collections.singletonList(Paths.get("src/main"));
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void enumCollectionSupplier() {
-        EnumCollectionSupplier<TestEnum> supplier = () -> Collections.singleton(TestEnum.ONE);
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void enumListSupplier() {
-        EnumListSupplier<TestEnum> supplier = () -> Collections.singletonList(TestEnum.ONE);
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void temporalCollectionSupplier() {
-        TemporalCollectionSupplier<LocalDate> supplier = () -> Collections.singleton(LocalDate.now());
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void temporalListSupplier() {
-        TemporalListSupplier<LocalDate> supplier = () -> Collections.singletonList(LocalDate.now());
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void collectionCollectionSupplier() {
-        CollectionCollectionSupplier<String> supplier =
-                () -> Collections.singleton(Collections.singleton("a"));
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void collectionListSupplier() {
-        CollectionListSupplier<String> supplier =
-                () -> Collections.singletonList(Collections.singleton("a"));
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void listCollectionSupplier() {
-        ListCollectionSupplier<String> supplier =
-                () -> Collections.singleton(Collections.singletonList("a"));
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void listListSupplier() {
-        ListListSupplier<String> supplier =
-                () -> Collections.singletonList(Collections.singletonList("a"));
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void mapCollectionSupplier() {
-        MapCollectionSupplier<String, String> supplier =
-                () -> Collections.singleton(Collections.singletonMap("k", "v"));
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void mapListSupplier() {
-        MapListSupplier<String, String> supplier =
-                () -> Collections.singletonList(Collections.singletonMap("k", "v"));
-        verify(() -> checkOf(supplier), ListCheck.class);
-    }
-
-    @Test
-    public void optionalCollectionSupplier() {
-        OptionalCollectionSupplier<String> supplier = () -> Collections.singleton(Optional.of("a"));
-        verify(() -> checkOf(supplier), CollectionCheck.class);
-    }
-
-    @Test
-    public void optionalListSupplier() {
-        OptionalListSupplier<String> supplier = () -> Collections.singletonList(Optional.of("a"));
-        verify(() -> checkOf(supplier), ListCheck.class);
     }
 
     private <T extends AbstractCheck<?>> void verify(Supplier<T> check, Class<T> type) {

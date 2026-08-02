@@ -27,6 +27,18 @@ public class ListCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
     }
 
     @Override
+    @CheckReturnValue
+    public LinkedCheck<T, E, ListCheck<T, C, E>> first() {
+        return super.first();
+    }
+
+    @Override
+    @CheckReturnValue
+    public LinkedCheck<T, E, ListCheck<T, C, E>> last() {
+        return super.last();
+    }
+
+    @Override
     public final void is(Object... expectedElements) {
         super.is(expectedElements);
     }

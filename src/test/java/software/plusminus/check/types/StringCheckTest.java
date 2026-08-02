@@ -105,4 +105,118 @@ public class StringCheckTest {
     public void isJsonFail() {
         assertFail(() -> check("not json").isJson(), "not json", "json");
     }
+
+    @Test
+    public void isEmptyOk() {
+        check("").isEmpty();
+    }
+
+    @Test
+    public void isEmptyFail() {
+        assertFail(() -> check("a").isEmpty(), "a", "empty");
+    }
+
+    @Test
+    public void isNotEmptyOk() {
+        check("a").isNotEmpty();
+    }
+
+    @Test
+    public void isNotEmptyFail() {
+        assertFail(() -> check("").isNotEmpty(), "empty", "not empty");
+    }
+
+    @Test
+    public void isBlankOk() {
+        check(" \t\n").isBlank();
+    }
+
+    @Test
+    public void isBlankFail() {
+        assertFail(() -> check(" a ").isBlank(), " a ", "blank");
+    }
+
+    @Test
+    public void isNotBlankOk() {
+        check(" a ").isNotBlank();
+    }
+
+    @Test
+    public void isNotBlankFail() {
+        assertFail(() -> check("  ").isNotBlank(), "  ", "not blank");
+    }
+
+    @Test
+    public void hasLengthOk() {
+        check("abc").hasLength(3);
+    }
+
+    @Test
+    public void hasLengthFail() {
+        assertFail(() -> check("abc").hasLength(2), "length is 3", "length is 2");
+    }
+
+    @Test
+    public void doesNotContainOk() {
+        check("hello").doesNotContain("world");
+    }
+
+    @Test
+    public void doesNotContainFail() {
+        assertFail(() -> check("hello world").doesNotContain("world"),
+                "contains world", "does not contain world");
+    }
+
+    @Test
+    public void matchesOk() {
+        check("abc123").matches("[a-z]+\\d+");
+    }
+
+    @Test
+    public void matchesPartiallyFail() {
+        assertFail(() -> check("abc123!").matches("[a-z]+\\d+"),
+                "does not match [a-z]+\\d+", "matches [a-z]+\\d+");
+    }
+
+    @Test
+    public void ignoringLineEndingsOk() {
+        check("a\r\nb").ignoringLineEndings().is("a\nb");
+    }
+
+    @Test
+    public void ignoringLineEndingsCarriageReturnOk() {
+        check("a\rb").ignoringLineEndings().is("a\nb");
+    }
+
+    @Test
+    public void ignoringLineEndingsStillComparesContent() {
+        assertFail(() -> check("a\r\nb").ignoringLineEndings().is("a\nc"), "a\nb", "a\nc");
+    }
+
+    @Test
+    public void lineEndingsMatterByDefault() {
+        assertFail(() -> check("a\r\nb").is("a\nb"), "a\r\nb", "a\nb");
+    }
+
+    @Test
+    public void isNotOk() {
+        check("hello").isNot("world");
+    }
+
+    @Test
+    public void isNotFail() {
+        assertFail(() -> check("hello").isNot("hello"), "hello", "not hello");
+    }
+
+    @Test
+    public void chainsAssertions() {
+        check("hello world")
+                .isNotBlank()
+                .hasLength(11)
+                .startsWith("hello")
+                .endsWith("world")
+                .contains("o w")
+                .doesNotContain("bye")
+                .matches("hello.*");
+    }
 }

@@ -46,6 +46,18 @@ public class ArrayCheck<T, E extends AbstractCheck<T>>
     }
 
     @Override
+    @CheckReturnValue
+    public LinkedCheck<T, E, ArrayCheck<T, E>> first() {
+        return super.first();
+    }
+
+    @Override
+    @CheckReturnValue
+    public LinkedCheck<T, E, ArrayCheck<T, E>> last() {
+        return super.last();
+    }
+
+    @Override
     public void is(Object... expectedElements) {
         super.is(expectedElements);
     }

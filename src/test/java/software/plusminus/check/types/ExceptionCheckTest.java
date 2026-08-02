@@ -121,6 +121,102 @@ public class ExceptionCheckTest {
                 "type java.lang.IllegalArgumentException", "no exception");
     }
 
+    @Test
+    public void hasMessageContainingOk() {
+        checkException(() -> throwException(new IllegalArgumentException("Very bad exception")))
+                .hasMessageContaining("bad");
+    }
+
+    @Test
+    public void hasMessageContainingFail() {
+        assertFail(() -> checkException(() -> throwException(new IllegalArgumentException("Very bad exception")))
+                        .hasMessageContaining("good"),
+                "Very bad exception", "message containing good");
+    }
+
+    @Test
+    public void hasMessageMatchingOk() {
+        checkException(() -> throwException(new IllegalArgumentException("Very bad exception")))
+                .hasMessageMatching("Very .* exception");
+    }
+
+    @Test
+    public void hasMessageMatchingFail() {
+        assertFail(() -> checkException(() -> throwException(new IllegalArgumentException("Very bad exception")))
+                        .hasMessageMatching("bad"),
+                "Very bad exception", "message matching bad");
+    }
+
+    @Test
+    public void hasCauseOk() {
+        checkException(() -> throwException(wrapped()))
+                .hasCause(IllegalStateException.class);
+    }
+
+    @Test
+    public void hasCauseWrongTypeFail() {
+        assertFail(() -> checkException(() -> throwException(wrapped()))
+                        .hasCause(IllegalArgumentException.class),
+                "type java.lang.IllegalStateException", "type java.lang.IllegalArgumentException");
+    }
+
+    @Test
+    public void hasCauseWithoutCauseFail() {
+        assertFail(() -> checkException(() -> throwException(new IllegalArgumentException("boom")))
+                        .hasCause(IllegalStateException.class),
+                "no cause", "type java.lang.IllegalStateException");
+    }
+
+    @Test
+    public void hasNoCauseOk() {
+        checkException(() -> throwException(new IllegalArgumentException("boom"))).hasNoCause();
+    }
+
+    @Test
+    public void hasNoCauseFail() {
+        assertFail(() -> checkException(() -> throwException(wrapped())).hasNoCause(),
+                "type java.lang.IllegalStateException", "no cause");
+    }
+
+    @Test
+    public void causeOk() {
+        checkException(() -> throwException(wrapped()))
+                .cause()
+                .is(IllegalStateException.class)
+                .hasMessage("root");
+    }
+
+    @Test
+    public void causeFail() {
+        assertFail(() -> checkException(() -> throwException(wrapped())).cause().hasMessage("other"),
+                "cause ", "root", "other");
+    }
+
+    @Test
+    public void causeWithoutCauseFail() {
+        assertFail(() -> checkException(() -> throwException(new IllegalArgumentException("boom"))).cause(),
+                "no cause", "a cause");
+    }
+
+    @Test
+    public void rootCauseOk() {
+        checkException(() -> throwException(new IllegalArgumentException("outer", wrapped())))
+                .rootCause()
+                .is(IllegalStateException.class)
+                .hasMessage("root");
+    }
+
+    @Test
+    public void rootCauseWithoutCauseIsTheExceptionItself() {
+        checkException(() -> throwException(new IllegalArgumentException("boom")))
+                .rootCause()
+                .hasMessage("boom");
+    }
+
+    private static RuntimeException wrapped() {
+        return new IllegalArgumentException("wrapper", new IllegalStateException("root"));
+    }
+
     private void throwException(RuntimeException exception) {
         throw exception;
     }

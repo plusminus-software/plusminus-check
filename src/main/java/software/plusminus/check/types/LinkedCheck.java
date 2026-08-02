@@ -20,4 +20,9 @@ public class LinkedCheck<T, C extends AbstractCheck<T>, P extends AbstractCheck<
         check.accept(this.check);
         return previous;
     }
+
+    public P isNot(T unexpected) {
+        check.isNot(unexpected);
+        return previous;
+    }
 }

@@ -19,7 +19,14 @@ public class NullableBooleanCheck extends BooleanCheck {
     }
 
     @Override
-    public void isNotNull() {
+    public NullableBooleanCheck isNotNull() {
         super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public NullableBooleanCheck isNot(Boolean unexpected) {
+        super.isNot(unexpected);
+        return this;
     }
 }

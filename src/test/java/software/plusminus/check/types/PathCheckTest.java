@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static software.plusminus.check.Checks.check;
-import static software.plusminus.check.Checks.checkOf;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
@@ -275,17 +274,17 @@ public class PathCheckTest {
     }
 
     @Test
-    public void pathListSupplierElementOk() {
+    public void pathListElementOk() {
         List<Path> paths = Collections.singletonList(Paths.get("src/main"));
-        checkOf(() -> paths)
+        check(paths).isPathList()
                 .at(0).is(c -> c.is("src/main"))
                 .hasSize(1);
     }
 
     @Test
-    public void pathListSupplierElementFail() {
+    public void pathListElementFail() {
         List<Path> paths = Collections.singletonList(Paths.get("src/main"));
-        assertFail(() -> checkOf(() -> paths).at(0).is(c -> c.is("src/test")),
+        assertFail(() -> check(paths).isPathList().at(0).is(c -> c.is("src/test")),
                 "[0] ", path("src/main"), "src/test");
     }
 
@@ -307,6 +306,31 @@ public class PathCheckTest {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    @Test
+    public void chainsAssertions() throws IOException {
+        File file = temporaryFolder.newFile("chained.txt");
+        Files.write(file.toPath(), "content".getBytes(StandardCharsets.UTF_8));
+        check(file.toPath())
+                .isNotNull()
+                .isAbsolute()
+                .exists()
+                .isFile()
+                .startsWith(temporaryFolder.getRoot().toPath())
+                .endsWith("chained.txt")
+                .hasContent("content")
+                .isNot(Paths.get("other.txt"));
+    }
+
+    @Test
+    public void chainsRelativeAssertions() {
+        check(Paths.get("src/main/java"))
+                .isRelative()
+                .startsWith("src")
+                .endsWith("java")
+                .isDirectory()
+                .isNot(Paths.get("src/test"));
     }
 
     @Data

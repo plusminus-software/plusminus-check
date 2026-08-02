@@ -69,15 +69,15 @@ public class AbstractObjectCheckTest {
     }
 
     @Test
-    public void isTypeOk() {
+    public void isSameTypeAsOk() {
         TestObject testObject = new TestObject("b", 2);
-        check.isType(testObject);
+        check.isSameTypeAs(testObject);
     }
 
     @Test
-    public void isTypeFail() {
+    public void isSameTypeAsFail() {
         TestObject mock = mock(TestObject.class);
-        assertFail(() -> check.isType(mock),
+        assertFail(() -> check.isSameTypeAs(mock),
                 "type software.plusminus.check.fixtures.TestObject",
                 "type " + mock.getClass().getName());
     }

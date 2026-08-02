@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 
 import static software.plusminus.check.Checks.check;
-import static software.plusminus.check.Checks.checkOf;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
@@ -54,7 +53,7 @@ public class ListCheckTest {
     @Test
     public void at() {
         List<Integer> list = Arrays.asList(0, 1, -2);
-        checkOf(() -> list)
+        check(list).isNumberList()
                 .at(0).is(c -> c.isZero())
                 .at(1).is(c -> c.isPositive())
                 .at(2).is(c -> c.isNegative())
@@ -173,7 +172,7 @@ public class ListCheckTest {
         check(objects()).mapTo(TestObject::getDequeField)
                 .at(0).is(c -> c.is("One"));
         check(objects()).mapTo(TestObject::getOptionalField)
-                .at(0).is(c -> c.isNotEmpty().isEqual("One"));
+                .at(0).is(c -> c.isPresent().isEqual("One"));
         check(objects()).mapTo(TestObject::getMapField)
                 .at(0).is(c -> c.is("key", "One"));
         check(objects()).mapTo(TestObject::getArrayField)
@@ -338,6 +337,85 @@ public class ListCheckTest {
     public void noneMatchFail() {
         assertFail(() -> check(objects()).noneMatch(o -> o.getCount() > 1),
                 "element at index 1 matches", "no elements match");
+    }
+
+    @Test
+    public void anyMatch() {
+        check(objects()).anyMatch(o -> o.getCount() > 1)
+                .hasSize(2);
+    }
+
+    @Test
+    public void anyMatchFail() {
+        assertFail(() -> check(objects()).anyMatch(o -> o.getCount() > 9),
+                "no element matches", "at least one element matches");
+    }
+
+    @Test
+    public void isSorted() {
+        check(Arrays.asList("a", "b", "c")).isSorted()
+                .hasSize(3);
+    }
+
+    @Test
+    public void isSortedFail() {
+        assertFail(() -> check(Arrays.asList("a", "c", "b")).isSorted(),
+                "element at index 2 is out of order", "all elements are sorted");
+    }
+
+    @Test
+    public void isSortedEqualElements() {
+        check(Arrays.asList("a", "a")).isSorted();
+    }
+
+    @Test
+    public void isSortedNullElementFail() {
+        assertFail(() -> check(Arrays.asList("a", null)).isSorted(),
+                "element at index 1 is null", "all elements are non-null");
+    }
+
+    @Test
+    public void isSortedBy() {
+        check(objects()).isSortedBy(Comparator.comparing(TestObject::getCount))
+                .hasSize(2);
+    }
+
+    @Test
+    public void isSortedByFail() {
+        assertFail(() -> check(objects()).isSortedBy(Comparator.comparing(TestObject::getCount).reversed()),
+                "element at index 1 is out of order", "all elements are sorted");
+    }
+
+    @Test
+    public void first() {
+        check(objects()).first().is(c -> c.field(TestObject::getName).is("One"))
+                .hasSize(2);
+    }
+
+    @Test
+    public void firstFail() {
+        assertFail(() -> check(Arrays.asList("a", "b")).first().is("b"), "[0] ", "a", "b");
+    }
+
+    @Test
+    public void firstOnEmptyFail() {
+        assertFail(() -> check(Collections.emptyList()).first(), "empty", "not empty");
+    }
+
+    @Test
+    public void last() {
+        check(objects()).last().is(c -> c.field(TestObject::getName).is("Two"))
+                .hasSize(2);
+    }
+
+    @Test
+    public void lastFail() {
+        assertFail(() -> check(Arrays.asList("a", "b")).last().is("a"), "[1] ", "b", "a");
+    }
+
+    @Test
+    public void lastOnEmptyFail() {
+        assertFail(() -> check(Collections.emptyList()).last(), "empty", "not empty");
     }
 
     @Test

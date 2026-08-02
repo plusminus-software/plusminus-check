@@ -6,10 +6,12 @@ import software.plusminus.check.getter.BigDecimalGetter;
 import software.plusminus.check.getter.BigIntegerGetter;
 import software.plusminus.check.getter.BooleanGetter;
 import software.plusminus.check.getter.ByteGetter;
+import software.plusminus.check.getter.BytesGetter;
 import software.plusminus.check.getter.CharacterGetter;
 import software.plusminus.check.getter.CollectionGetter;
 import software.plusminus.check.getter.DequeGetter;
 import software.plusminus.check.getter.DoubleGetter;
+import software.plusminus.check.getter.DurationGetter;
 import software.plusminus.check.getter.EnumGetter;
 import software.plusminus.check.getter.FloatGetter;
 import software.plusminus.check.getter.InputStreamGetter;
@@ -19,6 +21,7 @@ import software.plusminus.check.getter.LongGetter;
 import software.plusminus.check.getter.MapGetter;
 import software.plusminus.check.getter.OptionalGetter;
 import software.plusminus.check.getter.PathGetter;
+import software.plusminus.check.getter.PeriodGetter;
 import software.plusminus.check.getter.PrimitiveBooleanGetter;
 import software.plusminus.check.getter.PrimitiveByteGetter;
 import software.plusminus.check.getter.PrimitiveCharacterGetter;
@@ -38,6 +41,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Period;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Deque;
@@ -158,6 +163,18 @@ public interface FieldCheck<T> {
 
     default LinkedCheck<Path, PathCheck, ObjectCheck<T>> field(PathGetter<T> getter) {
         return field(getter, PathCheck::new);
+    }
+
+    default LinkedCheck<byte[], BytesCheck, ObjectCheck<T>> field(BytesGetter<T> getter) {
+        return field(getter, BytesCheck::new);
+    }
+
+    default LinkedCheck<Duration, DurationCheck, ObjectCheck<T>> field(DurationGetter<T> getter) {
+        return field(getter, DurationCheck::new);
+    }
+
+    default LinkedCheck<Period, PeriodCheck, ObjectCheck<T>> field(PeriodGetter<T> getter) {
+        return field(getter, PeriodCheck::new);
     }
 
     default <X extends Temporal> LinkedCheck<X, TemporalCheck<X>, ObjectCheck<T>> field(

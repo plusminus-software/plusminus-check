@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
 class ElementOperations<T> {
 
     public static final String ELEMENT_AT_INDEX = "element at index ";
+    public static final String IS_NULL = " is null";
+    public static final String ALL_ELEMENTS_ARE_NON_NULL = "all elements are non-null";
     private List<T> elements;
     private List<String> levels;
     private BiConsumer<Object, Object> failure;
@@ -76,7 +78,7 @@ class ElementOperations<T> {
         if (comparator == null) {
             int nullIndex = firstNull();
             if (nullIndex >= 0) {
-                failure.accept(ELEMENT_AT_INDEX + nullIndex + " is null", "all elements are non-null");
+                failure.accept(ELEMENT_AT_INDEX + nullIndex + IS_NULL, ALL_ELEMENTS_ARE_NON_NULL);
             }
         }
         try {
@@ -101,6 +103,25 @@ class ElementOperations<T> {
             if (Boolean.TRUE.equals(apply(predicate::test, elements.get(i), i))) {
                 return i;
             }
+        }
+        return -1;
+    }
+
+    int firstOutOfOrder(@Nullable Comparator<? super T> comparator) {
+        if (comparator == null) {
+            int nullIndex = firstNull();
+            if (nullIndex >= 0) {
+                failure.accept(ELEMENT_AT_INDEX + nullIndex + IS_NULL, ALL_ELEMENTS_ARE_NON_NULL);
+            }
+        }
+        try {
+            for (int i = 1; i < elements.size(); i++) {
+                if (compare(elements.get(i - 1), elements.get(i), comparator) > 0) {
+                    return i;
+                }
+            }
+        } catch (ClassCastException e) {
+            failure.accept("elements are not mutually comparable", "all elements are comparable");
         }
         return -1;
     }
@@ -149,7 +170,7 @@ class ElementOperations<T> {
             if (element != null) {
                 throw e;
             }
-            failure.accept(ELEMENT_AT_INDEX + index + " is null", "all elements are non-null");
+            failure.accept(ELEMENT_AT_INDEX + index + IS_NULL, ALL_ELEMENTS_ARE_NON_NULL);
             return null;
         }
     }
@@ -177,6 +198,14 @@ class ElementOperations<T> {
         } catch (AssertionError e) {
             return false;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private int compare(T left, T right, @Nullable Comparator<? super T> comparator) {
+        if (comparator != null) {
+            return comparator.compare(left, right);
+        }
+        return ((Comparable<T>) left).compareTo(right);
     }
 
     private int firstNull() {

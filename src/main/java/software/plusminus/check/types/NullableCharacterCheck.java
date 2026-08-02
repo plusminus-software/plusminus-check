@@ -19,7 +19,14 @@ public class NullableCharacterCheck extends CharacterCheck {
     }
 
     @Override
-    public void isNotNull() {
+    public NullableCharacterCheck isNotNull() {
         super.isNotNull();
+        return this;
+    }
+
+    @Override
+    public NullableCharacterCheck isNot(Character unexpected) {
+        super.isNot(unexpected);
+        return this;
     }
 }

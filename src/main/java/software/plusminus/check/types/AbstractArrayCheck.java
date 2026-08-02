@@ -4,6 +4,7 @@ import software.plusminus.check.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -83,6 +84,30 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         return self();
     }
 
+    @Override
+    public Self isNotNull() {
+        super.isNotNull();
+        return self();
+    }
+
+    @Override
+    public Self isNot(A unexpected) {
+        super.isNot(unexpected);
+        return self();
+    }
+
+    @Override
+    public Self isSameTypeAs(A expected) {
+        super.isSameTypeAs(expected);
+        return self();
+    }
+
+    @Override
+    public Self isType(Class<?> expectedType) {
+        super.isType(expectedType);
+        return self();
+    }
+
     public Self hasSize(int expectedSize) {
         isNotNull();
         if (size() != expectedSize) {
@@ -143,6 +168,22 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         return self();
     }
 
+    public Self anyMatch(Predicate<T> predicate) {
+        int index = operations().firstMatching(predicate);
+        if (index < 0) {
+            fail("no element matches", "at least one element matches");
+        }
+        return self();
+    }
+
+    public Self isSorted() {
+        return checkSorted(null);
+    }
+
+    public Self isSortedBy(Comparator<? super T> comparator) {
+        return checkSorted(comparator);
+    }
+
     public Self hasNoDuplicates() {
         int[] duplicate = operations().firstDuplicate();
         if (duplicate != null) {
@@ -189,7 +230,19 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         return new LinkedCheck<>(check, self());
     }
 
-    protected ElementOperations<T> operations() {
+    @CheckReturnValue
+    protected LinkedCheck<T, E, Self> first() {
+        isNotEmpty();
+        return at(0);
+    }
+
+    @CheckReturnValue
+    protected LinkedCheck<T, E, Self> last() {
+        isNotEmpty();
+        return at(size() - 1);
+    }
+
+    ElementOperations<T> operations() {
         isNotNull();
         return new ElementOperations<>(actualList(), levels(), this::fail);
     }
@@ -201,6 +254,14 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
             fail(ELEMENT_AT_INDEX + index + " is " + operations.get(index).getClass().getName(),
                     "all elements are " + type.getName());
         }
+    }
+
+    private Self checkSorted(@Nullable Comparator<? super T> comparator) {
+        int index = operations().firstOutOfOrder(comparator);
+        if (index >= 0) {
+            fail(ELEMENT_AT_INDEX + index + " is out of order", "all elements are sorted");
+        }
+        return self();
     }
 
     @SuppressWarnings("unchecked")

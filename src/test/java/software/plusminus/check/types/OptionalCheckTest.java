@@ -22,16 +22,41 @@ public class OptionalCheckTest {
 
     @Test
     public void isNotEmptyOk() {
-        check(Optional.of(42)).isNotEmpty().is(42);
+        check(Optional.of(42)).isPresent().is(42);
     }
 
     @Test
     public void isNotEmptyFail() {
-        assertFail(() -> check(Optional.empty()).isNotEmpty(), "empty", "not empty");
+        assertFail(() -> check(Optional.empty()).isPresent(), "empty", "not empty");
     }
 
     @Test
     public void isNotEmptyChainedFail() {
-        assertFail(() -> check(Optional.of(1)).isNotEmpty().is(2), 1, 2);
+        assertFail(() -> check(Optional.of(1)).isPresent().is(2), 1, 2);
+    }
+
+    @Test
+    public void isPresentOk() {
+        check(Optional.of(42)).isPresent().is(42);
+    }
+
+    @Test
+    public void isPresentFail() {
+        assertFail(() -> check(Optional.empty()).isPresent(), "empty", "not empty");
+    }
+
+    @Test
+    public void is() {
+        check(Optional.of("abc")).is("abc");
+    }
+
+    @Test
+    public void isFail() {
+        assertFail(() -> check(Optional.of("abc")).is("abd"), "abc", "abd");
+    }
+
+    @Test
+    public void isOnEmptyFail() {
+        assertFail(() -> check(Optional.<String>empty()).is("abc"), "empty", "not empty");
     }
 }

@@ -42,6 +42,11 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
     }
 
     @Override
+    protected void is(Object... expectedElements) {
+        containsExactly(expectedElements);
+    }
+
+    @Override
     @CheckReturnValue
     public <R, M extends AbstractCheck<R>> CollectionCheck<R, Collection<R>, M> map(
             Function<T, R> mapper, BiFunction<R, List<String>, M> elementCheck) {

@@ -6,12 +6,41 @@ import software.plusminus.check.fixtures.TestObject;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
 @SuppressWarnings("java:S2699")
 public class CollectionCheckTest {
+
+    @Test
+    public void isIterableOk() {
+        Collection<String> actual = Arrays.asList("a", "b");
+        check(actual).is(iterable("a", "b"));
+    }
+
+    /** A plain collection has no defined order, so the comparison must not depend on it. */
+    @Test
+    public void isIterableIgnoresOrder() {
+        Collection<String> actual = new LinkedHashSet<>(Arrays.asList("a", "b"));
+        check(actual).is(iterable("b", "a"));
+    }
+
+    @Test
+    public void isIterableFail() {
+        Collection<String> actual = Arrays.asList("a", "b");
+        assertFail(() -> check(actual).is(iterable("a", "c")),
+                "does not contain: [\n  \"c\"\n]\nbut contains unexpected elements: [\n  \"b\"\n]",
+                "contains exactly elements");
+    }
+
+    @Test
+    public void isIterableAgainstNullFail() {
+        Collection<String> actual = Arrays.asList("a");
+        assertFail(() -> check(actual).is((Iterable<String>) null));
+    }
 
     @Test
     public void map() {
@@ -108,5 +137,10 @@ public class CollectionCheckTest {
 
     private Collection<TestObject> objects() {
         return Arrays.asList(TestObject.of("One", 1), TestObject.of("Two", 2));
+    }
+
+    private Iterable<String> iterable(String... elements) {
+        List<String> list = Arrays.asList(elements);
+        return list::iterator;
     }
 }

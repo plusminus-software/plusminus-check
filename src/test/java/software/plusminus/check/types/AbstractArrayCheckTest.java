@@ -5,6 +5,7 @@ import org.junit.Test;
 import software.plusminus.check.fixtures.TestObject;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -138,5 +139,45 @@ public class AbstractArrayCheckTest {
                 "[\n  {\n    \"name\": \"One\",\n    \"count\": 1\n  },"
                         + "\n  {\n    \"name\": \"One\",\n    \"count\": 1\n  }\n]",
                 "{\n  \"name\": \"One\",\n  \"count\": 1\n}");
+    }
+
+    @Test
+    public void isIterableOk() {
+        check(Arrays.asList("a", "b")).is(iterable("a", "b"));
+    }
+
+    @Test
+    public void isIterableComparesByPositionFail() {
+        assertFail(() -> check(Arrays.asList("a", "b")).is(iterable("b", "a")),
+                "[0] ", "a", "b");
+    }
+
+    @Test
+    public void isIterableSizeFail() {
+        assertFail(() -> check(Arrays.asList("a", "b")).is(iterable("a")),
+                "size is 2", "size is 1");
+    }
+
+    /**
+     * A single expected element is not a sequence, so it must still be taken as one
+     * element rather than being flattened into the elements it holds.
+     */
+    @Test
+    public void isNestedListStaysSingleElement() {
+        List<List<String>> nested = Collections.singletonList(Arrays.asList("a", "b"));
+        check(nested).is(Arrays.asList("a", "b"));
+    }
+
+    @Test
+    public void isIterableAgainstNullFail() {
+        assertFail(() -> check(Arrays.asList("a")).is((Iterable<String>) null));
+    }
+
+    /**
+     * An {@link Iterable} that is not a {@link java.util.Collection}.
+     */
+    private Iterable<String> iterable(String... elements) {
+        List<String> list = Arrays.asList(elements);
+        return list::iterator;
     }
 }

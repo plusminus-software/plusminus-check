@@ -4,11 +4,13 @@ import software.plusminus.check.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -169,9 +171,36 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         List<R> mapped = new ArrayList<>(elements.size());
         for (int i = 0; i < elements.size(); i++) {
             T element = elements.get(i);
-            mapped.add(mapElement(mapper, element, i));
+            mapped.add(applyToElement(mapper, element, i));
         }
         return mapped;
+    }
+
+    protected List<T> filterToList(Predicate<T> predicate) {
+        isNotNull();
+        List<T> elements = actualList();
+        List<T> filtered = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            T element = elements.get(i);
+            if (applyToElement(predicate::test, element, i)) {
+                filtered.add(element);
+            }
+        }
+        return filtered;
+    }
+
+    protected List<T> sortToList(@Nullable Comparator<? super T> comparator) {
+        isNotNull();
+        List<T> sorted = new ArrayList<>(actualList());
+        if (comparator == null) {
+            checkNoNullElements(sorted);
+        }
+        try {
+            sorted.sort(comparator);
+        } catch (ClassCastException e) {
+            fail("elements are not mutually comparable", "all elements are comparable");
+        }
+        return sorted;
     }
 
     protected void checkElementsType(Class<?> type) {
@@ -186,15 +215,23 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         }
     }
 
+    private void checkNoNullElements(List<T> elements) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i) == null) {
+                fail("element at index " + i + " is null", "all elements are non-null");
+            }
+        }
+    }
+
     @SuppressWarnings({"PMD.AvoidCatchingNPE", "java:S1696"})
-    private <R> R mapElement(Function<T, R> mapper, @Nullable T element, int index) {
+    private <R> R applyToElement(Function<T, R> function, @Nullable T element, int index) {
         try {
-            return mapper.apply(element);
+            return function.apply(element);
         } catch (NullPointerException e) {
             if (element != null) {
                 throw e;
             }
-            fail("element at index " + index + " is null", "all elements are mappable");
+            fail("element at index " + index + " is null", "all elements are non-null");
             return null;
         }
     }

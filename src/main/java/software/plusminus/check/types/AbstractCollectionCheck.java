@@ -2,9 +2,11 @@ package software.plusminus.check.types;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
@@ -25,6 +27,16 @@ abstract class AbstractCollectionCheck<T, C extends Collection<T>, E extends Abs
     protected AbstractCollectionCheck(@Nullable C actual, List<String> levels,
                                       BiFunction<T, List<String>, E> elementCheck) {
         super(actual, levels, elementCheck);
+    }
+
+    @CheckReturnValue
+    public ListCheck<T, List<T>, E> sorted() {
+        return new ListCheck<>(sortToList(null), levels(), elementCheck);
+    }
+
+    @CheckReturnValue
+    public ListCheck<T, List<T>, E> sorted(Comparator<? super T> comparator) {
+        return new ListCheck<>(sortToList(comparator), levels(), elementCheck);
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -35,6 +36,11 @@ public class ListCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
     public <R, M extends AbstractCheck<R>> ListCheck<R, List<R>, M> map(
             Function<T, R> mapper, BiFunction<R, List<String>, M> elementCheck) {
         return new ListCheck<>(mapToList(mapper), levels(), elementCheck);
+    }
+
+    @CheckReturnValue
+    public ListCheck<T, List<T>, E> filter(Predicate<T> predicate) {
+        return new ListCheck<>(filterToList(predicate), levels(), elementCheck);
     }
 
     @Override

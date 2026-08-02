@@ -5,6 +5,7 @@ import software.plusminus.check.fixtures.TestObject;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 
 import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
@@ -61,6 +62,27 @@ public class CollectionCheckTest {
                 .contains(NumberCheck::isPositive);
         check(objects()).mapTo(TestObject::getCount)
                 .contains(NullableNumberCheck::isNotNull);
+    }
+
+    @Test
+    public void filter() {
+        check(objects()).filter(o -> o.getCount() > 1)
+                .map(TestObject::getName)
+                .contains("Two");
+    }
+
+    @Test
+    public void sortedReturnsOrderedCheck() {
+        Collection<String> values = Arrays.asList("c", "a", "b");
+        check(values).sorted()
+                .is("a", "b", "c");
+    }
+
+    @Test
+    public void sortedWithComparator() {
+        check(objects()).sorted(Comparator.comparing(TestObject::getName).reversed())
+                .map(TestObject::getName)
+                .is("Two", "One");
     }
 
     @Test

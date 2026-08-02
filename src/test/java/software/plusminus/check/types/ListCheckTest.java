@@ -7,6 +7,7 @@ import software.plusminus.check.fixtures.TestObject;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -97,7 +98,7 @@ public class ListCheckTest {
     public void mapFailOnNullElement() {
         List<TestObject> list = Arrays.asList(TestObject.of("One", 1), null);
         assertFail(() -> check(list).map(TestObject::getName),
-                "element at index 1 is null", "all elements are mappable");
+                "element at index 1 is null", "all elements are non-null");
     }
 
     @Test
@@ -176,6 +177,71 @@ public class ListCheckTest {
                 .at(0).is(c -> c.is("key", "One"));
         check(objects()).mapTo(TestObject::getArrayField)
                 .at(0).is(c -> c.is("One"));
+    }
+
+    @Test
+    public void filter() {
+        check(objects()).filter(o -> o.getCount() > 1)
+                .map(TestObject::getName)
+                .is("Two");
+    }
+
+    @Test
+    public void filterKeepsElementCheck() {
+        check(objects())
+                .map(TestObject::getName, StringCheck::new)
+                .filter(name -> name.startsWith("O"))
+                .at(0).is(c -> c.endsWith("ne"));
+    }
+
+    @Test
+    public void filterMatchingNothing() {
+        check(objects()).filter(o -> o.getCount() > 9)
+                .isEmpty();
+    }
+
+    @Test
+    public void filterFailOnNull() {
+        List<TestObject> nullList = null;
+        assertFail(() -> check(nullList).filter(o -> true));
+    }
+
+    @Test
+    public void filterFailOnNullElement() {
+        List<TestObject> list = Arrays.asList(TestObject.of("One", 1), null);
+        assertFail(() -> check(list).filter(o -> o.getCount() > 0),
+                "element at index 1 is null", "all elements are non-null");
+    }
+
+    @Test
+    public void sorted() {
+        check(Arrays.asList("c", "a", "b")).sorted()
+                .is("a", "b", "c");
+    }
+
+    @Test
+    public void sortedWithComparator() {
+        check(objects()).sorted(Comparator.comparing(TestObject::getName).reversed())
+                .map(TestObject::getName)
+                .is("Two", "One");
+    }
+
+    @Test
+    public void sortedFailOnNullElement() {
+        assertFail(() -> check(Arrays.asList("b", null)).sorted(),
+                "element at index 1 is null", "all elements are non-null");
+    }
+
+    @Test
+    public void sortedFailOnNotComparable() {
+        assertFail(() -> check(objects()).sorted(),
+                "elements are not mutually comparable", "all elements are comparable");
+    }
+
+    @Test
+    public void sortedAllowsNullsWithComparator() {
+        check(Arrays.asList("b", null)).sorted(Comparator.nullsFirst(Comparator.naturalOrder()))
+                .is(null, "b");
     }
 
     @Test

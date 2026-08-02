@@ -162,6 +162,8 @@ Checks.FACTORY.set(new MyCheckFactory());
 | `map(Function<T, R>)`           | converts every element, returning a check of the same shape over the results |
 | `map(Function<T, R>, elementCheck)` | same, with an explicit element checker                             |
 | `mapTo(getter)`                 | same, with the element checker chosen from the getter's return type    |
+| `filter(Predicate<T>)`          | keeps the matching elements, along with the current element checker    |
+| `sorted()` / `sorted(Comparator)` | reorders the elements, as on `Stream`                               |
 | `isStringList()` / `isNumberList()` / ... | asserts the element type and narrows the element checker     |
 
 `map` and `mapTo` keep element order and the current path, so failures still report
@@ -198,6 +200,26 @@ check(users).map(u -> u.getName().trim(), StringCheck::new).at(0).is(c -> c.star
 `map` fails like any other check if a mapper cannot handle an element —
 `element at index 1 is null` rather than a `NullPointerException`. A mapper that
 accepts null keeps working, so mapping a list containing nulls is fine.
+
+### Reshaping before asserting
+
+`filter` and `sorted` narrow the elements down before the assertion, keeping the
+element checker they already carry:
+
+```java
+check(users).filter(u -> u.isActive()).hasSize(2);
+check(users).sorted(comparing(User::getName)).map(User::getName).is("Alice", "Bob");
+```
+
+Both re-index, so `at(0)` on the result is the first matching or lowest-sorted element,
+not the first element of the original. `sorted()` uses natural ordering and reports
+`all elements are comparable` / `all elements are non-null` instead of the
+`ClassCastException` / `NullPointerException` `Stream.sorted()` would raise; pass a
+`Comparator` (for instance `Comparator.nullsFirst(...)`) to handle those cases yourself.
+
+`sorted` always returns a `ListCheck`, including when called on a `CollectionCheck` —
+ordering is exactly what an unordered collection lacks, so the ordered check is the
+useful result.
 
 ### Narrowing an untyped collection
 

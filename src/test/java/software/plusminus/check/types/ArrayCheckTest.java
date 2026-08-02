@@ -3,6 +3,8 @@ package software.plusminus.check.types;
 import org.junit.Test;
 import software.plusminus.check.fixtures.TestObject;
 
+import java.util.Comparator;
+
 import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
 
@@ -95,6 +97,34 @@ public class ArrayCheckTest {
         Object[] array = {true, false};
         check(array).isBooleanArray()
                 .at(0).is(BooleanCheck::isTrue);
+    }
+
+    @Test
+    public void filter() {
+        check(objects()).filter(o -> o.getCount() > 1)
+                .map(TestObject::getName)
+                .is("Two");
+    }
+
+    @Test
+    public void filterKeepsArrayComponentType() {
+        TestObject[] filtered = check(objects()).filter(o -> o.getCount() > 1)
+                .actual();
+        check(filtered).hasSize(1);
+    }
+
+    @Test
+    public void sorted() {
+        String[] array = {"c", "a", "b"};
+        check(array).sorted()
+                .is("a", "b", "c");
+    }
+
+    @Test
+    public void sortedWithComparator() {
+        check(objects()).sorted(Comparator.comparing(TestObject::getName).reversed())
+                .map(TestObject::getName)
+                .is("Two", "One");
     }
 
     private TestObject[] objects() {

@@ -3,9 +3,11 @@ package software.plusminus.check.types;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -56,6 +58,21 @@ public class ArrayCheck<T, E extends AbstractCheck<T>>
         return new ArrayCheck<>(mapped, levels(), elementCheck);
     }
 
+    @CheckReturnValue
+    public ArrayCheck<T, E> filter(Predicate<T> predicate) {
+        return create(filterToList(predicate));
+    }
+
+    @CheckReturnValue
+    public ArrayCheck<T, E> sorted() {
+        return create(sortToList(null));
+    }
+
+    @CheckReturnValue
+    public ArrayCheck<T, E> sorted(Comparator<? super T> comparator) {
+        return create(sortToList(comparator));
+    }
+
     @Override
     @CheckReturnValue
     @SuppressWarnings("unchecked")
@@ -65,6 +82,11 @@ public class ArrayCheck<T, E extends AbstractCheck<T>>
         List<X> mapped = mapToList(type::cast);
         X[] typed = mapped.toArray((X[]) Array.newInstance(type, mapped.size()));
         return new ArrayCheck<>(typed, levels(), checkBuilder);
+    }
+
+    private ArrayCheck<T, E> create(List<T> elements) {
+        T[] empty = Arrays.copyOf(actual(), 0);
+        return new ArrayCheck<>(elements.toArray(empty), levels(), elementCheck);
     }
 
     @CheckReturnValue

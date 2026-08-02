@@ -1,6 +1,7 @@
 package software.plusminus.check.types;
 
 import org.junit.Test;
+import software.plusminus.check.fixtures.TestObject;
 
 import java.util.Optional;
 
@@ -58,5 +59,25 @@ public class OptionalCheckTest {
     @Test
     public void isOnEmptyFail() {
         assertFail(() -> check(Optional.<String>empty()).is("abc"), "empty", "not empty");
+    }
+
+    @Test
+    public void hasValueOk() {
+        check(Optional.of(42)).hasValue(42);
+    }
+
+    @Test
+    public void hasValueFail() {
+        assertFail(() -> check(Optional.of(42)).hasValue(43), 42, 43);
+    }
+
+    @Test
+    public void hasObjectValueOk() {
+        check(Optional.of(new TestObject("a", 1))).hasValue(new TestObject("a", 1));
+    }
+
+    @Test
+    public void hasEmptyValueFail() {
+        assertFail(() -> check(Optional.<Integer>empty()).hasValue(42), "empty", "not empty");
     }
 }

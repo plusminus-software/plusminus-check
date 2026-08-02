@@ -516,15 +516,21 @@ check(subscription.getTerm()).is("P1Y");
 | `isEmpty()`                     | asserts the optional is empty                               |
 | `isPresent()`                   | asserts a value is present and descends into it             |
 | `is(String)`                    | compares the contained value; a resource reference is resolved |
+| `hasValue(T)`                   | compares the contained value, keeping its static type       |
 | `isLike(any)`                   | compares the contained value against a value of any type    |
 
-`is` and `isLike` look through the optional rather than at it, so the common case needs
-no unwrapping step:
+`is`, `hasValue` and `isLike` look through the optional rather than at it, so the common
+case needs no unwrapping step:
 
 ```java
 check(user.getNickname()).is("alice");
-check(repository.findByName("Alice")).isLike(new User("Alice", 30));
+check(repository.findByName("Alice")).hasValue(new User("Alice", 30));
+check(order.getDiscount()).isLike(10);
 ```
+
+`hasValue` is the type-safe one — `hasValue(42)` on an `Optional<String>` does not compile,
+where `isLike(42)` does and simply fails. It is spelled apart from `is` because `is(T)`
+and the inherited `is(Optional<T>)` erase to the same signature, which Java rejects.
 
 An empty optional fails those with `expected:<not empty> but was:<empty>`, the same
 message `isPresent()` produces. Use `isPresent()` when you want the narrowed check of

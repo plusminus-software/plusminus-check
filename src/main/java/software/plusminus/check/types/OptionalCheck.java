@@ -53,6 +53,10 @@ public class OptionalCheck<T> extends AbstractObjectCheck<Optional<T>> {
         isPresent().isLike(expected);
     }
 
+    public void hasValue(T expected) {
+        isPresent().is(expected);
+    }
+
     public void isEmpty() {
         isNotNull();
         if (actual().isPresent()) {

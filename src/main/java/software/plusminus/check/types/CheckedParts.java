@@ -16,7 +16,6 @@ class CheckedParts {
 
     private final String partsName;
     private final Set<String> checked = new LinkedHashSet<>();
-    private boolean all;
 
     CheckedParts(String partsName) {
         this.partsName = partsName;
@@ -26,14 +25,7 @@ class CheckedParts {
         checked.add(String.valueOf(part));
     }
 
-    void markAll() {
-        all = true;
-    }
-
     void verify(Collection<String> required, BiConsumer<Object, Object> fail) {
-        if (all) {
-            return;
-        }
         Set<String> notChecked = new LinkedHashSet<>(required);
         notChecked.removeAll(checked);
         if (!notChecked.isEmpty()) {

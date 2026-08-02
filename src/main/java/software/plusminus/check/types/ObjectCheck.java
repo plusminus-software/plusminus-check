@@ -63,18 +63,6 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
     }
 
     @Override
-    public void is(String expected) {
-        checkedParts.markAll();
-        super.is(expected);
-    }
-
-    @Override
-    public void isLike(Object expected) {
-        checkedParts.markAll();
-        super.isLike(expected);
-    }
-
-    @Override
     public void allChecked(FieldCoverage coverage) {
         if (actual() == null) {
             throw new AssertionError("Cannot verify checked fields: actual is null");

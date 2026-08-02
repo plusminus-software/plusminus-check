@@ -159,6 +159,77 @@ Checks.FACTORY.set(new MyCheckFactory());
 | `contains(elements...)`         | each expected element matches a distinct actual element                |
 | `contains(Consumer<E>...)`      | each `Consumer<E>` matches a distinct actual element via predicate     |
 | `containsExactly(elements...)`  | actual and expected match as multisets                                 |
+| `map(Function<T, R>)`           | converts every element, returning a check of the same shape over the results |
+| `map(Function<T, R>, elementCheck)` | same, with an explicit element checker                             |
+| `mapTo(getter)`                 | same, with the element checker chosen from the getter's return type    |
+| `isStringList()` / `isNumberList()` / ... | asserts the element type and narrows the element checker     |
+
+`map` and `mapTo` keep element order and the current path, so failures still report
+the index the mismatching element came from. Both are available on `ListCheck`,
+`CollectionCheck` and `ArrayCheck`.
+
+`map` takes any `Function` — a lambda or a method reference — and gives you
+`ObjectCheck<R>` elements:
+
+```java
+check(users).map(User::getName).is("Alice", "Bob");
+check(users).map(u -> u.getName().trim()).contains("Alice");
+```
+
+`mapTo` takes a typed getter and — like `field(...)` — dispatches on its return type to
+narrow the element checker:
+
+```java
+check(users).mapTo(User::getName).at(0).is(c -> c.startsWith("A"));   // StringCheck
+check(users).mapTo(User::getAge).at(0).is(c -> c.isPositive());       // NumberCheck
+check(orders).mapTo(Order::getLines).at(0).is(c -> c.hasSize(3));     // ListCheck
+```
+
+The narrowing covers the same types as `field(...)`: `String`, `Path`, every boxed and
+primitive number, `boolean` / `char`, `Temporal`, `InputStream`, enums, `Optional`,
+`Map`, arrays and the collection kinds. `mapTo` needs a method reference — a lambda
+carries no getter type, so the overloads cannot be told apart. For a lambda with a
+narrowed checker, pass the builder explicitly:
+
+```java
+check(users).map(u -> u.getName().trim(), StringCheck::new).at(0).is(c -> c.startsWith("A"));
+```
+
+`map` fails like any other check if a mapper cannot handle an element —
+`element at index 1 is null` rather than a `NullPointerException`. A mapper that
+accepts null keeps working, so mapping a list containing nulls is fine.
+
+### Narrowing an untyped collection
+
+When the elements arrive as `Object` — from a raw JSON parse, a reflective call, a
+heterogeneous list — `isXxxList()` asserts what they are and hands back a check with
+the matching element checker. This is `TypeCheck`'s `isString()` / `isNumber()` applied
+to elements instead of a single value:
+
+```java
+check(values).isStringList().at(0).is(c -> c.startsWith("a"));
+check(values).isNumberList().at(0).is(c -> c.isPositive());
+check(values).isEnumList(Status.class).at(0).is(Status.ACTIVE);
+```
+
+A mismatch reports the offending index:
+`expected:<all elements are java.lang.String> but was:<element at index 1 is java.lang.Integer>`.
+Null elements pass the type assertion — the element checkers are null-tolerant.
+
+Available for `boolean`, `char`, `Number`, `Float`, `Double`, `BigDecimal`, `String`,
+`Path`, `InputStream`, `Temporal` and enums, named per shape: `isStringList()` on
+`ListCheck`, `isStringCollection()` on `CollectionCheck`, `isStringArray()` on
+`ArrayCheck`. The three whose element type is itself generic — `isNumberXxx`,
+`isTemporalXxx`, `isEnumXxx` — also take a `Class`, which both pins the element type
+and lets the result be chained:
+
+```java
+check(values).isEnumList().at(0).is(Status.ACTIVE);              // does not compile
+check(values).isEnumList(Status.class).at(0).is(Status.ACTIVE);  // fine
+```
+
+The no-argument form infers nothing in receiver position, so it only works when what
+follows does not mention the element type (`isNumberList().hasSize(3)`).
 
 `MapCheck` additionally exposes overloaded `is(k1, v1, ..., k4, v4)` shortcuts.
 

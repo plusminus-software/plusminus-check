@@ -18,6 +18,7 @@ package software.plusminus.check.types;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -28,7 +29,8 @@ import javax.annotation.Nullable;
  * {@link ListCheck} for the publicly-exposed indexed variant.
  */
 public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck<T>>
-        extends AbstractCollectionCheck<T, C, E, CollectionCheck<T, C, E>> {
+        extends AbstractCollectionCheck<T, C, E, CollectionCheck<T, C, E>>
+        implements CollectionMapCheck<T>, CollectionTypeCheck {
 
     public CollectionCheck(@Nullable C actual, BiFunction<T, List<String>, E> elementCheck) {
         super(actual, elementCheck);
@@ -36,6 +38,21 @@ public class CollectionCheck<T, C extends Collection<T>, E extends AbstractCheck
 
     public CollectionCheck(@Nullable C actual, List<String> levels, BiFunction<T, List<String>, E> elementCheck) {
         super(actual, levels, elementCheck);
+    }
+
+    @Override
+    @CheckReturnValue
+    public <R, M extends AbstractCheck<R>> CollectionCheck<R, Collection<R>, M> map(
+            Function<T, R> mapper, BiFunction<R, List<String>, M> elementCheck) {
+        return new CollectionCheck<>(mapToList(mapper), levels(), elementCheck);
+    }
+
+    @Override
+    @CheckReturnValue
+    public <X, M extends AbstractCheck<X>> CollectionCheck<X, Collection<X>, M> isCollectionOf(
+            Class<X> type, BiFunction<X, List<String>, M> checkBuilder) {
+        checkElementsType(type);
+        return map(type::cast, checkBuilder);
     }
 
     @CheckReturnValue

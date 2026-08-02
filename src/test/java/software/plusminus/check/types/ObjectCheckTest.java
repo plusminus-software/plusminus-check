@@ -1,7 +1,8 @@
 package software.plusminus.check.types;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.Test;
-import software.plusminus.check.fixtures.TestObject;
 
 import static software.plusminus.check.Checks.check;
 import static software.plusminus.check.helper.Assertions.assertFail;
@@ -88,5 +89,12 @@ public class ObjectCheckTest {
     @Test
     public void isBooleanNarrowing() {
         check((Object) true).isBoolean().isTrue();
+    }
+
+    @AllArgsConstructor
+    @Getter
+    private static class TestObject {
+        private String name;
+        private Integer count;
     }
 }

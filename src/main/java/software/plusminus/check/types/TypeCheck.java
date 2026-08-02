@@ -15,6 +15,9 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unchecked")
 public interface TypeCheck {
 
+    <X, C extends AbstractCheck<X>> C isType(Class<X> type,
+                                             BiFunction<X, List<String>, C> checkBuilder);
+
     default NullableBooleanCheck isBoolean() {
         return isType(Boolean.class, NullableBooleanCheck::new);
     }
@@ -96,7 +99,4 @@ public interface TypeCheck {
         Class<X> type = (Class<X>) Temporal.class;
         return isType(type, TemporalCheck::new);
     }
-
-    <X, C extends AbstractCheck<X>> C isType(Class<X> type,
-                                             BiFunction<X, List<String>, C> checkBuilder);
 }

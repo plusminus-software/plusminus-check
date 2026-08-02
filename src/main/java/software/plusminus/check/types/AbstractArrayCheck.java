@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
@@ -160,6 +161,42 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         elementLevels.add("[" + index + "]");
         E check = elementCheck.apply(element, elementLevels);
         return new LinkedCheck<>(check, self());
+    }
+
+    protected <R> List<R> mapToList(Function<T, R> mapper) {
+        isNotNull();
+        List<T> elements = actualList();
+        List<R> mapped = new ArrayList<>(elements.size());
+        for (int i = 0; i < elements.size(); i++) {
+            T element = elements.get(i);
+            mapped.add(mapElement(mapper, element, i));
+        }
+        return mapped;
+    }
+
+    protected void checkElementsType(Class<?> type) {
+        isNotNull();
+        List<T> elements = actualList();
+        for (int i = 0; i < elements.size(); i++) {
+            T element = elements.get(i);
+            if (element != null && !type.isInstance(element)) {
+                fail("element at index " + i + " is " + element.getClass().getName(),
+                        "all elements are " + type.getName());
+            }
+        }
+    }
+
+    @SuppressWarnings({"PMD.AvoidCatchingNPE", "java:S1696"})
+    private <R> R mapElement(Function<T, R> mapper, @Nullable T element, int index) {
+        try {
+            return mapper.apply(element);
+        } catch (NullPointerException e) {
+            if (element != null) {
+                throw e;
+            }
+            fail("element at index " + index + " is null", "all elements are mappable");
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -61,6 +61,15 @@ public interface FieldCheck<T> {
 
     <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(String fieldName);
 
+    <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
+            AbstractGetter<T, V> getter,
+            BiFunction<V, List<String>, C> checkBuilder);
+
+    <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
+            Serializable getter,
+            Function<T, V> valueProvider,
+            BiFunction<V, List<String>, C> checkBuilder);
+
     default <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(AbstractGetter<T, X> getter) {
         BiFunction<X, List<String>, ObjectCheck<X>> checkBuilder = ObjectCheck::new;
         return field(getter, checkBuilder);
@@ -203,14 +212,4 @@ public interface FieldCheck<T> {
         BiFunction<E, List<String>, ObjectCheck<E>> elementCheckBuilder = ObjectCheck::new;
         return field(getter, (v, l) -> new ArrayCheck<>(v, l, elementCheckBuilder));
     }
-
-    <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
-            AbstractGetter<T, V> getter,
-            BiFunction<V, List<String>, C> checkBuilder);
-
-    <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
-            Serializable getter,
-            Function<T, V> valueProvider,
-            BiFunction<V, List<String>, C> checkBuilder);
-
 }

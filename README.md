@@ -1,6 +1,17 @@
 # plusminus-check
 Rich test assertions for Java
 
+## Getting started
+
+```xml
+<dependency>
+    <groupId>software.plusminus</groupId>
+    <artifactId>plusminus-check</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <scope>test</scope>
+</dependency>
+```
+
 ## What is it?
 Fluent assertions based on JSON / string comparison instead of `equals()`, with
 first-class support for loading expected values from `src/test/resources`.
@@ -710,3 +721,17 @@ checkException(() -> service.save(entity))
 
 Failures name the level they happened at, so `cause expected:<...> but was:<...>`
 points at the cause rather than the wrapper.
+
+## Building
+
+Requires JDK 8. Build with the Maven wrapper:
+
+```bash
+./mvnw clean install
+```
+
+The build enforces Checkstyle, PMD, SpotBugs and JaCoCo coverage checks.
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE).

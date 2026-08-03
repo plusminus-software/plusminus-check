@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
  * Converts Map to string (in Json or Jsog formats) before comparing.
  *
  * <p>The {@code is} overloads take alternating keys and values, up to ten pairs,
- * the way {@link Map#of} does. Past that, or when the pairs are built elsewhere,
+ * the way {@code Map.of} does. Past that, or when the pairs are built elsewhere,
  * use the entry overload with {@code Checks.entry(key, value)}.
  *
  * @author Taras Shpek

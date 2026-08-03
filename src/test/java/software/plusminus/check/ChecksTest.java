@@ -27,6 +27,7 @@ import software.plusminus.check.types.CollectionCheck;
 import software.plusminus.check.types.DecimalCheck;
 import software.plusminus.check.types.DurationCheck;
 import software.plusminus.check.types.EnumCheck;
+import software.plusminus.check.types.IterableCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
 import software.plusminus.check.types.NullableBooleanCheck;
@@ -251,7 +252,7 @@ public class ChecksTest {
     @Test
     public void iterableCheck() {
         Iterable<String> actual = () -> Collections.singletonList("a").iterator();
-        verify(() -> check(actual), CollectionCheck.class);
+        verify(() -> check(actual), IterableCheck.class);
     }
 
     @Test
@@ -276,7 +277,7 @@ public class ChecksTest {
 
     @Test
     public void nullIterableCheck() {
-        verify(() -> check((Iterable<String>) null), CollectionCheck.class);
+        verify(() -> check((Iterable<String>) null), IterableCheck.class);
     }
 
     @Test

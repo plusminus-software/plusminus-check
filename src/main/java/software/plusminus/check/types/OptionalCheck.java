@@ -17,7 +17,6 @@ package software.plusminus.check.types;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("java:S2789")
@@ -64,7 +63,6 @@ public class OptionalCheck<T> extends AbstractObjectCheck<Optional<T>> {
         }
     }
 
-    @CheckReturnValue
     public ObjectCheck<T> isPresent() {
         isNotNull();
         Optional<T> actual = actual();

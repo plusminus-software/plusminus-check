@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import javax.annotation.CheckReturnValue;
 
 @SuppressWarnings({"unchecked", "java:S2160"})
 public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck, FieldCheck<T> {
@@ -76,6 +77,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
     }
 
     @Override
+    @CheckReturnValue
     public <X> LinkedCheck<X, ObjectCheck<X>, ObjectCheck<T>> field(String fieldName) {
         isNotNull();
         T actual = actual();
@@ -87,6 +89,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
     }
 
     @Override
+    @CheckReturnValue
     public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
             AbstractGetter<T, V> getter,
             BiFunction<V, List<String>, C> checkBuilder) {
@@ -97,6 +100,7 @@ public class ObjectCheck<T> extends AbstractObjectCheck<T> implements TypeCheck,
     }
 
     @Override
+    @CheckReturnValue
     public <V, C extends AbstractCheck<V>> LinkedCheck<V, C, ObjectCheck<T>> field(
             Serializable getter,
             Function<T, V> valueProvider,

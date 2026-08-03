@@ -3,7 +3,6 @@ package software.plusminus.check.types;
 import org.junit.Test;
 import software.plusminus.check.fixtures.TestObject;
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 import static software.plusminus.check.Checks.check;
@@ -22,18 +21,6 @@ public class ArrayCheckTest {
     public void isFail() {
         Integer[] array = {1, 2, 3};
         assertFail(() -> check(array).is(1, 2, 4), "[2] ", 3, 4);
-    }
-
-    @Test
-    public void isIterableOk() {
-        String[] array = {"a", "b"};
-        check(array).is(Arrays.asList("a", "b"));
-    }
-
-    @Test
-    public void isIterableFail() {
-        String[] array = {"a", "b"};
-        assertFail(() -> check(array).is(Arrays.asList("a", "c")), "[1] ", "b", "c");
     }
 
     @Test

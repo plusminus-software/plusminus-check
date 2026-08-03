@@ -11,6 +11,7 @@ import software.plusminus.check.types.DurationCheck;
 import software.plusminus.check.types.EnumCheck;
 import software.plusminus.check.types.ExceptionCheck;
 import software.plusminus.check.types.InputStreamCheck;
+import software.plusminus.check.types.IterableCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
 import software.plusminus.check.types.NullableBooleanCheck;
@@ -172,7 +173,7 @@ public interface Checks {
         return FACTORY.get().build(actual);
     }
 
-    static <T> CollectionCheck<T, Collection<T>, ObjectCheck<T>> check(Iterable<T> actual) {
+    static <T> IterableCheck<T, Iterable<T>, ObjectCheck<T>> check(Iterable<T> actual) {
         return FACTORY.get().build(actual);
     }
 

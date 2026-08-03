@@ -75,16 +75,6 @@ public abstract class AbstractArrayCheck<T, A, E extends AbstractCheck<T>,
         }
     }
 
-    public void is(@Nullable Iterable<? extends T> expectedElements) {
-        if (expectedElements == null) {
-            isNull();
-            return;
-        }
-        List<Object> elements = new ArrayList<>();
-        expectedElements.forEach(elements::add);
-        is(elements.toArray());
-    }
-
     protected void is(Object... expectedElements) {
         isNotNull();
         hasSize(expectedElements.length);

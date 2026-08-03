@@ -11,6 +11,7 @@ import software.plusminus.check.types.DurationCheck;
 import software.plusminus.check.types.EnumCheck;
 import software.plusminus.check.types.ExceptionCheck;
 import software.plusminus.check.types.InputStreamCheck;
+import software.plusminus.check.types.IterableCheck;
 import software.plusminus.check.types.ListCheck;
 import software.plusminus.check.types.MapCheck;
 import software.plusminus.check.types.NullableBooleanCheck;
@@ -182,17 +183,8 @@ public class CheckFactory {
         return ListCheck.create(actual);
     }
 
-    public <T> CollectionCheck<T, Collection<T>, ObjectCheck<T>> build(Iterable<T> actual) {
-        Collection<T> elements;
-        if (actual == null) {
-            elements = null;
-        } else if (actual instanceof Collection) {
-            elements = (Collection<T>) actual;
-        } else {
-            elements = new ArrayList<>();
-            actual.forEach(elements::add);
-        }
-        return CollectionCheck.create(elements);
+    public <T> IterableCheck<T, Iterable<T>, ObjectCheck<T>> build(Iterable<T> actual) {
+        return IterableCheck.create(actual);
     }
 
     public <T> ListCheck<T, List<T>, ObjectCheck<T>> build(Stream<T> actual) {
